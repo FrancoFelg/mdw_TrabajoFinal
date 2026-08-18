@@ -1,0 +1,14 @@
+# El contexto de build es la raíz del repo — excluir lo que no debe
+# viajar al daemon (pesado o sensible)
+node_modules
+.next
+.git
+.env*
+!.env.example
+infra
+.codacy
+.github
+.claude
+README.md
+AGENTS.md
+CLAUDE.md
