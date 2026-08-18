@@ -44,3 +44,6 @@ next-env.d.ts
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
+
+# agent teams lite - skill registry (artefacto local generado)
+.atl/
