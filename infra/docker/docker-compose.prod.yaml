@@ -1,0 +1,66 @@
+# =============================================================================
+# Docker Compose - PRODUCCIÓN (base precaria)
+# =============================================================================
+# OJO: esto es un esqueleto para tener de base. Antes de desplegar en serio:
+#   - [ ] Completar infra/docker/Dockerfile (multi-stage build de Next.js,
+#         output standalone) — hoy está VACÍO, el servicio `app` no buildea.
+#   - [ ] Reemplazar el manejo de secretos: acá vienen de un archivo .env en
+#         el servidor (NUNCA commiteado). Idealmente migrar a docker secrets
+#         o al secret manager del proveedor.
+#   - [ ] Poner un reverse proxy adelante (nginx / traefik / caddy) con TLS.
+#         La app NO debería exponerse directo a internet.
+#   - [ ] Definir estrategia de backups para el volumen de MySQL.
+#   - [ ] Ajustar recursos (deploy.resources) según el servidor real.
+#
+# Uso (en el servidor, con un .env al lado):
+#   docker compose -f infra/docker/docker-compose.prod.yaml up -d --build
+# =============================================================================
+
+services:
+  app:
+    build:
+      # Contexto en la raíz del repo porque el build necesita package.json,
+      # el código y el lockfile de pnpm
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+    container_name: mdw-app-prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      # La app habla con la DB por la red interna de compose usando el nombre
+      # del servicio (db) como host — no localhost, no puerto publicado
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}
+    ports:
+      # TODO: cuando haya reverse proxy, sacar este mapeo y exponer solo el proxy
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    container_name: mdw-mysql-prod
+    restart: always
+    environment:
+      # Valores desde el .env del servidor — sin defaults a propósito:
+      # si falta una variable, mejor que falle el arranque a correr con
+      # credenciales de juguete en producción
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    # SIN `ports`: en prod la DB solo es alcanzable desde la red interna
+    # de compose. Exponerla al host es un agujero de seguridad innecesario.
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      # Le da tiempo a la inicialización del datadir en el primer arranque
+      # antes de empezar a contar fallos
+      start_period: 30s
+
+volumes:
+  mysql_prod_data:

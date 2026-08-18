@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: mdw-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mdw_dev
+      MYSQL_USER: mdw_user
+      MYSQL_PASSWORD: mdw_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_dev_data:
