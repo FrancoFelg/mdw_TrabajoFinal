@@ -7,12 +7,14 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
 //Seccion ENUMS
 enum Rol {
   ADMIN
   COORDINADOR
   VOLUNTARIO
 }
+
 //Seccion ENUMS
 
 model Persona {
@@ -21,7 +23,7 @@ model Persona {
   nombre   String
   fechaNac DateTime
   creadoEn DateTime @default(now())
-  usuario  Usuario? // Campo de relación opuesto (1 a 1)
+  usuario  Usuario?
 }
 
 model Usuario {
@@ -29,54 +31,57 @@ model Usuario {
   nombreUsuario String   @unique
   password      String
   rol           Rol      @default(VOLUNTARIO)
-  personaId     String   @unique // @unique indispensable para relaciones 1 a 1
+  personaId     String   @unique
   persona       Persona  @relation(fields: [personaId], references: [id])
   creadoEn      DateTime @default(now())
+  cursosCreados                Cursos[]             @relation("CursosCreador")
+  cursosEliminados             Cursos[]             @relation("CursosEliminador")
+  cursosAtributosCreados       CursosAtributos[]    @relation("CursosAtributosCreador")
+  cursosAtributosEliminados    CursosAtributos[]    @relation("CursosAtributosEliminador")
+  cursosRelAtributosCreados    CursosRelAtributos[] @relation("CursosRelAtributosCreador")
+  cursosRelAtributosEliminados CursosRelAtributos[] @relation("CursosRelAtributosEliminador")
 }
 
 model Cursos {
-  id                 String               @id @default(cuid())
-  titulo             String
-  descripcion        String
-  fechaDesde         DateTime
-  fechaHasta         DateTime
-  fechaCreacion      DateTime             @default(now())
-  usuarioCreacion    Int //TODO: Change to Usuarios
-  fechaEliminacion   DateTime
-  usuarioEliminacion Int //TODO: Change to Usuarios
+  id            String   @id @default(cuid())
+  titulo        String
+  descripcion   String
+  fechaDesde    DateTime
+  fechaHasta    DateTime
+  fechaCreacion DateTime @default(now())
+  usuarioCreacionId String
+  usuarioCreacion   Usuario @relation("CursosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CursosEliminador", fields: [usuarioEliminacionId], references: [id])
   atributos          CursosAtributos[]
   cursosRelAtributos CursosRelAtributos[]
 }
 
-model CursosRelAtributos {
-  id               String          @id @default(cuid())
-  cursoId          String
-  campoId          String
-  curso            Cursos          @relation(fields: [cursoId], references: [id])
-  campos           CursosAtributos @relation(fields: [campoId], references: [id])
-  fechaHasta       DateTime
-  fechaCreacion    DateTime        @default(now())
-  usuarioCreacion  Int //TODO: Change to Usuarios
-  fechaEliminacion DateTime
-}
-
 model CursosAtributos {
-  id                 String               @id @default(cuid())
-  cursoId            String
-  curso              Cursos               @relation(fields: [cursoId], references: [id])
-  fechaCreacion      DateTime             @default(now())
-  usuarioCreacion    Int //TODO: Change to Usuarios
-  fechaEliminacion   DateTime
-  usuarioEliminacion Int //TODO: Change to Usuarios
+  id      String @id @default(cuid())
+  cursoId String
+  curso   Cursos @relation(fields: [cursoId], references: [id])
+  fechaCreacion     DateTime @default(now())
+  usuarioCreacionId String
+  usuarioCreacion   Usuario  @relation("CursosAtributosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CursosAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
   cursosRelAtributos CursosRelAtributos[]
 }
 
-/**
- * Cursos //DONE
- * CursosRelAtributos //
- * CursosAtributos //DONE
- * Certificados
- * CertificadosRelAtributos
- * CertificadosAtributos
- * CertificadosEstados
- */
+model CursosRelAtributos {
+  id         String          @id @default(cuid())
+  cursoId    String
+  campoId    String
+  curso      Cursos          @relation(fields: [cursoId], references: [id])
+  campos     CursosAtributos @relation(fields: [campoId], references: [id])
+  fechaHasta DateTime
+  fechaCreacion     DateTime @default(now())
+  usuarioCreacionId String
+  usuarioCreacion   Usuario  @relation("CursosRelAtributosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CursosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
+}
