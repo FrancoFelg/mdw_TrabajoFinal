@@ -3,32 +3,80 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
+//Seccion ENUMS
 enum Rol {
   ADMIN
   COORDINADOR
   VOLUNTARIO
 }
+//Seccion ENUMS
 
 model Persona {
-  id        String   @id @default(cuid())
-  apellido  String
-  nombre    String
-  fechaNac  DateTime
-  creadoEn  DateTime @default(now())
-
+  id       String   @id @default(cuid())
+  apellido String
+  nombre   String
+  fechaNac DateTime
+  creadoEn DateTime @default(now())
+  usuario  Usuario? // Campo de relación opuesto (1 a 1)
 }
 
 model Usuario {
-  id        String   @id @default(cuid())
+  id            String   @id @default(cuid())
   nombreUsuario String   @unique
-  password  String
-  rol       Rol      @default(VOLUNTARIO)
-  personaId String
-  persona   Persona  @relation(fields: [personaId], references: [id])
-  creadoEn  DateTime @default(now())
+  password      String
+  rol           Rol      @default(VOLUNTARIO)
+  personaId     String   @unique // @unique indispensable para relaciones 1 a 1
+  persona       Persona  @relation(fields: [personaId], references: [id])
+  creadoEn      DateTime @default(now())
 }
+
+model Cursos {
+  id                 String               @id @default(cuid())
+  titulo             String
+  descripcion        String
+  fechaDesde         DateTime
+  fechaHasta         DateTime
+  fechaCreacion      DateTime             @default(now())
+  usuarioCreacion    Int //TODO: Change to Usuarios
+  fechaEliminacion   DateTime
+  usuarioEliminacion Int //TODO: Change to Usuarios
+  atributos          CursosAtributos[]
+  cursosRelAtributos CursosRelAtributos[]
+}
+
+model CursosRelAtributos {
+  id               String          @id @default(cuid())
+  cursoId          String
+  campoId          String
+  curso            Cursos          @relation(fields: [cursoId], references: [id])
+  campos           CursosAtributos @relation(fields: [campoId], references: [id])
+  fechaHasta       DateTime
+  fechaCreacion    DateTime        @default(now())
+  usuarioCreacion  Int //TODO: Change to Usuarios
+  fechaEliminacion DateTime
+}
+
+model CursosAtributos {
+  id                 String               @id @default(cuid())
+  cursoId            String
+  curso              Cursos               @relation(fields: [cursoId], references: [id])
+  fechaCreacion      DateTime             @default(now())
+  usuarioCreacion    Int //TODO: Change to Usuarios
+  fechaEliminacion   DateTime
+  usuarioEliminacion Int //TODO: Change to Usuarios
+  cursosRelAtributos CursosRelAtributos[]
+}
+
+/**
+ * Cursos //DONE
+ * CursosRelAtributos //
+ * CursosAtributos //DONE
+ * Certificados
+ * CertificadosRelAtributos
+ * CertificadosAtributos
+ * CertificadosEstados
+ */
