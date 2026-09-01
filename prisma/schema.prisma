@@ -3,32 +3,85 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
+//Seccion ENUMS
 enum Rol {
   ADMIN
   COORDINADOR
   VOLUNTARIO
 }
 
-model Persona {
-  id        String   @id @default(cuid())
-  apellido  String
-  nombre    String
-  fechaNac  DateTime
-  creadoEn  DateTime @default(now())
+//Seccion ENUMS
 
+model Persona {
+  id       String   @id @default(cuid())
+  apellido String
+  nombre   String
+  fechaNac DateTime
+  creadoEn DateTime @default(now())
+  usuario  Usuario?
 }
 
 model Usuario {
-  id        String   @id @default(cuid())
+  id            String   @id @default(cuid())
   nombreUsuario String   @unique
-  password  String
-  rol       Rol      @default(VOLUNTARIO)
-  personaId String
-  persona   Persona  @relation(fields: [personaId], references: [id])
-  creadoEn  DateTime @default(now())
+  password      String
+  rol           Rol      @default(VOLUNTARIO)
+  personaId     String   @unique
+  persona       Persona  @relation(fields: [personaId], references: [id])
+  creadoEn      DateTime @default(now())
+  cursosCreados                Cursos[]             @relation("CursosCreador")
+  cursosEliminados             Cursos[]             @relation("CursosEliminador")
+  cursosAtributosCreados       CursosAtributos[]    @relation("CursosAtributosCreador")
+  cursosAtributosEliminados    CursosAtributos[]    @relation("CursosAtributosEliminador")
+  cursosRelAtributosCreados    CursosRelAtributos[] @relation("CursosRelAtributosCreador")
+  cursosRelAtributosEliminados CursosRelAtributos[] @relation("CursosRelAtributosEliminador")
+}
+
+model Cursos {
+  id            String   @id @default(cuid())
+  titulo        String
+  descripcion   String
+  fechaDesde    DateTime
+  fechaHasta    DateTime
+  fechaCreacion DateTime @default(now())
+  usuarioCreacionId String
+  usuarioCreacion   Usuario @relation("CursosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CursosEliminador", fields: [usuarioEliminacionId], references: [id])
+  atributos          CursosAtributos[]
+  cursosRelAtributos CursosRelAtributos[]
+}
+
+model CursosAtributos {
+  id      String @id @default(cuid())
+  cursoId String
+  curso   Cursos @relation(fields: [cursoId], references: [id])
+  fechaCreacion     DateTime @default(now())
+  usuarioCreacionId String
+  usuarioCreacion   Usuario  @relation("CursosAtributosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CursosAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
+  cursosRelAtributos CursosRelAtributos[]
+}
+
+model CursosRelAtributos {
+  id         String          @id @default(cuid())
+  cursoId    String
+  campoId    String
+  curso      Cursos          @relation(fields: [cursoId], references: [id])
+  campos     CursosAtributos @relation(fields: [campoId], references: [id])
+  fechaHasta DateTime
+  fechaCreacion     DateTime @default(now())
+  usuarioCreacionId String
+  usuarioCreacion   Usuario  @relation("CursosRelAtributosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CursosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
 }
