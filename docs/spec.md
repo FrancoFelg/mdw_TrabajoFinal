@@ -8,7 +8,7 @@ Este documento es el relevamiento de requerimientos del proyecto. Se mantiene ac
 
 * **Para quién:** personas sin hogar o en situación de vulnerabilidad en la vía pública, voluntarios, brigadistas y coordinadores de organizaciones de asistencia social.
 * **Qué hace hoy sin el sistema:** el reporte de personas que necesitan ayuda en la calle se hace por llamados informales o grupos de mensajería desorganizados. No hay registro de qué capacitaciones tienen quienes asisten, no se sabe en tiempo real quién está yendo a un lugar ni qué prioridad tiene cada caso, provocando superposición de esfuerzos o emergencias desatendidas.
-* **Qué mejora:** centraliza las solicitudes de emergencia en un mapa geolocalizado en tiempo real, prioriza los casos según su gravedad, permite certificar la capacitación de los asistentes (cursos y primeros auxilios) y hace un seguimiento del voluntario que va en camino.
+* **Qué mejora:** centraliza las solicitudes de emergencia en un mapa geolocalizado en tiempo real, prioriza los casos según su gravedad, permite certificar la capacitación de los asistentes (cursos y primeros auxilios), gestiona ascensos a coordinadores, notifica incidencias críticas y hace un seguimiento del voluntario que va en camino.
 
 ---
 
@@ -16,132 +16,168 @@ Este documento es el relevamiento de requerimientos del proyecto. Se mantiene ac
 
 | Rol | Quién es | Qué puede hacer que el otro no |
 | :--- | :--- | :--- |
-| **Voluntario / Asistente** | La persona que acude al lugar a brindar apoyo | Subir sus certificados de cursos, postularse/ir a atender una emergencia activa y marcar su resolución |
-| **Coordinador / Admin** | El encargado de gestionar la red de apoyo | Crear cursos, aprobar o rechazar certificados de voluntariado y asignar o reordenar prioridades de emergencias |
+| **Voluntario / Asistente** | La persona que acude al lugar a brindar apoyo | Subir sus certificados de cursos, postularse/ir a atender una emergencia activa, solicitar ascenso a coordinador y marcar la resolución de casos |
+| **Coordinador / Admin** | El encargado de gestionar la red de apoyo | Crear cursos, aprobar o rechazar solicitudes de certificados y de ascenso a coordinador, configurar notificaciones y reordenar prioridades de emergencias |
 
 > **Un tercer actor no tiene cuenta:** quien reporta una emergencia desde la vía pública (un vecino o transeúnte) o consulta la ubicación pública de asistencia. Puede crear el alerta e ingresar las coordenadas/dirección directamente sin registrarse.
 
 ---
 
 ## 3. Entidades
+
+Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo de datos.
+
 | Entidad | Qué representa | Se relaciona con |
 | :--- | :--- | :--- |
 | **Persona** | Los datos filiatorios y de contacto de un individuo | Usuario (1-1) · Certificado (1-N) · Emergencia (1-N como reportador o asistido) |
-| **Usuario** | La cuenta de acceso con sus credenciales y su rol definido | Persona (1-1) · Rol (N-1) · Emergencia (1-N como voluntario asignado) |
+| **Usuario** | La cuenta de acceso con sus credenciales y su rol definido | Persona (1-1) · Rol (N-1) · Emergencia (1-N como voluntario asignado) · SolicitudAscenso (1-N) · Certificado (N-N via UsuarioCertificado) |
 | **Rol** | El perfil de permisos en el sistema (Voluntario, Coordinador, Admin) | Usuario (1-N) |
-| **Emergencia** | El incidente reportado en la vía pública con su descripción y foto | EmergenciaPrioridad (N-1) · EmergenciaEstado (N-1) · Ubicacion (1-1) · Usuario (N-1, asignado) |
+| **SolicitudAscenso** | Petición enviada por un voluntario para ser promovido a rol Coordinador | Usuario (N-1) · SolicitudAscensoEstado (N-1) |
+| **SolicitudAscensoEstado** | Estado del trámite de ascenso: PENDIENTE, APROBADO, RECHAZADO | SolicitudAscenso (1-N) |
+| **Emergencia** | El incidente reportado en la vía pública con su descripción y foto | EmergenciaPrioridad (N-1) · EmergenciaEstado (N-1) · Ubicacion (1-1) · Usuario (N-1, asignado) · Notificacion (1-N) |
 | **EmergenciaPrioridad**| El nivel de urgencia del evento: ROJO (crítico), AMARILLO (urgente), VERDE (moderado) | Emergencia (1-N) |
 | **EmergenciaEstado** | La etapa en la que está la asistencia: SIN GESTIONAR, EN CAMINO, GESTIONADA, CANCELADA | Emergencia (1-N) |
+| **Notificacion** | Alerta enviada (vía email u otro medio) tras el reporte o cambio de una emergencia | Emergencia (N-1) · Usuario (N-1, destinatario) |
 | **Ubicacion** | Las coordenadas geográficas y la dirección exacta del suceso | UbicacionTipo (N-1) · Emergencia (1-1) |
 | **UbicacionTipo** | Categoría del punto: CALLE, CIUDAD, PROVINCIA, PAIS | Ubicacion (1-N) |
-| **Curso** | Formación en asistencia, cuidados o primeros auxilios que valida a un voluntario | CursoAtributo (N-N via CursoRelAtributo) · Certificado (1-N) |
+| **Curso** | Formación en asistencia, cuidados o primeros auxilios que valida a un voluntario (opcional en certificados) | CursoAtributo (N-N via CursoRelAtributo) · Certificado (1-N) |
 | **CursoAtributo** | Características del curso (ej. Horas lectivas, Nivel, Entidad emisora) | Curso (N-N via CursoRelAtributo) |
 | **CursoRelAtributo** | Tabla intermedia entre el catálogo de cursos y sus atributos opcionales | Curso (N-1) · CursoAtributo (N-1) |
-| **Certificado** | Documento o comprobante subido por el voluntario para acreditar una capacitación | Persona (N-1) · Curso (N-1) · CertificadoEstado (N-1) |
+| **Certificado** | Documento o comprobante subido para acreditar capacitaciones | Persona (N-1) · Curso (N-1, opcional) · CertificadoEstado (N-1) · Usuario (N-N via UsuarioCertificado) · SolicitudValidacionCertificado (1-N) |
 | **CertificadoEstado**| Estado de la validación del certificado: PENDIENTE, APROBADO, RECHAZADO, VENCIDO | Certificado (1-N) |
+| **UsuarioCertificado** | Tabla de unión que relaciona usuarios con sus certificados asociados | Usuario (N-1) · Certificado (N-1) |
+| **SolicitudValidacionCertificado** | Registro explícito de la solicitud enviada por el usuario para validar un certificado | Usuario (N-1) · Certificado (N-1) · CertificadoEstado (N-1) |
 
 ---
 
 ## 4. Historias de usuario
 
-### H1 — Reportar una emergencia en la vía pública
-*Como transeúnte o vecino* (Publica), quiero reportar una persona que necesita asistencia en la calle, *para que la red comunitaria pueda acudir a ayudarla.*
+### 1. Gestión de usuarios
+*Como coordinador o administrador*, quiero gestionar las cuentas de los usuarios del sistema, *para mantener actualizados sus perfiles, roles y permisos dentro de la plataforma.*
 * **Criterios de aceptación:**
-  * Cuando se envía la descripción, la foto opcional y la ubicación (vía GPS del navegador o dirección de calle), la emergencia queda registrada con estado `SIN GESTIONAR`.
-  * Dado que el reportante no seleccionó prioridad, el sistema le asigna por defecto prioridad `VERDE` hasta que la revise un coordinador.
-  * **Caso de error:** si la geolocalización no es válida o está fuera de los límites detectables, se exige ingresar manualmente la calle y ciudad.
+  * Permite listar, consultar y actualizar la información de los usuarios registrados.
+  * Permite la asignación y modificación de roles (`Voluntario`, `Coordinador`).
+  * **Caso de error:** si se intenta registrar o actualizar un correo o documento existente, el sistema bloquea la operación e informa la duplicidad.
 
-### H2 — Cargar un certificado de capacitación
-*Como voluntario*, quiero subir mi certificado de primeros auxilios o cuidados, *para demostrar que estoy apto para responder a emergencias.*
+### 2. Inicio de sesión
+*Como usuario registrado*, quiero autenticarme con mis credenciales, *para acceder de forma segura a las funciones correspondientes a mi rol.*
 * **Criterios de aceptación:**
-  * Cuando el voluntario selecciona un curso del catálogo y adjunta el archivo (PDF/Imagen), el certificado se guarda en estado `PENDIENTE`.
-  * **Caso de error:** si el archivo supera los 5 MB o no es un formato válido (PDF, JPG, PNG), no se guarda y se muestra el motivo.
+  * Al ingresar email y contraseña válidos, el sistema inicia la sesión y redirige al panel según el rol del usuario.
+  * **Caso de error:** si las credenciales son incorrectas, se muestra un mensaje de error genérico.
 
-### H3 — Validar un certificado de un voluntario
-*Como coordinador*, quiero revisar los certificados presentados por los voluntarios, *para autorizar su nivel de respuesta.*
+### 3. Solicitud de ascensión a coordinador
+*Como voluntario*, quiero enviar una solicitud de ascenso, *para ser promovido al rol de coordinador y colaborar en la gestión operativa.*
 * **Criterios de aceptación:**
-  * Dado un certificado en estado `PENDIENTE`, cuando el coordinador presiona "Aprobar", pasa a estado `APROBADO` y el voluntario queda habilitado en el sistema con esa capacitación.
-  * Dado que el certificado no es válido o legible, cuando el coordinador presiona "Rechazar", debe ingresar un motivo y el certificado pasa a estado `RECHAZADO`.
+  * La solicitud se registra en `SolicitudAscenso` con estado `PENDIENTE`.
+  * Un coordinador/administrador puede evaluar la solicitud, revisando el historial y certificados del voluntario, y aprobarla o rechazarla.
+  * Al aprobarse, el rol del usuario cambia a `Coordinador`.
+  * **Caso de error:** si el usuario ya cuenta con una solicitud `PENDIENTE` o ya tiene rol `Coordinador`, el sistema impide enviar una nueva.
 
-### H4 — Visualizar y filtrar el mapa de emergencias
-*Como voluntario*, quiero ver en un mapa los casos reportados y su prioridad, *para saber dónde se requiere apoyo urgente cerca de mi ubicación.*
+### 4. Gestión de cursos
+*Como coordinador*, quiero dar de alta, modificar y administrar el catálogo de cursos, *para definir los programas de capacitación disponibles.*
 * **Criterios de aceptación:**
-  * Las emergencias se despliegan en un mapa clasificadas visualmente por su color de prioridad (`ROJO`, `AMARILLO`, `VERDE`).
-  * Dado que una emergencia pasa a estado `GESTIONADA`, deja de aparecer en el mapa activo por defecto.
+  * Permite crear, editar y listar cursos indicando título, descripción y horas lectivas.
+  * Los cursos sirven como referencia opcional para la posterior validación de certificados.
 
-### H5 — Tomar y hacer seguimiento de una emergencia
-*Como voluntario*, quiero marcar que voy en camino a atender un caso, *para que los demás sepan que el lugar ya está siendo cubierto.*
+### 5. Gestionar certificados
+*Como usuario*, quiero subir y administrar mis certificados de capacitación, *para demostrar mis competencias ante la organización.*
 * **Criterios de aceptación:**
-  * Dado que la emergencia está `SIN GESTIONAR`, cuando el voluntario la toma, el estado cambia a `EN CAMINO` y se le asigna su usuario como responsable.
-  * Mientras el voluntario está `EN CAMINO`, la app comparte su posición aproximada al mapa central de la emergencia para dar seguimiento.
-  * **Caso de error:** si la emergencia ya fue tomada por otro voluntario mientras leía la ficha, el sistema impide la asignación dual y notifica que el caso ya está en atención.
+  * El usuario puede adjuntar archivos de sus certificados (PDF/Imagen).
+  * El campo `Curso` es **opcional** (se puede vincular a un curso del catálogo o dejarlo vacío para certificados externos/generales).
+  * La subida asocia el certificado al usuario mediante la tabla de relación `UsuarioCertificado` y genera automáticamente una solicitud de validación.
 
-### H6 — Finalizar la atención de un incidente
-*Como voluntario*, quiero dar por cerrada la emergencia indicando las acciones realizadas, *para dejar registro del estado final de la persona asistida.*
+### 6. Validar certificados
+*Como coordinador*, quiero revisar las solicitudes de validación de certificados, *para verificar la autenticidad de los comprobantes presentados.*
 * **Criterios de aceptación:**
-  * Dado que el voluntario está en el lugar y atendiéndola, cuando presiona "Finalizar" e ingresa observaciones, el estado pasa a `GESTIONADA`.
+  * Se dispone de una tabla de solicitudes de validación (`SolicitudValidacionCertificado`) que relaciona a los usuarios con sus certificados subidos (con `Curso` opcional).
+  * El coordinador puede aprobar el certificado (pasa a estado `APROBADO`) o rechazarlo (pasa a `RECHAZADO` indicando un motivo).
+
+### 7. Reportar una emergencia
+*Como transeúnte o vecino*, quiero reportar una situación de necesidad en la vía pública, *para solicitar asistencia comunitaria inmediata.*
+* **Criterios de aceptación:**
+  * No requiere inicio de sesión.
+  * Se registra la descripción del incidente, foto opcional y la ubicación (vía GPS o dirección manual).
+  * Se genera la emergencia en estado `SIN GESTIONAR` con prioridad por defecto `VERDE`.
+
+### 8. Visualizar mapa de emergencias
+*Como voluntario o coordinador*, quiero ver las emergencias activas en un mapa, *para ubicar rápidamente los incidentes reportados en tiempo real.*
+* **Criterios de aceptación:**
+  * Despliega los marcadores geolocalizados codificados por colores según la prioridad (`ROJO`, `AMARILLO`, `VERDE`).
+  * Permite aplicar filtros por prioridad, estado y proximidad.
+  * Al pasar a estado `GESTIONADA`, la emergencia se remueve de la vista activa.
+
+### 9. Gestionar notificaciones de emergencias
+*Como sistema / coordinador*, quiero generar notificaciones sobre emergencias (opcionalmente enviadas por email), *para alertar oportunamente al personal de asistencia.*
+* **Criterios de aceptación:**
+  * Cuando se genera una emergencia, debe llegar a los usuarios con rol voluntario una notificación de la misma.
+
+### 10. Tomar emergencia
+*Como voluntario*, quiero asignarme y marcar que voy en camino a atender un caso, *para coordinar la atención y evitar la superposición de recursos.*
+* **Criterios de aceptación:**
+  * Al seleccionar una emergencia `SIN GESTIONAR`, su estado pasa a `EN CAMINO` y se le asigna el `Usuario` del voluntario.
+  * **Caso de error:** si otro voluntario la toma simultáneamente, el sistema bloquea la acción e informa la actualización.
+
+### 11. Finalizar atención
+*Como voluntario asignado*, quiero registrar el resultado y cerrar el caso, *para dar por concluida la intervención.*
+* **Criterios de aceptación:**
+  * Dado que la emergencia está `EN CAMINO`, el voluntario ingresa un informe/observación final y actualiza el estado a `GESTIONADA`.
 
 ---
 
 ## 5. Flujo principal
 
-1. Un vecino detecta a una persona vulnerada en la calle e ingresa al portal público para reportar la emergencia con la ubicación de la **CALLE**. El sistema registra la **Emergencia** en estado `SIN GESTIONAR`.
-2. Un coordinador revisa el reporte desde el panel de control y cambia la **EmergenciaPrioridad** a `ROJO` debido a las condiciones climáticas o de salud reportadas.
-3. Un **Usuario** con rol *Voluntario* (que previamente subió un **Certificado** de primeros auxilios en estado `APROBADO`) ve el marcador **ROJO** en el mapa desde su móvil.
-4. El voluntario presiona "Acudir al lugar". La emergencia cambia su **EmergenciaEstado** a `EN CAMINO` y se le vincula su **Usuario**.
-5. El sistema transmite la ubicación del voluntario hacia el punto de la emergencia para que el coordinador monitoree el seguimiento.
-6. El voluntario llega al lugar, brinda la asistencia requerida y presiona "Completar asistencia".
-7. La emergencia pasa al estado `GESTIONADA` y se guarda en el historial de la ubicación y del usuario.
+1. Un transeúnte reporta una persona vulnerada en la calle (**7. Reportar una emergencia**). El sistema registra la **Emergencia** como `SIN GESTIONAR` y genera una **Notificacion** (**9. Gestionar notificaciones de emergencias**).
+2. Un voluntario inicia sesión (**2. Inicio de sesión**) y consulta el mapa (**8. Visualizar mapa de emergencias**).
+3. El voluntario ha cargado sus comprobantes (**5. Gestionar certificados**) y un coordinador los validó (**6. Validar certificados**).
+4. El voluntario ejecuta **10. Tomar emergencia**. El estado cambia a `EN CAMINO` y se le asigna su **Usuario**.
+5. Al finalizar la asistencia, ejecuta **11. Finalizar atención** ingresando las observaciones finales; el estado pasa a `GESTIONADA`.
+6. Si cumple los requisitos, el voluntario puede recurrir a **3. Solicitud de ascensión a coordinador**, evaluada por la **1. Gestión de usuarios** y coordinadores.
 
 ---
 
 ## 6. Reglas de negocio
 
-1. Un reporte de emergencia no requiere cuenta de usuario, pero la asignación para acudir a resolverla exige obligatoriamente un **Usuario** autenticado.
-2. Para tomar una emergencia catalogada con prioridad `ROJO`, el voluntario debe poseer al menos un **Certificado** en estado `APROBADO` en la categoría de Primeros Auxilios o Cuidados Intensivos.
-3. Una emergencia en estado `SIN GESTIONAR` solo puede ser tomada por un voluntario a la vez para evitar duplicar recursos.
-4. Si una emergencia pasa más de 30 minutos en estado `SIN GESTIONAR` con prioridad `ROJO`, el sistema la escala enviando un alerta sonora/visual al panel del **Coordinador**.
-5. Solo los usuarios con rol **Coordinador** o **Admin** pueden cambiar el estado de un **Certificado** de `PENDIENTE` a `APROBADO` o `RECHAZADO`.
-6. Un voluntario solo puede tener una emergencia activa en estado `EN CAMINO` de manera simultánea. No puede asignar otra hasta marcar la actual como `GESTIONADA` o cancelarla.
-7. Las ubicaciones deben asociarse siempre a su jerarquía geográfica completa: `CALLE` -> `CIUDAD` -> `PROVINCIA` -> `PAIS`.
+1. Un reporte de emergencia no requiere cuenta de usuario, pero la asignación para acudir a resolverla exige un **Usuario** autenticado.
+2. Para tomar una emergencia de prioridad `ROJO`, el voluntario debe poseer al menos un **Certificado** en estado `APROBADO` vinculado a su cuenta vía `UsuarioCertificado`.
+3. El campo `Curso` dentro de un `Certificado` es opcional; si no se selecciona un curso del catálogo, se registra como certificado general.
+4. Toda subida de certificado por parte de un usuario genera automáticamente un registro en la tabla de solicitudes de validación (`SolicitudValidacionCertificado`) para revisión de los coordinadores.
+5. Una emergencia en estado `SIN GESTIONAR` solo puede ser tomada por un voluntario a la vez.
+6. Un voluntario solo puede tener una emergencia activa en estado `EN CAMINO` en un momento dado.
+7. Las solicitudes de ascensión a coordinador solo pueden ser aprobadas por usuarios con rol `Coordinador` o `Admin`.
 
 ---
 
 ## 7. Requisitos no funcionales
 
 ### Usabilidad
-* **Eficiencia:** la creación de una emergencia desde la vía pública se completa en **3 toques/clics o menos** habilitando la geolocalización automática por GPS.
-* **Errores:** si falla la geolocalización por GPS, se resalta inmediatamente el campo de entrada manual de dirección sin borrar la descripción o foto ingresada.
-* **Aprendizaje:** la interfaz móvil del voluntario tiene un botón prominente de acción rápida ("Voy en camino") fácil de presionar en la calle o caminando.
-* **Recuerdo:** el mapa interactivo de emergencias activas es la pantalla de inicio para todos los usuarios con sesión iniciada.
-* **Satisfacción:** se testeará la carga de reportes en simulacro de campo con voluntarios de una ONG local antes de la puesta en producción.
+* **Eficiencia:** el reporte de emergencia en vía pública requiere 3 clics/toques o menos.
+* **Errores:** si falla el GPS, se destaca la entrada manual sin perder los campos ya completados.
+* **Aprendizaje:** botón claro de acción rápida ("Tomar emergencia") accesible en dispositivos móviles.
 
 ### Accesibilidad
-* Todo se puede operar con el teclado, y se ve dónde está el foco.
-* Los campos de formulario tienen label asociado, no solo placeholder.
-* Las imágenes que informan (ej. foto de la emergencia) tienen texto alternativo; las decorativas, alternativo vacío.
-* El contraste entre texto y fondo llega a 4,5:1 (3:1 si la letra es grande).
-* El error o la prioridad nunca se comunica solo con color: la prioridad `ROJO`, `AMARILLO`, `VERDE` siempre va acompañada del texto explícito y un icono distintivo.
+* Operación completa por teclado con foco visible.
+* Labels explícitos en todos los formularios.
+* Contraste de texto/fondo mínimo de 4,5:1.
+* Los colores de prioridad (`ROJO`, `AMARILLO`, `VERDE`) se acompañan con texto explícito e iconos distintivos.
 
 ---
 
 ## 8. Integración externa
 
-* **Procesamiento de Imágenes y Certificados:**
-  * **Para qué:** guardado de imágenes adjuntas de las emergencias y archivos PDF/imágenes de los certificados de capacitación.
-  * **Qué pasa si se cae:** la emergencia se registra con los datos de texto y coordenadas geográficas; la imagen se omite temporalmente o se reintenta su carga en segundo plano.
-* **Mapeo / Geolocalización (Geocoding API):**
-  * **Para qué:** convertir la latitud/longitud en una dirección postal humana (`CALLE`, `CIUDAD`) y trazar la ruta de seguimiento.
-  * **Qué pasa si se cae:** la app utiliza directamente las coordenadas numéricas (Latitud/Longitud) sin traducir la calle para no interrumpir el flujo.
+* **Servicio de Emailing (para notificaciones opcionales):**
+  * **Para qué:** envío de correos electrónicos informando emergencias críticas o actualizaciones de estado.
+  * **Qué pasa si se cae:** la emergencia e itinerario se registran normalmente en la base de datos; el fallo del mail no interrumpe el flujo operativo.
+* **Almacenamiento de Archivos (Certificados y Fotos):**
+  * **Para qué:** almacenamiento persistente de imágenes de emergencias y documentos PDF/imágenes de certificados.
+  * **Qué pasa si se cae:** la emergencia/solicitud se guarda con sus metadatos y se reintenta la carga del adjunto.
 
 ---
 
 ## 9. Fuera de alcance
 
-1. **Atención médica especializada o ambulancias institucionales.** La app es para soporte comunitario/voluntariado; las urgencias médicas graves deben derivarse al sistema público de salud (p. ej. 107/911).
-2. **Sistema de mensajería o chat interno en tiempo real.** Se utilizará llamada telefónica o enlace directo a WhatsApp entre voluntario y coordinador.
-3. **Gestión de inventario de insumos físicos.** No se controlan cobijas, alimentos o medicamentos entregados.
-4. **Validación automática de firmas digitales en certificados.** La validez del certificado la realiza un coordinador de forma visual/manual.
-5. **Aplicación nativa (Android/iOS) en tiendas.** El sistema es una aplicación web responsiva (PWA / Next.js) optimizada para navegadores móviles.
-6. **Pagos, transferencias o donaciones monetarias dentro de la plataforma.**
-7. **Soporte Offline sin conexión a internet.** Se requiere conectividad activa para transmitir la geolocalización y los cambios de estado.
+1. Atención médica especializada o servicios de ambulancia oficiales.
+2. Sistema de chat o mensajería instantánea interna entre usuarios.
+3. Control de inventario físico de insumos (alimentos, prendas, medicamentos).
+4. Validación automatizada con firma digital en certificados.
+5. Aplicación nativa en tiendas (iOS/Android); el sistema es una PWA/Web responsiva.
+6. Donaciones o transacciones monetarias.
