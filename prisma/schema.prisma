@@ -146,15 +146,16 @@ model CursosRelAtributos {
   usuarioEliminacion   Usuario?        @relation("CursosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
 }
 
+
 model Certificado {
   id                 String            @id @default(cuid())
   cursoId            String
-  estadoId           String
-  usuarioId          String
-  codigoVerificacion String            @unique
   curso              Cursos            @relation(fields: [cursoId], references: [id])
+  estadoId           String
   estado             CertificadoEstado
+  usuarioId          String
   usuario            Usuario           @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
+  codigoVerificacion String            @unique
   fechaEmision       DateTime          @default(now())
   fechaCreacion      DateTime          @default(now())
   usuarioCreacionId  String
@@ -172,7 +173,6 @@ model CertificadoAtributo {
   id            String      @id @default(cuid())
   certificadoId String
   certificado   Certificado @relation(fields: [certificadoId], references: [id])
-
   fechaCreacion     DateTime @default(now())
   usuarioCreacionId String
   usuarioCreacion   Usuario  @relation("CertificadoAtributoCreador", fields: [usuarioCreacionId], references: [id])
@@ -187,8 +187,8 @@ model CertificadoAtributo {
 model CertificadosRelAtributos {
   id            String              @id @default(cuid())
   certificadoId String
-  campoId       String
   certificado   Certificado         @relation(fields: [certificadoId], references: [id])
+  campoId       String
   campos        CertificadoAtributo @relation(fields: [campoId], references: [id])
   fechaHasta    DateTime?
 
