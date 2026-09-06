@@ -150,7 +150,7 @@ model CursosRelAtributos {
 model Certificado {
   id                 String            @id @default(cuid())
   cursoId            String
-  curso              Cursos            @relation(fields: [cursoId], references: [id])
+  curso              Cursos?            @relation(fields: [cursoId], references: [id])
   estadoId           String
   estado             CertificadoEstado
   usuarioId          String
