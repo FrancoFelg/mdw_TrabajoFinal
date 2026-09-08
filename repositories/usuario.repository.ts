@@ -49,14 +49,18 @@ export class UsuarioRepository {
   }
 
   // Buscar por nombre de usuario (para auth o validaciones)
-  async findByNombreUsuario(nombreUsuario: string): Promise<Usuario | null> {
-    return await db.usuario.findUnique({
-      where: { nombreUsuario },
-      include: {
-        persona: true
-      }
-    });
-  }
+  // src/repositories/usuario.repository.ts
+async findByNombreUsuario(nombreUsuario: string) {
+  return await db.usuario.findUnique({
+    where: { nombreUsuario },
+    select: {
+      id: true,
+      nombreUsuario: true,
+      password: true,
+      rol: true,
+    },
+  });
+}
 
   // Buscar por ID con detalle de persona y teléfonos
   async findById(id: string) {
