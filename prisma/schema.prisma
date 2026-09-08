@@ -69,6 +69,12 @@ enum Provincia {
   TUCUMAN
 }
 
+enum SolicitudAscensoEstado {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+}
+
 //Seccion ENUMS
 
 model Persona {
@@ -105,6 +111,8 @@ model Usuario {
   certificadosRelAtributosCreados    CertificadosRelAtributos[] @relation("CertificadosRelAtributosCreador")
   certificadosRelAtributosEliminados CertificadosRelAtributos[] @relation("CertificadosRelAtributosEliminador")
   creadoEn                           DateTime                   @default(now())
+
+  solicitudesAscenso SolicitudAscenso[]
 }
 
 // ---------- CURSOS ----------
@@ -269,4 +277,15 @@ model Telefono {
   persona   Persona @relation(fields: [personaId], references: [id])
 
   @@index([personaId])
+}
+
+
+// solicitudesAscenso
+
+model SolicitudAscenso {
+  id        String                  @id @default(cuid())
+  usuarioId String
+  usuario   Usuario                @relation(fields: [usuarioId], references: [id])
+  estado    SolicitudAscensoEstado @default(PENDIENTE)
+  creadoEn  DateTime                @default(now())
 }
