@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "mysql"
-  url       = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
   //directUrl = env("DIRECT_URL")
 }
 
@@ -21,6 +21,7 @@ enum CertificadoEstado {
   RECHAZADO
   VENCIDO
 }
+
 enum Prioridad {
   ROJO
   AMARILLO
@@ -28,59 +29,65 @@ enum Prioridad {
 }
 
 enum EmergenciaEstado {
-    SIN_GESTIONAR
-    EN_CAMINO
-    GESTIONADA
-    CANCELADA
+  SIN_GESTIONAR
+  EN_CAMINO
+  GESTIONADA
+  CANCELADA
+}
+
+enum AtributoTipo {
+  TEXTO
+  NUMERO
+  FECHA
+  BOOLEANO
 }
 
 enum Provincia {
-    BUENOS_AIRES
-    CABA
-    CATAMARCA
-    CHACO
-    CHUBUT
-    CORDOBA
-    CORRIENTES
-    ENTRE_RIOS
-    FORMOSA
-    JUJUY
-    LA_PAMPA
-    LA_RIOJA
-    MENDOZA
-    MISIONES
-    NEUQUEN
-    RIO_NEGRO
-    SALTA
-    SAN_JUAN
-    SAN_LUIS
-    SANTA_CRUZ
-    SANTA_FE
-    SANTIAGO_DEL_ESTERO
-    TIERRA_DEL_FUEGO
-    TUCUMAN
-    
+  BUENOS_AIRES
+  CABA
+  CATAMARCA
+  CHACO
+  CHUBUT
+  CORDOBA
+  CORRIENTES
+  ENTRE_RIOS
+  FORMOSA
+  JUJUY
+  LA_PAMPA
+  LA_RIOJA
+  MENDOZA
+  MISIONES
+  NEUQUEN
+  RIO_NEGRO
+  SALTA
+  SAN_JUAN
+  SAN_LUIS
+  SANTA_CRUZ
+  SANTA_FE
+  SANTIAGO_DEL_ESTERO
+  TIERRA_DEL_FUEGO
+  TUCUMAN
 }
 
 //Seccion ENUMS
 
 model Persona {
-  id          String   @id @default(cuid())
-  apellido    String
-  nombre      String
-  fechaNac    DateTime
-  usuario     Usuario?
-  telefonos   Telefono[]
-  creadoEn    DateTime @default(now())
+  id        String     @id @default(cuid())
+  apellido  String
+  nombre    String
+  fechaNac  DateTime
+  usuario   Usuario?
+  telefonos Telefono[]
+  creadoEn  DateTime   @default(now())
 }
 
 model Usuario {
-  id            String   @id @default(cuid())
-  nombreUsuario String   @unique
+  id            String              @id @default(cuid())
+  nombreUsuario String              @unique
   password      String
-  rol           Rol      @default(VOLUNTARIO)
-  personaId     String   @unique
-  persona       Persona  @relation(fields: [personaId], references: [id])
+  rol           Rol                 @default(VOLUNTARIO)
+  personaId     String              @unique
+  persona       Persona             @relation(fields: [personaId], references: [id])
   emergencias   UsuarioEmergencia[]
 
   cursosCreados                Cursos[]             @relation("CursosCreador")
@@ -97,9 +104,12 @@ model Usuario {
   certificadosAtributosEliminados    CertificadoAtributo[]      @relation("CertificadoAtributoEliminador")
   certificadosRelAtributosCreados    CertificadosRelAtributos[] @relation("CertificadosRelAtributosCreador")
   certificadosRelAtributosEliminados CertificadosRelAtributos[] @relation("CertificadosRelAtributosEliminador")
-  creadoEn      DateTime @default(now())
+  creadoEn                           DateTime                   @default(now())
 }
 
+// ---------- CURSOS ----------
+
+// Troncal
 model Cursos {
   id                   String               @id @default(cuid())
   titulo               String
@@ -112,15 +122,15 @@ model Cursos {
   fechaEliminacion     DateTime?
   usuarioEliminacionId String?
   usuarioEliminacion   Usuario?             @relation("CursosEliminador", fields: [usuarioEliminacionId], references: [id])
-  atributos            CursosAtributos[]
   cursosRelAtributos   CursosRelAtributos[]
   certificados         Certificado[]
 }
 
+// Parametrica: catalogo de atributos posibles para un curso
 model CursosAtributos {
   id                   String               @id @default(cuid())
-  cursoId              String
-  curso                Cursos               @relation(fields: [cursoId], references: [id])
+  nombre               String               @unique
+  tipo                 AtributoTipo         @default(TEXTO)
   fechaCreacion        DateTime             @default(now())
   usuarioCreacionId    String
   usuarioCreacion      Usuario              @relation("CursosAtributosCreador", fields: [usuarioCreacionId], references: [id])
@@ -130,6 +140,7 @@ model CursosAtributos {
   cursosRelAtributos   CursosRelAtributos[]
 }
 
+// Relacional: valor de un atributo para un curso
 model CursosRelAtributos {
   id                   String          @id @default(cuid())
   cursoId              String
@@ -137,102 +148,125 @@ model CursosRelAtributos {
   dato                 String
   curso                Cursos          @relation(fields: [cursoId], references: [id])
   campos               CursosAtributos @relation(fields: [campoId], references: [id])
-  fechaHasta           DateTime
+  fechaHasta           DateTime?
   fechaCreacion        DateTime        @default(now())
   usuarioCreacionId    String
   usuarioCreacion      Usuario         @relation("CursosRelAtributosCreador", fields: [usuarioCreacionId], references: [id])
   fechaEliminacion     DateTime?
   usuarioEliminacionId String?
   usuarioEliminacion   Usuario?        @relation("CursosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
+
+  @@unique([cursoId, campoId])
+  @@index([campoId])
 }
 
+// ---------- CERTIFICADOS ----------
+
+// Troncal
 model Certificado {
-  id                   String                     @id @default(cuid())
-  cursoId              String?                    // Opcional en Prisma si no requiere curso
-  curso                Cursos?                    @relation(fields: [cursoId], references: [id])
-  estado               CertificadoEstado          @default(PENDIENTE)
-  usuarioId            String
-  usuario              Usuario                    @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
-  codigoVerificacion   String                     @unique
-  fechaEmision         DateTime                   @default(now())
-  fechaCreacion        DateTime                   @default(now())
-  usuarioCreacionId    String
-  usuarioCreacion      Usuario                    @relation("CertificadoCreador", fields: [usuarioCreacionId], references: [id])
+  id                 String            @id @default(cuid())
+  cursoId            String
+  usuarioId          String
+  codigoVerificacion String            @unique
+  curso              Cursos            @relation(fields: [cursoId], references: [id])
+  estado             CertificadoEstado @default(PENDIENTE)
+  usuario            Usuario           @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
+  fechaEmision       DateTime          @default(now())
+  fechaCreacion      DateTime          @default(now())
+  usuarioCreacionId  String
+  usuarioCreacion    Usuario           @relation("CertificadoCreador", fields: [usuarioCreacionId], references: [id])
+
   fechaEliminacion     DateTime?
   usuarioEliminacionId String?
-  usuarioEliminacion   Usuario?                   @relation("CertificadoEliminador", fields: [usuarioEliminacionId], references: [id])
+  usuarioEliminacion   Usuario?  @relation("CertificadoEliminador", fields: [usuarioEliminacionId], references: [id])
 
   certificadosRelAtributos CertificadosRelAtributos[]
+
+  @@index([cursoId])
+  @@index([usuarioId])
 }
 
+// Parametrica: catalogo de atributos posibles para un certificado
 model CertificadoAtributo {
-  id                      String                     @id @default(cuid())
-  nombre                  String                     
-  fechaCreacion           DateTime                   @default(now())
-  usuarioCreacionId       String
-  usuarioCreacion         Usuario                    @relation("CertificadoAtributoCreador", fields: [usuarioCreacionId], references: [id])
-  fechaEliminacion        DateTime?
-  usuarioEliminacionId    String?
-  usuarioEliminacion      Usuario?                   @relation("CertificadoAtributoEliminador", fields: [usuarioEliminacionId], references: [id])
+  id     String       @id @default(cuid())
+  nombre String       @unique
+  tipo   AtributoTipo @default(TEXTO)
+
+  fechaCreacion     DateTime @default(now())
+  usuarioCreacionId String
+  usuarioCreacion   Usuario  @relation("CertificadoAtributoCreador", fields: [usuarioCreacionId], references: [id])
+
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CertificadoAtributoEliminador", fields: [usuarioEliminacionId], references: [id])
 
   certificadosRelAtributos CertificadosRelAtributos[]
 }
 
+// Relacional: valor de un atributo para un certificado
 model CertificadosRelAtributos {
-  id                      String              @id @default(cuid())
-  certificadoId           String
-  certificado             Certificado         @relation(fields: [certificadoId], references: [id])
-  campoId                 String
-  campos                  CertificadoAtributo @relation(fields: [campoId], references: [id])
-  valor                   String              
-  fechaHasta              DateTime?
-  fechaCreacion           DateTime            @default(now())
-  usuarioCreacionId       String
-  usuarioCreacion         Usuario             @relation("CertificadosRelAtributosCreador", fields: [usuarioCreacionId], references: [id])
-  fechaEliminacion        DateTime?
-  usuarioEliminacionId    String?
-  usuarioEliminacion      Usuario?             @relation("CertificadosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
+  id            String              @id @default(cuid())
+  certificadoId String
+  campoId       String
+  dato          String
+  certificado   Certificado         @relation(fields: [certificadoId], references: [id])
+  campos        CertificadoAtributo @relation(fields: [campoId], references: [id])
+  fechaHasta    DateTime?
+
+  fechaCreacion        DateTime  @default(now())
+  usuarioCreacionId    String
+  usuarioCreacion      Usuario   @relation("CertificadosRelAtributosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion     DateTime?
+  usuarioEliminacionId String?
+  usuarioEliminacion   Usuario?  @relation("CertificadosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
+
+  @@unique([certificadoId, campoId])
+  @@index([campoId])
 }
 
+// ---------- EMERGENCIAS ----------
 
 model Emergencia {
-  id            String   @id @default(cuid())
-  descripcion   String
-  fecha         DateTime
-  imagen        String?
-  ubicacionId   String
-  ubicacion     Ubicacion @relation(fields: [ubicacionId], references: [id])
-  prioridad     Prioridad
-  estado        EmergenciaEstado @default(SIN_GESTIONAR)
-  usuarios      UsuarioEmergencia[]
-  creadoEn      DateTime @default(now())
+  id          String              @id @default(cuid())
+  descripcion String
+  fecha       DateTime
+  imagen      String?
+  ubicacionId String
+  ubicacion   Ubicacion           @relation(fields: [ubicacionId], references: [id])
+  prioridad   Prioridad
+  estado      EmergenciaEstado    @default(SIN_GESTIONAR)
+  usuarios    UsuarioEmergencia[]
+  creadoEn    DateTime            @default(now())
+
+  @@index([ubicacionId])
 }
 
 model UsuarioEmergencia {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   usuarioId    String
-  usuario      Usuario  @relation(fields: [usuarioId], references: [id])
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id])
   emergenciaId String
   emergencia   Emergencia @relation(fields: [emergenciaId], references: [id])
-  creadoEn     DateTime @default(now())
+  creadoEn     DateTime   @default(now())
 
   @@unique([usuarioId, emergenciaId])
+  @@index([emergenciaId])
 }
 
 model Ubicacion {
-    id           String   @id @default(cuid())
-    coordenada_x Float?
-    coordenada_y Float?
-    provincia    Provincia
-    emergencias  Emergencia[]
+  id           String       @id @default(cuid())
+  coordenada_x Float?
+  coordenada_y Float?
+  provincia    Provincia
+  emergencias  Emergencia[]
 }
 
 model Telefono {
-    id           String @id @default(cuid())
-    tipo         String
-    numero       String
-    personaId    String
-    persona      Persona  @relation(fields: [personaId], references: [id])
+  id        String  @id @default(cuid())
+  tipo      String
+  numero    String
+  personaId String
+  persona   Persona @relation(fields: [personaId], references: [id])
 
-    @@index([personaId])
+  @@index([personaId])
 }
