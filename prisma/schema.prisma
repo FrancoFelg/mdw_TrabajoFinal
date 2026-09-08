@@ -146,58 +146,52 @@ model CursosRelAtributos {
   usuarioEliminacion   Usuario?        @relation("CursosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
 }
 
-
 model Certificado {
-  id                 String            @id @default(cuid())
-  cursoId            String
-  curso              Cursos?            @relation(fields: [cursoId], references: [id])
-  estadoId           String
-  estado             CertificadoEstado
-  usuarioId          String
-  usuario            Usuario           @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
-  codigoVerificacion String            @unique
-  fechaEmision       DateTime          @default(now())
-  fechaCreacion      DateTime          @default(now())
-  usuarioCreacionId  String
-  usuarioCreacion    Usuario           @relation("CertificadoCreador", fields: [usuarioCreacionId], references: [id])
-
+  id                   String                     @id @default(cuid())
+  cursoId              String?                    // Opcional en Prisma si no requiere curso
+  curso                Cursos?                    @relation(fields: [cursoId], references: [id])
+  estado               CertificadoEstado          @default(PENDIENTE)
+  usuarioId            String
+  usuario              Usuario                    @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
+  codigoVerificacion   String                     @unique
+  fechaEmision         DateTime                   @default(now())
+  fechaCreacion        DateTime                   @default(now())
+  usuarioCreacionId    String
+  usuarioCreacion      Usuario                    @relation("CertificadoCreador", fields: [usuarioCreacionId], references: [id])
   fechaEliminacion     DateTime?
   usuarioEliminacionId String?
-  usuarioEliminacion   Usuario?  @relation("CertificadoEliminador", fields: [usuarioEliminacionId], references: [id])
+  usuarioEliminacion   Usuario?                   @relation("CertificadoEliminador", fields: [usuarioEliminacionId], references: [id])
 
-  atributos                CertificadoAtributo[]
   certificadosRelAtributos CertificadosRelAtributos[]
 }
 
 model CertificadoAtributo {
-  id            String      @id @default(cuid())
-  certificadoId String
-  certificado   Certificado @relation(fields: [certificadoId], references: [id])
-  fechaCreacion     DateTime @default(now())
-  usuarioCreacionId String
-  usuarioCreacion   Usuario  @relation("CertificadoAtributoCreador", fields: [usuarioCreacionId], references: [id])
-
-  fechaEliminacion     DateTime?
-  usuarioEliminacionId String?
-  usuarioEliminacion   Usuario?  @relation("CertificadoAtributoEliminador", fields: [usuarioEliminacionId], references: [id])
+  id                      String                     @id @default(cuid())
+  nombre                  String                     
+  fechaCreacion           DateTime                   @default(now())
+  usuarioCreacionId       String
+  usuarioCreacion         Usuario                    @relation("CertificadoAtributoCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion        DateTime?
+  usuarioEliminacionId    String?
+  usuarioEliminacion      Usuario?                   @relation("CertificadoAtributoEliminador", fields: [usuarioEliminacionId], references: [id])
 
   certificadosRelAtributos CertificadosRelAtributos[]
 }
 
 model CertificadosRelAtributos {
-  id            String              @id @default(cuid())
-  certificadoId String
-  certificado   Certificado         @relation(fields: [certificadoId], references: [id])
-  campoId       String
-  campos        CertificadoAtributo @relation(fields: [campoId], references: [id])
-  fechaHasta    DateTime?
-
-  fechaCreacion        DateTime  @default(now())
-  usuarioCreacionId    String
-  usuarioCreacion      Usuario   @relation("CertificadosRelAtributosCreador", fields: [usuarioCreacionId], references: [id])
-  fechaEliminacion     DateTime?
-  usuarioEliminacionId String?
-  usuarioEliminacion   Usuario?  @relation("CertificadosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
+  id                      String              @id @default(cuid())
+  certificadoId           String
+  certificado             Certificado         @relation(fields: [certificadoId], references: [id])
+  campoId                 String
+  campos                  CertificadoAtributo @relation(fields: [campoId], references: [id])
+  valor                   String              
+  fechaHasta              DateTime?
+  fechaCreacion           DateTime            @default(now())
+  usuarioCreacionId       String
+  usuarioCreacion         Usuario             @relation("CertificadosRelAtributosCreador", fields: [usuarioCreacionId], references: [id])
+  fechaEliminacion        DateTime?
+  usuarioEliminacionId    String?
+  usuarioEliminacion      Usuario?             @relation("CertificadosRelAtributosEliminador", fields: [usuarioEliminacionId], references: [id])
 }
 
 

@@ -27,13 +27,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(nuevoUsuario, { status: 201 });
   } catch (error: any) {
+    
     if (error.message === 'NOMBRE_USUARIO_EXISTENTE') {
       return NextResponse.json(
         { error: 'El nombre de usuario ya está registrado.' },
         { status: 409 }
       );
     }
-    return NextResponse.json(
+    return NextResponse.json(      
       { error: 'Error interno al registrar el usuario.' },
       { status: 500 }
     );
