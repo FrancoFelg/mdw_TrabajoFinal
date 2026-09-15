@@ -47,3 +47,6 @@ next-env.d.ts
 
 # agent teams lite - skill registry (artefacto local generado)
 .atl/
+
+# datos de MySQL en prod (bind mount del compose)
+infra/docker/db_data/

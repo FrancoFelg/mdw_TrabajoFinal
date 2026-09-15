@@ -1,58 +1,82 @@
 # =============================================================================
-# Docker Compose - PRODUCCIÓN (base precaria)
-# =============================================================================
-# OJO: esto es un esqueleto para tener de base. Antes de desplegar en serio:
-#   - [ ] Completar infra/docker/Dockerfile (multi-stage build de Next.js,
-#         output standalone) — hoy está VACÍO, el servicio `app` no buildea.
-#   - [ ] Reemplazar el manejo de secretos: acá vienen de un archivo .env en
-#         el servidor (NUNCA commiteado). Idealmente migrar a docker secrets
-#         o al secret manager del proveedor.
-#   - [ ] Poner un reverse proxy adelante (nginx / traefik / caddy) con TLS.
-#         La app NO debería exponerse directo a internet.
-#   - [ ] Definir estrategia de backups para el volumen de MySQL.
-#   - [ ] Ajustar recursos (deploy.resources) según el servidor real.
-#
-# Uso (en el servidor, con un .env al lado):
-#   docker compose -f infra/docker/docker-compose.prod.yaml up -d --build
+# Docker Compose - PRODUCCIÓN (VPS guillermonatali.com)
+# Dominio: https://mdw.guillermonatali.com
 # =============================================================================
 
+name: mdw
+
 services:
+  # ---------------------------------------------------------------------------
+  # App Next.js (standalone). Sin `ports`: solo la alcanza global-nginx por
+  # proxy-network usando el NOMBRE DEL CONTAINER (mdw-app:3000).
+  # ---------------------------------------------------------------------------
   app:
     build:
       # Contexto en la raíz del repo porque el build necesita package.json,
       # el código y el lockfile de pnpm
       context: ../..
       dockerfile: infra/docker/Dockerfile
-    container_name: mdw-app-prod
-    restart: always
+      target: runner
+    image: mdw-app:prod
+    container_name: mdw-app
+    restart: unless-stopped
     environment:
       NODE_ENV: production
-      # La app habla con la DB por la red interna de compose usando el nombre
-      # del servicio (db) como host — no localhost, no puerto publicado
-      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE}
-    ports:
-      # TODO: cuando haya reverse proxy, sacar este mapeo y exponer solo el proxy
-      - "3000:3000"
+      # Host = nombre del servicio `db`, resuelto por DNS interno de compose
+      DATABASE_URL: mysql://${MYSQL_USER:?}:${MYSQL_PASSWORD:?}@db:3306/${MYSQL_DATABASE:?}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
+    expose:
+      - "3000"
+    healthcheck:
+      # busybox wget viene en alpine; --spider no descarga el body
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - proxy-network # para que global-nginx lo alcance
+      - internal      # red privada con su DB
 
+  # ---------------------------------------------------------------------------
+  # Migraciones: corre una vez y termina. `restart: "no"` es clave, si no
+  # compose lo reinicia en loop cuando sale con 0.
+  # ---------------------------------------------------------------------------
+  migrate:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: migrate
+    image: mdw-migrate:prod
+    container_name: mdw-migrate
+    restart: "no"
+    environment:
+      DATABASE_URL: mysql://${MYSQL_USER:?}:${MYSQL_PASSWORD:?}@db:3306/${MYSQL_DATABASE:?}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # ---------------------------------------------------------------------------
+  # MySQL. SIN `ports` y solo en la red `internal` (sin salida a internet).
+  # ---------------------------------------------------------------------------
   db:
     image: mysql:8.4
-    container_name: mdw-mysql-prod
-    restart: always
+    container_name: mdw-db
+    restart: unless-stopped
     environment:
-      # Valores desde el .env del servidor — sin defaults a propósito:
-      # si falta una variable, mejor que falle el arranque a correr con
-      # credenciales de juguete en producción
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    # SIN `ports`: en prod la DB solo es alcanzable desde la red interna
-    # de compose. Exponerla al host es un agujero de seguridad innecesario.
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD es obligatorio}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?MYSQL_DATABASE es obligatorio}
+      MYSQL_USER: ${MYSQL_USER:?MYSQL_USER es obligatorio}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD es obligatorio}
     volumes:
-      - mysql_prod_data:/var/lib/mysql
+      - ./db_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 10s
@@ -61,6 +85,13 @@ services:
       # Le da tiempo a la inicialización del datadir en el primer arranque
       # antes de empezar a contar fallos
       start_period: 30s
+    networks:
+      - internal
 
-volumes:
-  mysql_prod_data:
+networks:
+  # Ya existe en el VPS; la comparten todas las apps con global-nginx
+  proxy-network:
+    external: true
+  # `internal: true` = sin acceso a internet ni al host. Solo app <-> db.
+  internal:
+    internal: true
