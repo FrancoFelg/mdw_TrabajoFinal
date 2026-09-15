@@ -91,6 +91,13 @@ services:
     image: mysql:8.4
     container_name: mdw-db
     restart: unless-stopped
+    # Las migraciones se generan en Windows, donde MySQL ignora mayúsculas en
+    # nombres de tabla (hay ALTER TABLE `certificadoatributo` sobre una tabla
+    # creada como `CertificadoAtributo`). En Linux el default distingue y la
+    # migración muere. Este flag replica el comportamiento de Windows.
+    # OJO: solo se puede fijar al INICIALIZAR el datadir. Si ya existe
+    # db_data con otro valor, MySQL no arranca: borrar db_data y recrear.
+    command: --lower-case-table-names=1
     # MySQL 8 con menos de ~768M se pone inestable; 1G es el piso razonable
     deploy:
       resources:
