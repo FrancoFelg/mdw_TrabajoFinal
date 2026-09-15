@@ -1,0 +1,105 @@
+# =============================================================================
+# CI — corre en cada PR y en cada push a main. NO despliega nada ni usa secrets:
+# no tiene forma de tocar el VPS. El deploy es pull-based desde el servidor.
+#
+# Jobs:
+#   calidad     -> lint, typecheck y next build (lo que rompió el primer deploy)
+#   migraciones -> aplica las migraciones sobre un MySQL igual al de prod
+#                  (lower_case_table_names=1) y verifica que la DB resultante
+#                  coincida con prisma/schema.prisma. Ataja migraciones
+#                  faltantes y nombres de tabla que solo funcionan en Windows.
+# =============================================================================
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Sin permisos de escritura: este workflow solo lee el repo
+permissions:
+  contents: read
+
+# Si llegan varios pushes al mismo PR, cancela el run anterior
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+
+jobs:
+  calidad:
+    name: Lint, typecheck y build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      # corepack lee la versión exacta de pnpm del campo packageManager
+      - run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # El cliente se genera desde el schema; sin esto tsc tipa contra nada
+      - run: pnpm prisma generate
+
+      - run: pnpm lint
+
+      - run: pnpm exec tsc --noEmit
+
+      # Mismo comando que corre el Dockerfile de prod
+      - run: pnpm build
+
+  migraciones:
+    name: Migraciones vs schema
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Credenciales de juguete: el MySQL vive solo durante este job
+      DATABASE_URL: mysql://root:ci@127.0.0.1:3306/mdw_ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # docker run en vez de `services:` porque services no permite pasarle
+      # flags a mysqld, y necesitamos el mismo lower_case_table_names que prod
+      - name: Levantar MySQL 8.4 como en prod
+        run: |
+          docker run -d --name mysql-ci \
+            -e MYSQL_ROOT_PASSWORD=ci \
+            -e MYSQL_DATABASE=mdw_ci \
+            -p 3306:3306 \
+            mysql:8.4 --lower-case-table-names=1
+          for i in $(seq 1 30); do
+            if docker exec mysql-ci mysqladmin ping -h 127.0.0.1 -uroot -pci --silent 2>/dev/null; then
+              echo "MySQL listo"; exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL no arrancó"; docker logs mysql-ci; exit 1
+
+      # Exactamente lo que corre el servicio `migrate` en prod
+      - name: Aplicar migraciones
+        run: pnpm prisma migrate deploy
+
+      # Si el schema tiene cambios sin migración, esto devuelve exit 2 y
+      # muestra el SQL que falta. Es el chequeo que hubiera atajado el drift
+      # de cursos/solicitudes.
+      - name: Verificar que la DB coincide con el schema
+        run: pnpm prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
