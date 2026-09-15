@@ -24,3 +24,5 @@ La app corre en `/opt/mdw_TrabajoFinal` con su propio compose, detrás del Nginx
 - **502** → `docker exec global-nginx nginx -s reload`. Si sigue, confirmar que `mdw-app` está en `proxy-network`.
 - **`nginx -t` falla por cert inexistente** → volver a fase 1, reload, generar cert, recién ahí fase 2.
 - **`migrate` falla** → `docker compose --env-file .env -f infra/docker/docker-compose.prod.yaml logs migrate`. Casi siempre es `DATABASE_URL` mal parseada por un carácter especial en el password.
+- **`migrate` falla con `Table 'mdw.xxx' doesn't exist`** en una tabla que sí existe con otras mayúsculas → la DB se inicializó sin `lower_case_table_names=1`. Con la DB vacía: `docker compose --env-file .env -f infra/docker/docker-compose.prod.yaml down && rm -rf infra/docker/db_data` y volver a levantar.
+- **`mdw-db` no arranca con `Different lower_case_table_names settings`** → mismo caso: el datadir se creó con otro valor. Borrar `db_data` (solo si la DB está vacía o tenés backup) y recrear.
