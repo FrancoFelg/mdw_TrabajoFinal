@@ -48,8 +48,10 @@ services:
     expose:
       - "3000"
     healthcheck:
-      # busybox wget viene en alpine; --spider no descarga el body
-      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/"]
+      # busybox wget viene en alpine; --spider no descarga el body.
+      # /api/health devuelve 503 si la DB no responde, así que este check
+      # cubre app + DB, no solo que el proceso esté vivo.
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000/api/health"]
       interval: 15s
       timeout: 5s
       retries: 5

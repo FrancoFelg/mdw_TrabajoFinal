@@ -11,6 +11,7 @@ La app corre en `/opt/mdw_TrabajoFinal` con su propio compose, detrás del Nginx
 | Datos de MySQL | Bind mount en `/opt/mdw_TrabajoFinal/infra/docker/db_data` (patrón del VPS). Hacer backup de esa carpeta. |
 | Redeploy | `git pull && docker compose --env-file .env -f infra/docker/docker-compose.prod.yaml up -d --build`, y después **siempre** `docker exec global-nginx nginx -s reload` (Nginx cachea la IP vieja y tira 502). |
 | Secretos | Solo en `/opt/mdw_TrabajoFinal/.env` del servidor (mismo `.env.example` que dev). Nunca commitear. |
+| Healthcheck | `GET /api/health` → `200 {status:"ok"}` si app y DB responden; `503 {status:"degraded"}` si la DB no. Lo usan el healthcheck de Docker y sirve para Uptime Kuma. |
 
 ## Checklist antes de dar por terminado
 
@@ -18,6 +19,7 @@ La app corre en `/opt/mdw_TrabajoFinal` con su propio compose, detrás del Nginx
 - [ ] `mdw-app` aparece en `docker network inspect proxy-network`
 - [ ] `nginx -t` pasa con el conf de fase 2
 - [ ] `https://mdw.guillermonatali.com/` responde con cert válido
+- [ ] `curl -s https://mdw.guillermonatali.com/api/health` devuelve `"status":"ok"` y `"db":"ok"`
 
 ## Troubleshooting
 
