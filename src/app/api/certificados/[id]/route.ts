@@ -3,9 +3,13 @@ import { CertificadoController } from '../../../../../controllers/certificado.co
 
 const controller = new CertificadoController();
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+// En Next 15+ `params` es una Promise: hay que hacerle await
+type Contexto = { params: Promise<{ id: string }> };
+
+export async function GET(_: NextRequest, { params }: Contexto) {
   try {
-    const certificado = await controller.obtenerPorId(params.id);
+    const { id } = await params;
+    const certificado = await controller.obtenerPorId(id);
     return NextResponse.json(certificado);
   } catch (error: any) {
     if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
@@ -15,10 +19,11 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
   }
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: Contexto) {
   try {
+    const { id } = await params;
     const body = await req.json();
-    const actualizado = await controller.actualizar(params.id, body);
+    const actualizado = await controller.actualizar(id, body);
     return NextResponse.json(actualizado);
   } catch (error: any) {
     if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
@@ -28,10 +33,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: Contexto) {
   try {
+    const { id } = await params;
     const { usuarioEliminacionId } = await req.json();
-    await controller.eliminar(params.id, usuarioEliminacionId);
+    await controller.eliminar(id, usuarioEliminacionId);
     return NextResponse.json({ mensaje: 'Certificado eliminado correctamente.' });
   } catch (error: any) {
     if (error.message === 'USUARIO_ELIMINACION_REQUERIDO') {

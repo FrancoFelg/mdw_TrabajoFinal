@@ -37,7 +37,8 @@ export class CertificadoRepository {
           ? {
               create: data.atributos.map((attr) => ({
                 campoId: attr.campoId,
-                valor: attr.valor,
+                // La columna en el schema se llama `dato`; `valor` es el nombre del contrato de la API
+                dato: attr.valor,
                 fechaHasta: attr.fechaHasta,
                 usuarioCreacionId: data.usuarioCreacionId,
               })),
