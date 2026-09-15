@@ -1,14 +1,14 @@
 # Deploy de mdw en el VPS
 
-La app corre en `/opt/mdw` con su propio compose, detrás del Nginx central (`global-nginx`) y con cert de Let's Encrypt emitido por el Certbot central. El compose NO abre puertos: `global-nginx` alcanza al container `mdw-app` por la red `proxy-network`. La DB queda en una red aislada.
+La app corre en `/opt/mdw_TrabajoFinal` con su propio compose, detrás del Nginx central (`global-nginx`) y con cert de Let's Encrypt emitido por el Certbot central. El compose NO abre puertos: `global-nginx` alcanza al container `mdw-app` por la red `proxy-network`. La DB queda en una red aislada.
 
 ## Quick path
 
 1. **DNS**: registro `A | mdw | 85.209.93.211`. Verificar: `dig mdw.guillermonatali.com +short`.
 2. **Clonar y configurar**:
    ```bash
-   git clone https://github.com/FrancoFelg/mdw_TrabajoFinal.git /opt/mdw
-   cd /opt/mdw
+   git clone https://github.com/FrancoFelg/mdw_TrabajoFinal.git /opt/mdw_TrabajoFinal
+   cd /opt/mdw_TrabajoFinal
    cp .env.example .env
    nano .env   # passwords SOLO alfanuméricos, completar JWT_SECRET
    ```
@@ -33,7 +33,7 @@ La app corre en `/opt/mdw` con su propio compose, detrás del Nginx central (`gl
    ```
 6. **Nginx con 443** (fase 2):
    ```bash
-   cp /opt/mdw/infra/nginx/mdw.conf /opt/nginx/conf.d/mdw.conf
+   cp /opt/mdw_TrabajoFinal/infra/nginx/mdw.conf /opt/nginx/conf.d/mdw.conf
    docker exec global-nginx nginx -t && docker exec global-nginx nginx -s reload
    ```
 7. **Verificar**:
@@ -48,9 +48,9 @@ La app corre en `/opt/mdw` con su propio compose, detrás del Nginx central (`gl
 |------|----------|
 | Container / puerto | `mdw-app` : `3000`. Es lo que usa `proxy_pass` en `infra/nginx/mdw.conf`. |
 | Migraciones | Servicio `migrate` corre `prisma migrate deploy` antes de `app`. Si falla, `app` no arranca. |
-| Datos de MySQL | Bind mount en `/opt/mdw/infra/docker/db_data` (patrón del VPS). Hacer backup de esa carpeta. |
+| Datos de MySQL | Bind mount en `/opt/mdw_TrabajoFinal/infra/docker/db_data` (patrón del VPS). Hacer backup de esa carpeta. |
 | Redeploy | `git pull && docker compose --env-file .env -f infra/docker/docker-compose.prod.yaml up -d --build`, y después **siempre** `docker exec global-nginx nginx -s reload` (Nginx cachea la IP vieja y tira 502). |
-| Secretos | Solo en `/opt/mdw/.env` del servidor (mismo `.env.example` que dev). Nunca commitear. |
+| Secretos | Solo en `/opt/mdw_TrabajoFinal/.env` del servidor (mismo `.env.example` que dev). Nunca commitear. |
 
 ## Checklist antes de dar por terminado
 

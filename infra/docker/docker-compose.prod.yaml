@@ -5,6 +5,25 @@
 
 name: mdw
 
+# Aislamiento respecto a las otras apps del VPS (compartido con prod):
+#   - límites de CPU/RAM por container (no puede starvear a las demás)
+#   - logs rotados (no puede llenar el disco)
+#   - sin escalada de privilegios dentro del container
+# Ajustar los números según el servidor real.
+x-limits-app: &limits-app
+  deploy:
+    resources:
+      limits:
+        cpus: "1.0"
+        memory: 512M
+  logging: &logging
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+  security_opt:
+    - no-new-privileges:true
+
 services:
   # ---------------------------------------------------------------------------
   # App Next.js (standalone). Sin `ports`: solo la alcanza global-nginx por
@@ -20,6 +39,7 @@ services:
     image: mdw-app:prod
     container_name: mdw-app
     restart: unless-stopped
+    <<: *limits-app
     environment:
       NODE_ENV: production
       # Host = nombre del servicio `db`, resuelto por DNS interno de compose
@@ -55,6 +75,7 @@ services:
     image: mdw-migrate:prod
     container_name: mdw-migrate
     restart: "no"
+    <<: *limits-app
     environment:
       DATABASE_URL: mysql://${MYSQL_USER:?}:${MYSQL_PASSWORD:?}@db:3306/${MYSQL_DATABASE:?}
     depends_on:
@@ -70,6 +91,15 @@ services:
     image: mysql:8.4
     container_name: mdw-db
     restart: unless-stopped
+    # MySQL 8 con menos de ~768M se pone inestable; 1G es el piso razonable
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+    logging: *logging
+    security_opt:
+      - no-new-privileges:true
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD es obligatorio}
       MYSQL_DATABASE: ${MYSQL_DATABASE:?MYSQL_DATABASE es obligatorio}
