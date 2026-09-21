@@ -1,0 +1,5 @@
+# Todo lo que se ejecuta en el VPS o define el pipeline requiere review del
+# dueño del servidor. Activar "Require review from Code Owners" en la branch
+# protection de main para que esto sea obligatorio y no solo informativo.
+/infra/    @guille-nat
+/.github/  @guille-nat
