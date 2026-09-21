@@ -1,0 +1,21 @@
+[Unit]
+Description=mdw: deploy pull-based desde origin/main
+Documentation=file:///opt/mdw_TrabajoFinal/infra/DEPLOY.md
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/mdw_TrabajoFinal
+# COPIA instalada fuera del repo (ver DEPLOY.md). Si apuntara al script dentro
+# del clone, cualquiera con write en el repo podría cambiarlo y ejecutar lo
+# que quiera como root en el VPS con el próximo tick del timer.
+ExecStart=/usr/local/bin/mdw-deploy
+# El clone en /opt es de root; con otro usuario git tira "dubious ownership"
+User=root
+# Sin límite: el build de Next puede tardar varios minutos en el VPS
+TimeoutStartSec=0
+# Que el git/curl del deploy ceda CPU a las apps de prod (el build corre en
+# el daemon de Docker, a ese lo limita el compose)
+Nice=10

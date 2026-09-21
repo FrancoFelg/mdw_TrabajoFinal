@@ -1,0 +1,12 @@
+[Unit]
+Description=mdw: chequear origin/main cada 5 minutos
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+# Evita que coincida al segundo con otros timers del VPS
+RandomizedDelaySec=30s
+Unit=mdw-deploy.service
+
+[Install]
+WantedBy=timers.target
