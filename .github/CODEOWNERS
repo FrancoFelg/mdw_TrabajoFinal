@@ -1,5 +1,7 @@
 # Todo lo que se ejecuta en el VPS o define el pipeline requiere review del
-# dueño del servidor. Activar "Require review from Code Owners" en la branch
-# protection de main para que esto sea obligatorio y no solo informativo.
-/infra/    @guille-nat
-/.github/  @guille-nat
+# dueño del servidor o del dueño del repo. Van los dos porque GitHub no cuenta
+# la aprobación del autor de un PR: con un solo owner, sus propios PRs a infra/
+# no podrían mergearse nunca. Activar "Require review from Code Owners" en la
+# branch protection de main para que esto sea obligatorio y no solo informativo.
+/infra/    @guille-nat @FrancoFelg
+/.github/  @guille-nat @FrancoFelg
