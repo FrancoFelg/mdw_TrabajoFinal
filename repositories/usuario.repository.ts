@@ -16,6 +16,18 @@ export interface CrearUsuarioDTO {
   };
 }
 
+export interface ActualizarUsuarioDTO {
+  persona?: {
+    nombre?: string;
+    apellido?: string;
+    fechaNac?: Date;
+    telefonos?: {
+      tipo: string;
+      numero: string;
+    }[];
+  };
+}
+
 export class UsuarioRepository {
 
   // Crear usuario junto con su registro de Persona y teléfonos opcionales
@@ -101,6 +113,41 @@ async findByNombreUsuario(nombreUsuario: string) {
     return await db.usuario.update({
       where: { id },
       data: { rol: nuevoRol }
+    });
+  }
+
+  // Actualizar datos personales y teléfonos del usuario
+  async actualizar(id: string, data: ActualizarUsuarioDTO) {
+    const { persona } = data;
+
+    return await db.usuario.update({
+      where: { id },
+      data: {
+        ...(persona && {
+          persona: {
+            update: {
+              ...(persona.nombre && { nombre: persona.nombre }),
+              ...(persona.apellido && { apellido: persona.apellido }),
+              ...(persona.fechaNac && { fechaNac: persona.fechaNac }),
+              ...(persona.telefonos && {
+                telefonos: {
+                  deleteMany: {}, // Reemplaza la lista previa de teléfonos por los nuevos
+                  createMany: {
+                    data: persona.telefonos,
+                  },
+                },
+              }),
+            },
+          },
+        }),
+      },
+      include: {
+        persona: {
+          include: {
+            telefonos: true,
+          },
+        },
+      },
     });
   }
 }
