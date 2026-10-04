@@ -3,6 +3,20 @@ import { UsuarioService } from '../../../../services/usuario.service';
 
 const usuarioService = new UsuarioService();
 
+export async function GET(req: NextRequest) {
+  try {
+    const usuarios = await usuarioService.listarUsuarios();
+
+    return NextResponse.json(usuarios, { status: 200 });
+  } catch (error: any) {
+    console.error('Error en GET /api/usuarios:', error);
+    return NextResponse.json(
+      { error: 'Error interno al obtener los usuarios.' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
