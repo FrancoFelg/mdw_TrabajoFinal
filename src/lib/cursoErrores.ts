@@ -122,3 +122,9 @@ export const RESPUESTA_PROHIBIDO = () =>
     { error: 'Sólo un COORDINADOR o ADMIN puede gestionar el catálogo de cursos.' },
     { status: 403 }
   );
+
+export const ACCESO_NO_AUTORIZADO = () =>
+  NextResponse.json(
+    { error: 'Sólo un COORDINADOR o ADMIN puede gestionar esta acción.' },
+    { status: 403 }
+  );

@@ -3,6 +3,7 @@ import {
     ActualizarCertificadoData,
   CrearCertificadoConAtributosData,
 } from '../repositories/certificado.repository';
+import { CertificadoEstado } from '@prisma/client';
 
 export class CertificadoController {
   private service: CertificadoService;
@@ -25,6 +26,10 @@ export class CertificadoController {
 
   async actualizar(id: string, datos: ActualizarCertificadoData) {
     return await this.service.actualizar(id, datos);
+  }
+
+  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado) {
+    return await this.service.cambiarEstado(id, nuevoEstado);
   }
 
   async eliminar(id: string, usuarioEliminacionId: string) {

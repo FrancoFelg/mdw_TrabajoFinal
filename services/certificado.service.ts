@@ -67,6 +67,21 @@ export class CertificadoService {
     return await this.repo.actualizar(id, data);
   }
 
+  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado) {
+    if (nuevoEstado !== CertificadoEstado.APROBADO && nuevoEstado !== CertificadoEstado.RECHAZADO) {
+      throw new Error('ESTADO_INVALIDO');
+    }
+
+    const certificado = await this.obtenerPorId(id);
+
+    if (certificado.estado !== CertificadoEstado.PENDIENTE) {
+      throw new Error('ESTADO_NO_PENDIENTE');
+    }
+
+    return await this.repo.actualizar(id, { estado: nuevoEstado });
+  }
+
+
   async eliminar(id: string, usuarioEliminacionId: string) {
     await this.obtenerPorId(id);
     return await this.repo.eliminar(id, usuarioEliminacionId);
