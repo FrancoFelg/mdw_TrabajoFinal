@@ -46,7 +46,7 @@ export class CursoRepository {
           ? {
               create: data.atributos.map((attr) => ({
                 campoId: attr.campoId,
-                valor: attr.valor,
+                dato: attr.dato,
                 fechaHasta: attr.fechaHasta ?? null,
                 usuarioCreacionId: data.usuarioCreacionId,
               })),
@@ -94,12 +94,12 @@ export class CursoRepository {
             create: {
               cursoId: id,
               campoId: attr.campoId,
-              valor: attr.valor,
+              dato: attr.dato,
               fechaHasta: attr.fechaHasta ?? null,
               usuarioCreacionId: usuarioId,
             },
             update: {
-              valor: attr.valor,
+              dato: attr.dato,
               fechaHasta: attr.fechaHasta ?? null,
               fechaCreacion: new Date(),
               usuarioCreacionId: usuarioId,

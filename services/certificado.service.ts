@@ -34,7 +34,7 @@ export class CertificadoService {
     // 3. Lógica para los atributos
     if (data.atributos && data.atributos.length > 0) {
       for (const attr of data.atributos) {
-        if (!attr.campoId || attr.valor === undefined || attr.valor === null) {
+        if (!attr.campoId || attr.dato === undefined || attr.dato === null) {
           throw new Error('ATRIBUTO_INCOMPLETO_CAMPO_Y_VALOR_REQUERIDOS');
         }
       }

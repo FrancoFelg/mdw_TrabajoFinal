@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+  PrismaClientInitializationError,
+} from '@prisma/client/runtime/library';
+
 
 // ---------------------------------------------------------------------------
 // Errores de negocio: los services lanzan `new Error('CODIGO')` y acá se
@@ -48,7 +54,7 @@ const ERRORES_NEGOCIO: Record<string, { status: number; mensaje: string }> = {
 // Errores de Prisma: se traducen por código para no filtrar detalles internos.
 // https://www.prisma.io/docs/orm/reference/error-reference
 // ---------------------------------------------------------------------------
-function responderErrorPrisma(error: Prisma.PrismaClientKnownRequestError) {
+function responderErrorPrisma(error: PrismaClientKnownRequestError) {
   switch (error.code) {
     case 'P2002': // violación de unique
       return NextResponse.json(
