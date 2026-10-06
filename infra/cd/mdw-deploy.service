@@ -14,6 +14,8 @@ WorkingDirectory=/opt/mdw_TrabajoFinal
 ExecStart=/usr/local/bin/mdw-deploy
 # El clone en /opt es de root; con otro usuario git tira "dubious ownership"
 User=root
+# Crea /var/lib/mdw-deploy para last-ok / last-failed (ver deploy.sh)
+StateDirectory=mdw-deploy
 # Sin límite: el build de Next puede tardar varios minutos en el VPS
 TimeoutStartSec=0
 # Que el git/curl del deploy ceda CPU a las apps de prod (el build corre en
