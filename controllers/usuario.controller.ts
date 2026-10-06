@@ -11,7 +11,7 @@ export class UsuarioController {
   // POST /api/usuarios
   registrar = async (req: Request, res: Response) => {
     try {
-      const { nombreUsuario, password, rol, persona } = req.body;
+      const { nombreUsuario, password, persona } = req.body;
 
       if (!nombreUsuario || !password || !persona?.nombre || !persona?.apellido || !persona?.fechaNac) {
         return res.status(400).json({ error: 'Faltan campos obligatorios para el registro.' });
@@ -20,7 +20,6 @@ export class UsuarioController {
       const nuevoUsuario = await this.usuarioService.registrarUsuario({
         nombreUsuario,
         password,
-        rol,
         persona: {
           ...persona,
           fechaNac: new Date(persona.fechaNac)
