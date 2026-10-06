@@ -173,10 +173,10 @@ model CursosRelAtributos {
 // Troncal
 model Certificado {
   id                 String            @id @default(cuid())
-  cursoId            String
+  cursoId            String?
   usuarioId          String
   codigoVerificacion String            @unique
-  curso              Cursos            @relation(fields: [cursoId], references: [id])
+  curso              Cursos?            @relation(fields: [cursoId], references: [id])
   estado             CertificadoEstado @default(PENDIENTE)
   usuario            Usuario           @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
   fechaEmision       DateTime          @default(now())

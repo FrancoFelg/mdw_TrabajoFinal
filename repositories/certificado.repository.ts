@@ -3,7 +3,7 @@ import { Certificado, CertificadoEstado } from '@prisma/client';
 
 export interface AtributoValorInput {
   campoId: string;
-  valor: string;
+  dato: string;
   fechaHasta?: Date;
 }
 
@@ -38,7 +38,7 @@ export class CertificadoRepository {
               create: data.atributos.map((attr) => ({
                 campoId: attr.campoId,
                 // La columna en el schema se llama `dato`; `valor` es el nombre del contrato de la API
-                dato: attr.valor,
+                dato: String(attr.dato),
                 fechaHasta: attr.fechaHasta,
                 usuarioCreacionId: data.usuarioCreacionId,
               })),

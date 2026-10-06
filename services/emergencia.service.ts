@@ -4,7 +4,6 @@ import { GeocodingService } from './geocoding.service';
 import { ModoViaje, Punto, RutasService } from './rutas.service';
 import { EmergenciaEstado, Prioridad, Provincia } from '@prisma/client';
 
-
 // Body de POST /api/emergencias. La ubicación llega de una de dos formas:
 //   - GPS: coordenada_x + coordenada_y + provincia
 //   - Dirección manual: direccion (se geocodifica con Google Maps)
@@ -29,18 +28,6 @@ export const CrearEmergenciaSchema = z
     { message: 'Debe enviar una dirección, o coordenada_x + coordenada_y + provincia.' },
   );
 export type CrearEmergenciaInput = z.infer<typeof CrearEmergenciaSchema>;
-
-// Contrato de GET /api/emergencias: un punto listo para dibujar en un mapa
-export interface EmergenciaMapa {
-  id: string;
-  descripcion: string;
-  fecha: string;
-  prioridad: Prioridad;
-  estado: EmergenciaEstado;
-  provincia: Provincia;
-  coordenada_x: number; // longitud
-  coordenada_y: number; // latitud
-}
 
 export class EmergenciaService {
   private emergenciaRepo: EmergenciaRepository;
@@ -122,21 +109,21 @@ export class EmergenciaService {
     };
   }
 
-  // Emergencias activas listas para dibujar en el mapa
-  async listarParaMapa(): Promise<EmergenciaMapa[]> {
-    const emergencias = await this.emergenciaRepo.findActivasConUbicacion();
-    return emergencias.map((e) => ({
-      id: e.id,
-      descripcion: e.descripcion,
-      fecha: e.fecha.toISOString(),
-      prioridad: e.prioridad,
-      estado: e.estado,
-      provincia: e.ubicacion.provincia,
-      coordenada_x: e.ubicacion.coordenada_x as number,
-      coordenada_y: e.ubicacion.coordenada_y as number,
-    }));
+  // Listar todas las emergencias
+  async listarEmergencias() {
+    return await this.emergenciaRepo.findAll();
   }
 
+  // Obtener detalle de una emergencia
+  async obtenerPorId(id: string) {
+    const emergencia = await this.emergenciaRepo.findById(id);
+    if (!emergencia) {
+      throw new Error('EMERGENCIA_NO_ENCONTRADA');
+    }
+    return emergencia;
+  }
+
+  // Tomar la emergencia (con reglas de negocio y control de concurrencia)
   async tomarEmergencia(emergenciaId: string, usuarioId: string) {
     // 1. Validar existencia de la emergencia
     const emergencia = await this.emergenciaRepo.findById(emergenciaId);
@@ -174,5 +161,28 @@ export class EmergenciaService {
       emergenciaId,
       estado: EmergenciaEstado.EN_CAMINO,
     };
+  }
+
+  // Finalizar la emergencia
+  async finalizarEmergencia(emergenciaId: string, usuarioId: string, observaciones?: string) {
+    const emergencia = await this.emergenciaRepo.findById(emergenciaId);
+    if (!emergencia) {
+      throw new Error('EMERGENCIA_NO_ENCONTRADA');
+    }
+
+    if (emergencia.estado !== EmergenciaEstado.EN_CAMINO) {
+      throw new Error('EMERGENCIA_NO_ESTA_EN_PROCESO');
+    }
+
+    // Validar que el voluntario que la finaliza sea quien la tiene asignada
+    const esVoluntarioAsignado = emergencia.usuarios?.some(
+      (relacion: any) => relacion.usuarioId === usuarioId
+    );
+
+    if (!esVoluntarioAsignado) {
+      throw new Error('NO_ES_EL_VOLUNTARIO_ASIGNADO');
+    }
+
+    return await this.emergenciaRepo.finalizarEmergencia(emergenciaId);
   }
 }

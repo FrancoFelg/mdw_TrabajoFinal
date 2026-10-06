@@ -47,11 +47,17 @@ cd /opt/mdw_TrabajoFinal && git pull
 install -m 0755 infra/cd/deploy.sh /usr/local/bin/mdw-deploy
 install -m 0644 infra/cd/mdw-deploy.service infra/cd/mdw-deploy.timer /etc/systemd/system/
 systemctl daemon-reload
+# Marca lo que ya está corriendo como desplegado; sin esto la primera corrida
+# rebuildea el mismo commit (no rompe nada, pero es un build al pedo)
+install -d -m 0755 /var/lib/mdw-deploy
+git rev-parse HEAD > /var/lib/mdw-deploy/last-ok
 systemctl enable --now mdw-deploy.timer
 systemctl list-timers mdw-deploy.timer
 ```
 
 Son **copias** a propósito (ver modelo de seguridad). Si cambia algo en `infra/cd/`, repetir los dos `install` y `systemctl daemon-reload`.
+
+El script compara `origin/main` contra `/var/lib/mdw-deploy/last-ok` (último deploy con health OK), no contra `HEAD`. Así un deploy que falla a mitad de camino se reintenta en la próxima corrida en vez de darse por hecho.
 
 ### Operación
 
@@ -67,7 +73,11 @@ Cuando no hay cambios el script sale sin loguear nada, así que el journal solo 
 
 ### Si un deploy falla
 
-El script **no hace rollback automático**: loguea el error con el comando exacto de rollback y sale con 1. El container viejo sigue arriba si el build falló; si falló el health, revisar `docker compose ... logs app migrate`. Con `journalctl -u mdw-deploy -n 50` está todo.
+El script **no hace rollback automático**: loguea el error y sale con 1. El container viejo sigue arriba si el build falló; si falló el health, revisar `docker compose ... logs app migrate`. Con `journalctl -u mdw-deploy -n 50` está todo.
+
+**Reintentos:** el mismo commit se reintenta en cada corrida hasta `MAX_ATTEMPTS` (3) fallos; el contador vive en `/var/lib/mdw-deploy/last-failed`. Después el CD queda quieto hasta que llegue otro commit a `main`. Para forzar un reintento antes: `rm /var/lib/mdw-deploy/last-failed && systemctl start mdw-deploy.service`.
+
+**Rollback:** revertir el commit en `main` (PR de revert) y el CD despliega la versión buena solo. Hacer `git reset --hard` en el VPS **no alcanza**: el timer vuelve a traer el commit roto en la próxima corrida. Si urge, primero `systemctl stop mdw-deploy.timer`, después el reset + `up -d --build`, y reactivar el timer cuando `main` esté revertida.
 
 Si alguien editó archivos trackeados a mano en el VPS, el script se niega a pisarlos y avisa. Resolver con `git stash` o `git checkout -- <archivo>` y volver a correr.
 

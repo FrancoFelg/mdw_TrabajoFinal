@@ -9,7 +9,7 @@ export class EmergenciaController {
     this.emergenciaService = new EmergenciaService();
   }
 
-  // POST /api/emergencias — reporte público
+  // POST /api/emergencias — reportar una emergencia (autenticado)
   async crear(datos: CrearEmergenciaInput) {
     return await this.emergenciaService.crear(datos);
   }
@@ -17,11 +17,6 @@ export class EmergenciaController {
   // GET /api/emergencias/:id/eta — tiempo de llegada del voluntario
   async calcularEta(id: string, origen: Punto, modo?: ModoViaje) {
     return await this.emergenciaService.calcularEta(id, origen, modo);
-  }
-
-  // GET /api/emergencias — activas con ubicación, para el mapa
-  async listarParaMapa() {
-    return await this.emergenciaService.listarParaMapa();
   }
 
   // POST /api/emergencias/:id/tomar

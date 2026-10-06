@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { EmergenciaController } from '../../../../controllers/emergencia.controller';
-import { CrearEmergenciaSchema } from '../../../../services/emergencia.service';
 import { getUserFromRequest } from '@/lib/auth';
+import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
+import { EmergenciaController } from '../../../../controllers/emergencia.controller';
+import { CrearEmergenciaSchema, EmergenciaService } from '../../../../services/emergencia.service';
 
+const service = new EmergenciaService();
 const controller = new EmergenciaController();
 
-// GET /api/emergencias — emergencias activas con coordenadas, para el mapa (autenticado)
+// GET /api/emergencias — Listar emergencias
 export async function GET(req: NextRequest) {
-  if (!getUserFromRequest(req)) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-  }
+    const usuario = getUserFromRequest(req);
+    if (!usuario) return RESPUESTA_NO_AUTORIZADO();
 
-  try {
-    const emergencias = await controller.listarParaMapa();
-    return NextResponse.json(emergencias, { headers: { 'Cache-Control': 'no-store' } });
-  } catch (error) {
-    console.error('Error en GET /api/emergencias:', error);
-    return NextResponse.json({ error: 'Error al obtener las emergencias.' }, { status: 500 });
-  }
+    try {
+        const emergencias = await service.listarEmergencias();
+        return NextResponse.json(emergencias, { status: 200 });
+    } catch (error: any) {
+        console.error('Error en GET /api/emergencias:', error);
+        return NextResponse.json(
+            { error: 'Error interno al consultar las emergencias.' },
+            { status: 500 }
+        );
+    }
 }
 
 // POST /api/emergencias — reportar una emergencia (autenticado).
