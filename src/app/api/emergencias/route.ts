@@ -26,7 +26,6 @@ export async function GET(req: NextRequest) {
 // POST /api/emergencias — Crear emergencia
 export async function POST(req: NextRequest) {
     const usuario = getUserFromRequest(req);
-    if (!usuario) return RESPUESTA_NO_AUTORIZADO();
 
     try {
         const rawBody = await leerBody(req);
@@ -34,7 +33,7 @@ export async function POST(req: NextRequest) {
 
         const nuevaEmergencia = await service.crearEmergencia({
             ...body,
-            creadorId: usuario.id,
+            creadorId: usuario?.id, // Si no hay usuario, devuelve undefined
         });
 
         return NextResponse.json(nuevaEmergencia, { status: 201 });
