@@ -1,38 +1,42 @@
 import { db } from '../config/database';
-import { EmergenciaEstado, Prioridad, CertificadoEstado, Prisma, Provincia } from '@prisma/client';
-
-export interface CrearEmergenciaDTO {
-  descripcion: string;
-  fecha: Date;
-  prioridad: Prioridad;
-  coordenada_x?: number;
-  coordenada_y?: number;
-  provincia: Provincia;
-  imagen?: string;
-  creadorId?: string;
-}
+import { Emergencia, EmergenciaEstado, Prioridad, CertificadoEstado, Provincia } from '@prisma/client';
 
 export class EmergenciaRepository {
-  // Crear una nueva emergencia
-  async crear(data: CrearEmergenciaDTO) {
+  // Emergencia con sus coordenadas (para calcular rutas hacia ella)
+  async findByIdConUbicacion(id: string) {
+    return await db.emergencia.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        estado: true,
+        ubicacion: { select: { coordenada_x: true, coordenada_y: true } },
+      },
+    });
+  }
+
+  // Crea la ubicación y la emergencia juntas (nested create = una sola transacción).
+  // Convención de Ubicacion: coordenada_x = longitud, coordenada_y = latitud.
+  async crear(datos: {
+    descripcion: string;
+    imagen?: string;
+    prioridad: Prioridad;
+    coordenada_x: number;
+    coordenada_y: number;
+    provincia: Provincia;
+  }): Promise<Emergencia> {
     return await db.emergencia.create({
       data: {
-        descripcion: data.descripcion,
-        fecha: new Date(data.fecha),
-        prioridad: data.prioridad,
-        imagen: data.imagen,
-        estado: EmergenciaEstado.SIN_GESTIONAR,
-        // Crea automáticamente la Ubicación anidada
+        descripcion: datos.descripcion,
+        imagen: datos.imagen,
+        fecha: new Date(),
+        prioridad: datos.prioridad,
         ubicacion: {
           create: {
-            coordenada_x: data.coordenada_x !== undefined ? Number(data.coordenada_x) : null,
-            coordenada_y: data.coordenada_y !== undefined ? Number(data.coordenada_y) : null,
-            provincia: data.provincia,
+            coordenada_x: datos.coordenada_x,
+            coordenada_y: datos.coordenada_y,
+            provincia: datos.provincia,
           },
         },
-      },
-      include: {
-        ubicacion: true,
       },
     });
   }

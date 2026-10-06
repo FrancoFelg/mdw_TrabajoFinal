@@ -45,6 +45,8 @@ services:
       # Host = nombre del servicio `db`, resuelto por DNS interno de compose
       DATABASE_URL: mysql://${MYSQL_USER:?}:${MYSQL_PASSWORD:?}@db:3306/${MYSQL_DATABASE:?}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
+      # Opcional: sin key, geocoding, autocompletado y ETA responden 503
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
     expose:
       - "3000"
     healthcheck:

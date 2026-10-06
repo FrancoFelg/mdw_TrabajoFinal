@@ -10,7 +10,8 @@
 | `POST /api/auth/logout` | Cerrar la sesión activa | Autenticado | H2 |
 | `POST /api/solicitudes-ascenso` | Crear una solicitud para ascender a coordinador | Voluntario | H3 |
 | `GET /api/solicitudes-ascenso` | Listar las solicitudes de ascenso pendientes y resueltas | Coordinador | H3 |
-| `PATCH /api/solicitudes-ascenso/:id` | Aprobar o rechazar la solicitud de ascenso | Coordinador | H3 |
+| `POST /api/solicitudes-ascenso/:id/aprobar` | Aprueba la solicitud de ascenso de la persona | Coordinador | H3 |
+| `POST /api/solicitudes-ascenso/:id/rechazar` | Desaprueba la solicitud de ascenso de la persona | Coordinador | H3 |
 | `GET /api/cursos` | Consultar el catálogo de cursos | Autenticado | H4 |
 | `POST /api/cursos` | Crear un nuevo curso en el catálogo | Coordinador | H4 |
 | `PATCH /api/cursos/:id` | Editar información o atributos de un curso | Coordinador | H4 |
