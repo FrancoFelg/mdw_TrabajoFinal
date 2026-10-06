@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CertificadoController } from '../../../../../controllers/certificado.controller';
+import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
+import { ACCESO_NO_AUTORIZADO, RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
+import { CertificadoEstado } from '@prisma/client';
 
 const controller = new CertificadoController();
 
@@ -33,6 +36,52 @@ export async function PUT(req: NextRequest, { params }: Contexto) {
   }
 }
 
+export async function PATCH(req: NextRequest, { params }: Contexto) {
+  // 1. Autenticación y Autorización (Solo Coordinadores o Admins)
+  const usuario = getUserFromRequest(req);
+  if (!usuario) return RESPUESTA_NO_AUTORIZADO();
+  if (!esCoordinadorOAdmin(usuario)) return ACCESO_NO_AUTORIZADO();
+
+  try {
+    const { id } = await params;
+    const { estado } = await req.json();
+
+    if (!estado) {
+      return NextResponse.json(
+        { error: 'El campo "estado" es obligatorio.' },
+        { status: 400 }
+      );
+    }
+
+    const actualizado = await controller.cambiarEstado(id, estado as CertificadoEstado);
+    return NextResponse.json(actualizado, { status: 200 });
+
+  } catch (error: any) {
+    if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
+      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
+    }
+
+    if (error.message === 'ESTADO_INVALIDO') {
+      return NextResponse.json(
+        { error: 'Solo se permite cambiar el estado a APROBADO o RECHAZADO.' },
+        { status: 400 }
+      );
+    }
+
+    if (error.message === 'ESTADO_NO_PENDIENTE') {
+      return NextResponse.json(
+        { error: 'Solo se pueden aprobar o rechazar certificados en estado PENDIENTE.' },
+        { status: 422 } // Unprocessable Entity
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Error al actualizar el estado del certificado.' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(req: NextRequest, { params }: Contexto) {
   try {
     const { id } = await params;
@@ -48,4 +97,6 @@ export async function DELETE(req: NextRequest, { params }: Contexto) {
     }
     return NextResponse.json({ error: 'Error al eliminar el certificado.' }, { status: 500 });
   }
+
+  
 }

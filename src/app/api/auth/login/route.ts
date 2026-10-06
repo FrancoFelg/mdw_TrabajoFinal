@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const respuesta = await authService.login(nombreUsuario, password);
     return NextResponse.json(respuesta, { status: 200 });
   } catch (error: any) {
-        console.error('Error detallado en login:', error)
+    console.error('Error detallado en login:', error)
 
     if (error.message === 'CREDANCIALES_INVALIDAS') {
       return NextResponse.json(
@@ -31,4 +31,5 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
 }
