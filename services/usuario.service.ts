@@ -9,7 +9,7 @@ export class UsuarioService {
     this.usuarioRepo = new UsuarioRepository();
   }
 
-  async registrarUsuario(dto: Omit<CrearUsuarioDTO, 'passwordHash'> & { password: string }) {
+  async registrarUsuario(dto: Omit<CrearUsuarioDTO, 'passwordHash' | 'rol'> & { password: string }) {
     // 1. Verificar si el nombre de usuario ya existe
     const usuarioExistente = await this.usuarioRepo.findByNombreUsuario(dto.nombreUsuario);
     if (usuarioExistente) {
@@ -20,11 +20,12 @@ export class UsuarioService {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
-    // 3. Crear el usuario en la BD
+    // 3. Crear el usuario en la BD. El rol no se puede autoasignar:
+    // todo registro arranca como VOLUNTARIO y solo un admin lo cambia
     const nuevoUsuario = await this.usuarioRepo.crear({
       nombreUsuario: dto.nombreUsuario,
       passwordHash,
-      rol: dto.rol,
+      rol: Rol.VOLUNTARIO,
       persona: dto.persona
     });
 

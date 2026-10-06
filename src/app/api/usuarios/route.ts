@@ -24,7 +24,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { nombreUsuario, password, rol, persona } = body;
+    // El rol no se toma del body: el registro público siempre crea VOLUNTARIO
+    const { nombreUsuario, password, persona } = body;
 
     if (!nombreUsuario || !password || !persona?.nombre || !persona?.apellido || !persona?.fechaNac) {
       return NextResponse.json(
@@ -36,7 +37,6 @@ export async function POST(req: NextRequest) {
     const nuevoUsuario = await usuarioService.registrarUsuario({
       nombreUsuario,
       password,
-      rol,
       persona: {
         ...persona,
         fechaNac: new Date(persona.fechaNac),
