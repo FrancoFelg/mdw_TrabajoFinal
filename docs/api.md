@@ -23,7 +23,5 @@
 | `POST /api/emergencias` | Reportar una nueva emergencia en la vía pública | **Público** | H7 |
 | `GET /api/emergencias` | Listar y filtrar emergencias activas para el mapa | Autenticado | H8 |
 | `GET /api/emergencias/:id` | Obtener detalle y ficha completa de una emergencia | Autenticado | H8 |
-| `GET /api/notificaciones` | Consultar alertas generadas por el sistema | Autenticado | H9 |
-| `PATCH /api/notificaciones/preferencias` | Configurar el envío opcional de notificaciones por email | Autenticado | H9 |
 | `POST /api/emergencias/:id/tomar` | Asignarse y marcar la emergencia como `EN CAMINO` | Voluntario | H10 |
 | `POST /api/emergencias/:id/finalizar` | Registrar informe de atención y marcar como `GESTIONADA` | Voluntario (asignado) | H11 |
