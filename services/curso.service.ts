@@ -15,6 +15,13 @@ export interface CursoInput {
   atributos?: { campoId?: string; dato?: unknown; fechaHasta?: string | Date | null }[];
 }
 
+// Si viene, tiene que ser string. Devuelve el texto sin espacios, o undefined si no vino.
+function leerTexto(valor: unknown, codigoError: string): string | undefined {
+  if (valor === undefined) return undefined;
+  if (typeof valor !== 'string') throw new Error(codigoError);
+  return valor.trim();
+}
+
 function parseFecha(valor: string | Date | null | undefined, codigoError: string): Date | undefined {
   if (valor === undefined || valor === null || valor === '') return undefined;
   const fecha = valor instanceof Date ? valor : new Date(valor);
@@ -82,8 +89,8 @@ export class CursoService {
       throw new Error('USUARIO_CREACION_REQUERIDO');
     }
 
-    const titulo = data.titulo?.trim();
-    const descripcion = data.descripcion?.trim();
+    const titulo = leerTexto(data.titulo, 'CAMPO_DEBE_SER_TEXTO');
+    const descripcion = leerTexto(data.descripcion, 'CAMPO_DEBE_SER_TEXTO');
     const fechaDesde = parseFecha(data.fechaDesde, 'FECHA_INVALIDA');
     const fechaHasta = parseFecha(data.fechaHasta, 'FECHA_INVALIDA');
 
@@ -124,12 +131,12 @@ export class CursoService {
     const cambios: ActualizarCursoData = {};
 
     if (data.titulo !== undefined) {
-      const titulo = data.titulo.trim();
+      const titulo = leerTexto(data.titulo, 'CAMPO_DEBE_SER_TEXTO');
       if (!titulo) throw new Error('TITULO_VACIO');
       cambios.titulo = titulo;
     }
     if (data.descripcion !== undefined) {
-      const descripcion = data.descripcion.trim();
+      const descripcion = leerTexto(data.descripcion, 'CAMPO_DEBE_SER_TEXTO');
       if (!descripcion) throw new Error('DESCRIPCION_VACIA');
       cambios.descripcion = descripcion;
     }

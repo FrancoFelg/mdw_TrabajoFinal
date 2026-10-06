@@ -33,7 +33,7 @@ const ERRORES_NEGOCIO: Record<string, { status: number; mensaje: string }> = {
   TIPO_INVALIDO: { status: 400, mensaje: 'El tipo debe ser TEXTO, NUMERO, FECHA o BOOLEANO.' },
   SIN_CAMBIOS: { status: 400, mensaje: 'No se enviaron campos para actualizar.' },
   ID_INVALIDO: { status: 400, mensaje: 'El id indicado no es válido.' },
-
+  CAMPO_DEBE_SER_TEXTO: { status: 400, mensaje: 'titulo y descripcion deben ser texto.' },
   // 401 Unauthorized: sin token o token inválido
   USUARIO_CREACION_REQUERIDO: { status: 401, mensaje: 'No autorizado o token inválido.' },
   USUARIO_ELIMINACION_REQUERIDO: { status: 401, mensaje: 'No autorizado o token inválido.' },
