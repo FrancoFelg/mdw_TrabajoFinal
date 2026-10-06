@@ -24,7 +24,6 @@ export class UsuarioService {
     const nuevoUsuario = await this.usuarioRepo.crear({
       nombreUsuario: dto.nombreUsuario,
       passwordHash,
-      rol: dto.rol,
       persona: dto.persona
     });
 
