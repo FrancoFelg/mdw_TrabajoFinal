@@ -55,4 +55,19 @@ export class UsuarioService {
 
     return await this.usuarioRepo.actualizarRol(usuarioId, nuevoRol);
   }
+
+  async actualizarPerfil(usuarioId: string, datos: { persona?: Record<string, any> }) {
+    const usuarioExistente = await this.usuarioRepo.findById(usuarioId);
+    if (!usuarioExistente) {
+      throw new Error('USUARIO_NO_ENCONTRADO');
+    }
+
+    if (datos.persona?.fechaNac) {
+      datos.persona.fechaNac = new Date(datos.persona.fechaNac);
+    }
+
+    const usuarioActualizado = await this.usuarioRepo.actualizar(usuarioId, datos);
+    const { password, ...usuarioSinPassword } = usuarioActualizado;
+    return usuarioSinPassword;
+  }
 }

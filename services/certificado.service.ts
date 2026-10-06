@@ -34,7 +34,7 @@ export class CertificadoService {
     // 3. Lógica para los atributos
     if (data.atributos && data.atributos.length > 0) {
       for (const attr of data.atributos) {
-        if (!attr.campoId || attr.valor === undefined || attr.valor === null) {
+        if (!attr.campoId || attr.dato === undefined || attr.dato === null) {
           throw new Error('ATRIBUTO_INCOMPLETO_CAMPO_Y_VALOR_REQUERIDOS');
         }
       }
@@ -66,6 +66,21 @@ export class CertificadoService {
     await this.obtenerPorId(id);
     return await this.repo.actualizar(id, data);
   }
+
+  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado) {
+    if (nuevoEstado !== CertificadoEstado.APROBADO && nuevoEstado !== CertificadoEstado.RECHAZADO) {
+      throw new Error('ESTADO_INVALIDO');
+    }
+
+    const certificado = await this.obtenerPorId(id);
+
+    if (certificado.estado !== CertificadoEstado.PENDIENTE) {
+      throw new Error('ESTADO_NO_PENDIENTE');
+    }
+
+    return await this.repo.actualizar(id, { estado: nuevoEstado });
+  }
+
 
   async eliminar(id: string, usuarioEliminacionId: string) {
     await this.obtenerPorId(id);
