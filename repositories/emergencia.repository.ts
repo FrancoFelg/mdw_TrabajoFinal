@@ -1,5 +1,5 @@
 import { db } from '../config/database';
-import { Emergencia, EmergenciaEstado, Prioridad, CertificadoEstado } from '@prisma/client';
+import { Emergencia, EmergenciaEstado, Prioridad, CertificadoEstado, Provincia } from '@prisma/client';
 
 export class EmergenciaRepository {
 
@@ -7,6 +7,68 @@ export class EmergenciaRepository {
   async findById(id: string): Promise<Emergencia | null> {
     return await db.emergencia.findUnique({
       where: { id },
+    });
+  }
+
+  // Emergencia con sus coordenadas (para calcular rutas hacia ella)
+  async findByIdConUbicacion(id: string) {
+    return await db.emergencia.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        estado: true,
+        ubicacion: { select: { coordenada_x: true, coordenada_y: true } },
+      },
+    });
+  }
+
+  // Crea la ubicación y la emergencia juntas (nested create = una sola transacción).
+  // Convención de Ubicacion: coordenada_x = longitud, coordenada_y = latitud.
+  async crear(datos: {
+    descripcion: string;
+    imagen?: string;
+    lat: number;
+    lng: number;
+    provincia: Provincia;
+  }): Promise<Emergencia> {
+    return await db.emergencia.create({
+      data: {
+        descripcion: datos.descripcion,
+        imagen: datos.imagen,
+        fecha: new Date(),
+        prioridad: Prioridad.VERDE,
+        ubicacion: {
+          create: {
+            coordenada_x: datos.lng,
+            coordenada_y: datos.lat,
+            provincia: datos.provincia,
+          },
+        },
+      },
+    });
+  }
+
+  // Emergencias activas (SIN_GESTIONAR o EN_CAMINO) que tienen coordenadas cargadas, para el mapa
+  async findActivasConUbicacion() {
+    return await db.emergencia.findMany({
+      where: {
+        estado: { in: [EmergenciaEstado.SIN_GESTIONAR, EmergenciaEstado.EN_CAMINO] },
+        ubicacion: {
+          coordenada_x: { not: null },
+          coordenada_y: { not: null },
+        },
+      },
+      select: {
+        id: true,
+        descripcion: true,
+        fecha: true,
+        prioridad: true,
+        estado: true,
+        ubicacion: {
+          select: { coordenada_x: true, coordenada_y: true, provincia: true },
+        },
+      },
+      orderBy: { fecha: 'desc' },
     });
   }
 

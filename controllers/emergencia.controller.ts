@@ -1,11 +1,27 @@
 import { Request, Response } from 'express';
-import { EmergenciaService } from '../services/emergencia.service';
+import { CrearEmergenciaInput, EmergenciaService } from '../services/emergencia.service';
+import { ModoViaje, Punto } from '../services/rutas.service';
 
 export class EmergenciaController {
   private emergenciaService: EmergenciaService;
 
   constructor() {
     this.emergenciaService = new EmergenciaService();
+  }
+
+  // POST /api/emergencias — reporte público
+  async crear(datos: CrearEmergenciaInput) {
+    return await this.emergenciaService.crear(datos);
+  }
+
+  // GET /api/emergencias/:id/eta — tiempo de llegada del voluntario
+  async calcularEta(id: string, origen: Punto, modo?: ModoViaje) {
+    return await this.emergenciaService.calcularEta(id, origen, modo);
+  }
+
+  // GET /api/emergencias — activas con ubicación, para el mapa
+  async listarParaMapa() {
+    return await this.emergenciaService.listarParaMapa();
   }
 
   // POST /api/emergencias/:id/tomar
