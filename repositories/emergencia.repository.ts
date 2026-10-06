@@ -27,8 +27,9 @@ export class EmergenciaRepository {
   async crear(datos: {
     descripcion: string;
     imagen?: string;
-    lat: number;
-    lng: number;
+    prioridad: Prioridad;
+    coordenada_x: number;
+    coordenada_y: number;
     provincia: Provincia;
   }): Promise<Emergencia> {
     return await db.emergencia.create({
@@ -36,11 +37,11 @@ export class EmergenciaRepository {
         descripcion: datos.descripcion,
         imagen: datos.imagen,
         fecha: new Date(),
-        prioridad: Prioridad.VERDE,
+        prioridad: datos.prioridad,
         ubicacion: {
           create: {
-            coordenada_x: datos.lng,
-            coordenada_y: datos.lat,
+            coordenada_x: datos.coordenada_x,
+            coordenada_y: datos.coordenada_y,
             provincia: datos.provincia,
           },
         },

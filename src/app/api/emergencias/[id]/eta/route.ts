@@ -14,13 +14,14 @@ const coordenada = (min: number, max: number) =>
   z.string().trim().min(1).transform(Number).pipe(z.number().min(min).max(max));
 
 const QuerySchema = z.object({
-  lat: coordenada(-90, 90),
-  lng: coordenada(-180, 180),
+  coordenada_x: coordenada(-180, 180), // longitud
+  coordenada_y: coordenada(-90, 90), // latitud
   modo: z.enum(MODOS_VIAJE).optional(),
 });
 
-// GET /api/emergencias/:id/eta?lat=..&lng=..&modo=DRIVE — distancia y tiempo
-// estimado de llegada desde la posición actual del voluntario (autenticado)
+// GET /api/emergencias/:id/eta?coordenada_x=..&coordenada_y=..&modo=DRIVE —
+// distancia y tiempo estimado de llegada desde la posición actual del
+// voluntario (autenticado)
 export async function GET(req: NextRequest, { params }: Contexto) {
   if (!getUserFromRequest(req)) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -29,15 +30,15 @@ export async function GET(req: NextRequest, { params }: Contexto) {
   const validacion = QuerySchema.safeParse(Object.fromEntries(req.nextUrl.searchParams));
   if (!validacion.success) {
     return NextResponse.json(
-      { error: `Parámetros inválidos: lat y lng son obligatorios; modo puede ser ${MODOS_VIAJE.join(', ')}.` },
+      { error: `Parámetros inválidos: coordenada_x y coordenada_y son obligatorias; modo puede ser ${MODOS_VIAJE.join(', ')}.` },
       { status: 400 },
     );
   }
 
   try {
     const { id } = await params;
-    const { lat, lng, modo } = validacion.data;
-    const eta = await controller.calcularEta(id, { lat, lng }, modo);
+    const { coordenada_x, coordenada_y, modo } = validacion.data;
+    const eta = await controller.calcularEta(id, { lat: coordenada_y, lng: coordenada_x }, modo);
     return NextResponse.json(eta, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : '';

@@ -20,9 +20,15 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST /api/emergencias — reportar una emergencia. Público: no requiere login.
-// Body: { descripcion, imagen?, direccion } ó { descripcion, imagen?, lat, lng, provincia }
+// POST /api/emergencias — reportar una emergencia (autenticado).
+// Body: { descripcion, imagen?, prioridad?, direccion }
+//    ó { descripcion, imagen?, prioridad?, coordenada_x, coordenada_y, provincia }
+// coordenada_x = longitud, coordenada_y = latitud. Sin prioridad, nace VERDE.
 export async function POST(req: NextRequest) {
+  if (!getUserFromRequest(req)) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await req.json();
