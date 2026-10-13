@@ -1,0 +1,153 @@
+---
+title: DER - mdw_TrabajoFinal (obligatorio / opcional por atributo; regla al borrar en cada relación)
+---
+erDiagram
+    Persona {
+        String id PK "obligatorio"
+        String apellido "obligatorio"
+        String nombre "obligatorio"
+        DateTime fechaNac "obligatorio"
+        DateTime creadoEn "obligatorio (default now)"
+    }
+    Telefono {
+        String id PK "obligatorio"
+        String tipo "obligatorio"
+        String numero "obligatorio"
+        String personaId FK "obligatorio"
+    }
+    Usuario {
+        String id PK "obligatorio"
+        String nombreUsuario UK "obligatorio"
+        String password "obligatorio"
+        Rol rol "obligatorio (default VOLUNTARIO)"
+        String personaId FK,UK "obligatorio"
+        DateTime creadoEn "obligatorio (default now)"
+    }
+    SolicitudAscenso {
+        String id PK "obligatorio"
+        String usuarioId FK "obligatorio"
+        SolicitudAscensoEstado estado "obligatorio (default PENDIENTE)"
+        DateTime creadoEn "obligatorio (default now)"
+    }
+    Cursos {
+        String id PK "obligatorio"
+        String titulo "obligatorio"
+        String descripcion "obligatorio"
+        DateTime fechaDesde "obligatorio"
+        DateTime fechaHasta "obligatorio"
+        DateTime fechaCreacion "obligatorio (default now)"
+        String usuarioCreacionId FK "obligatorio"
+        DateTime fechaEliminacion "opcional"
+        String usuarioEliminacionId FK "opcional"
+    }
+    CursosAtributos {
+        String id PK "obligatorio"
+        String nombre UK "obligatorio"
+        AtributoTipo tipo "obligatorio (default TEXTO)"
+        DateTime fechaCreacion "obligatorio (default now)"
+        String usuarioCreacionId FK "obligatorio"
+        DateTime fechaEliminacion "opcional"
+        String usuarioEliminacionId FK "opcional"
+    }
+    CursosRelAtributos {
+        String id PK "obligatorio"
+        String cursoId FK "obligatorio (UK con campoId)"
+        String campoId FK "obligatorio (UK con cursoId)"
+        String dato "obligatorio"
+        DateTime fechaHasta "opcional"
+        DateTime fechaCreacion "obligatorio (default now)"
+        String usuarioCreacionId FK "obligatorio"
+        DateTime fechaEliminacion "opcional"
+        String usuarioEliminacionId FK "opcional"
+    }
+    Certificado {
+        String id PK "obligatorio"
+        String cursoId FK "opcional"
+        String usuarioId FK "obligatorio"
+        String codigoVerificacion UK "obligatorio"
+        CertificadoEstado estado "obligatorio (default PENDIENTE)"
+        DateTime fechaEmision "obligatorio (default now)"
+        DateTime fechaCreacion "obligatorio (default now)"
+        String usuarioCreacionId FK "obligatorio"
+        DateTime fechaEliminacion "opcional"
+        String usuarioEliminacionId FK "opcional"
+    }
+    CertificadoAtributo {
+        String id PK "obligatorio"
+        String nombre UK "obligatorio"
+        AtributoTipo tipo "obligatorio (default TEXTO)"
+        DateTime fechaCreacion "obligatorio (default now)"
+        String usuarioCreacionId FK "obligatorio"
+        DateTime fechaEliminacion "opcional"
+        String usuarioEliminacionId FK "opcional"
+    }
+    CertificadosRelAtributos {
+        String id PK "obligatorio"
+        String certificadoId FK "obligatorio (UK con campoId)"
+        String campoId FK "obligatorio (UK con certificadoId)"
+        String dato "obligatorio"
+        DateTime fechaHasta "opcional"
+        DateTime fechaCreacion "obligatorio (default now)"
+        String usuarioCreacionId FK "obligatorio"
+        DateTime fechaEliminacion "opcional"
+        String usuarioEliminacionId FK "opcional"
+    }
+    Ubicacion {
+        String id PK "obligatorio"
+        Float coordenada_x "opcional"
+        Float coordenada_y "opcional"
+        Provincia provincia "obligatorio"
+    }
+    Emergencia {
+        String id PK "obligatorio"
+        String descripcion "obligatorio"
+        DateTime fecha "obligatorio"
+        String imagen "opcional"
+        String ubicacionId FK "obligatorio"
+        Prioridad prioridad "obligatorio"
+        EmergenciaEstado estado "obligatorio (default SIN_GESTIONAR)"
+        DateTime creadoEn "obligatorio (default now)"
+    }
+    UsuarioEmergencia {
+        String id PK "obligatorio"
+        String usuarioId FK "obligatorio (UK con emergenciaId)"
+        String emergenciaId FK "obligatorio (UK con usuarioId)"
+        DateTime creadoEn "obligatorio (default now)"
+    }
+
+    %% Personas y usuarios
+    Persona ||--o| Usuario : "1:1 · al borrar: restringir"
+    Persona ||--o{ Telefono : "1:N · al borrar: restringir"
+    Usuario ||--o{ SolicitudAscenso : "1:N · al borrar: restringir"
+
+    %% N-N
+    Usuario }o..o{ Emergencia : "N:N vía UsuarioEmergencia · al borrar: restringir"
+    Usuario ||--o{ UsuarioEmergencia : "1:N · al borrar: restringir"
+    Emergencia ||--o{ UsuarioEmergencia : "1:N · al borrar: restringir"
+    Ubicacion ||--o{ Emergencia : "1:N · al borrar: restringir"
+
+    Cursos }o..o{ CursosAtributos : "N:N vía CursosRelAtributos · al borrar: restringir"
+    Cursos ||--o{ CursosRelAtributos : "1:N · al borrar: restringir"
+    CursosAtributos ||--o{ CursosRelAtributos : "1:N · al borrar: restringir"
+
+    Certificado }o..o{ CertificadoAtributo : "N:N vía CertificadosRelAtributos · al borrar: restringir"
+    Certificado ||--o{ CertificadosRelAtributos : "1:N · al borrar: restringir"
+    CertificadoAtributo ||--o{ CertificadosRelAtributos : "1:N · al borrar: restringir"
+
+    %% Certificados
+    Cursos |o--o{ Certificado : "1:N (curso opcional) · al borrar: anular"
+    Usuario ||--o{ Certificado : "1:N alumno · al borrar: restringir"
+
+    %% Auditoría: creador (obligatorio) y eliminador (opcional)
+    Usuario ||--o{ Cursos : "1:N creador · al borrar: restringir"
+    Usuario |o--o{ Cursos : "1:N eliminador · al borrar: anular"
+    Usuario ||--o{ CursosAtributos : "1:N creador · al borrar: restringir"
+    Usuario |o--o{ CursosAtributos : "1:N eliminador · al borrar: anular"
+    Usuario ||--o{ CursosRelAtributos : "1:N creador · al borrar: restringir"
+    Usuario |o--o{ CursosRelAtributos : "1:N eliminador · al borrar: anular"
+    Usuario ||--o{ Certificado : "1:N creador · al borrar: restringir"
+    Usuario |o--o{ Certificado : "1:N eliminador · al borrar: anular"
+    Usuario ||--o{ CertificadoAtributo : "1:N creador · al borrar: restringir"
+    Usuario |o--o{ CertificadoAtributo : "1:N eliminador · al borrar: anular"
+    Usuario ||--o{ CertificadosRelAtributos : "1:N creador · al borrar: restringir"
+    Usuario |o--o{ CertificadosRelAtributos : "1:N eliminador · al borrar: anular"
