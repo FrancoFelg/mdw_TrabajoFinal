@@ -4,7 +4,6 @@ import { Usuario, Persona, Rol } from '@prisma/client';
 export interface CrearUsuarioDTO {
   nombreUsuario: string;
   passwordHash: string;
-  rol?: Rol;
   persona: {
     nombre: string;
     apellido: string;
@@ -36,7 +35,7 @@ export class UsuarioRepository {
       data: {
         nombreUsuario: data.nombreUsuario,
         password: data.passwordHash,
-        rol: data.rol || Rol.VOLUNTARIO,
+        rol: Rol.VOLUNTARIO,
         persona: {
           create: {
             nombre: data.persona.nombre,
