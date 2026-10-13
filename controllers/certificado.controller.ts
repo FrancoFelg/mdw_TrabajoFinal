@@ -16,8 +16,8 @@ export class CertificadoController {
     return await this.service.crearCertificado(datos, usuarioCreacionId);
   }
 
-  async listar() {
-    return await this.service.listarCertificados();
+  async listar(usuarioId?: string) {
+    return await this.service.listarCertificados(usuarioId);
   }
 
   async obtenerPorId(id: string) {

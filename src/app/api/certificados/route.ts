@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CertificadoController } from '../../../../controllers/certificado.controller';
-import { getUserIdFromRequest } from '@/lib/auth';
+import { esCoordinadorOAdmin, getUserFromRequest, getUserIdFromRequest } from '@/lib/auth';
+import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
 
 const controller = new CertificadoController();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+    const usuario = getUserFromRequest(req);
+    if (!usuario) return RESPUESTA_NO_AUTORIZADO();
+
     try {
-        const certificados = await controller.listar();
+        // Coordinadores y admins ven todos; un voluntario solo los suyos
+        const certificados = await controller.listar(esCoordinadorOAdmin(usuario) ? undefined : usuario.id);
         return NextResponse.json(certificados);
     } catch {
         return NextResponse.json({ error: 'Error al obtener los certificados.' }, { status: 500 });

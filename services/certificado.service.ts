@@ -50,8 +50,8 @@ export class CertificadoService {
     return await this.repo.crearConAtributos(payloadCompleto);
   }
 
-  async listarCertificados() {
-    return await this.repo.findAll();
+  async listarCertificados(usuarioId?: string) {
+    return await this.repo.findAll(usuarioId);
   }
 
   async obtenerPorId(id: string) {
