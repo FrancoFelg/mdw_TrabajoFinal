@@ -1,0 +1,8 @@
+import { Alert, Badge, Button, Card, Input, Skeleton } from '@/components/ui';
+import { SinDatos } from '@/components/sin-datos';
+
+export const metadata = { title: 'Sistema visual | Red de Apoyo' };
+
+export default function Sistema() {
+  return <section className="stack"><header><p className="eyebrow">Componentes compartidos</p><h1>Sistema visual</h1><p className="lead">Una base común para todas las pantallas.</p></header><div className="card-grid"><Card><h2>Acciones</h2><div className="actions"><Button>Principal</Button><Button className="button-secondary">Secundario</Button><Button disabled>Ingresando…</Button></div></Card><Card><h2>Campos</h2><label htmlFor="ejemplo">Nombre de usuario</label><Input id="ejemplo" placeholder="Ejemplo" /><label htmlFor="invalido">Campo con error</label><Input id="invalido" aria-invalid="true" aria-describedby="error-campo" /><p id="error-campo">Este campo es obligatorio.</p></Card><Card><h2>Roles</h2><div className="actions"><Badge>Administrador</Badge><Badge>Coordinador</Badge><Badge>Voluntario</Badge></div></Card></div><Card><h2>Texto extenso</h2><p>María de los Ángeles Fernández de la Comunidad de Voluntarios y Coordinadores para el Acompañamiento de Personas en Situación de Vulnerabilidad.</p><p>Este ejemplo permite revisar saltos de línea y tamaños en pantallas angostas sin cargar datos de prueba.</p></Card><Card><h2>Cargando</h2><Skeleton /><Skeleton /><Skeleton /></Card><Alert><h2>Error de consulta</h2><p>No pudimos cargar los datos. Intentá nuevamente.</p></Alert><SinDatos titulo="Todavía no hay datos"><p>Los registros aparecerán cuando estén disponibles.</p></SinDatos><SinDatos titulo="Sin resultados"><p>No hay coincidencias. Probá con otro término.</p></SinDatos></section>;
+}

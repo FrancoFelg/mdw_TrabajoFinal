@@ -126,6 +126,26 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 
 ## 5. Flujo principal
 
+### Mapa de pantallas
+
+| Pantalla | Dirección | Acceso | Estado |
+| :--- | :--- | :--- | :--- |
+| Inicio | `/` | Público | Implementada; presentación de la red |
+| Iniciar sesión | `/login` | Público; con sesión vuelve al destino permitido | Implementada |
+| Crear cuenta | `/registro` | Público; con sesión vuelve al inicio | Implementada; alta como voluntario |
+| Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
+| Sistema visual | `/sistema` | Público; ejemplos sin datos personales | Implementada |
+| Reportar emergencia | Por definir | Público | Pantalla pendiente; API existente |
+| Mapa y emergencias pendientes | Por definir | Voluntario, coordinador y administrador | Pantalla pendiente; API existente |
+| Cursos y certificados | Por definir | Según rol y operación | Pantallas pendientes; API existente |
+| Solicitudes de ascenso | Por definir | Según rol y operación | Pantalla pendiente; API existente |
+
+El acceso anónimo a `/usuarios` redirige a `/login?next=/usuarios`. Al iniciar sesión se recupera ese destino.
+Un voluntario autenticado recibe un mensaje de acceso restringido sin consultar el directorio.
+Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfaz propia.
+
+### Recorrido del flujo
+
 1. Un transeúnte reporta una persona vulnerada en la calle (**7. Reportar una emergencia**). El sistema registra la **Emergencia** como `SIN GESTIONAR`.
 2. Un voluntario inicia sesión (**2. Inicio de sesión**) y consulta el mapa (**8. Visualizar mapa de emergencias**) o consulta las emergencias pendientes (**9. Listar emergencias sin tomar**).
 3. El voluntario ha cargado sus comprobantes (**5. Gestionar certificados**) y un coordinador los validó (**6. Validar certificados**).
