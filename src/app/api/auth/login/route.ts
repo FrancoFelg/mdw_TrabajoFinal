@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthService } from '../../../../../services/auth.service';
+import { sessionCookie } from '@/lib/session';
 
 const authService = new AuthService();
 
@@ -8,7 +9,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { nombreUsuario, password } = body;
 
-    if (!nombreUsuario || !password) {
+    if (typeof nombreUsuario !== 'string' || typeof password !== 'string' || !nombreUsuario.trim() || !password) {
       return NextResponse.json(
         { error: 'Debe ingresar nombreUsuario y password.' },
         { status: 400 }
@@ -16,7 +17,9 @@ export async function POST(req: NextRequest) {
     }
 
     const respuesta = await authService.login(nombreUsuario, password);
-    return NextResponse.json(respuesta, { status: 200 });
+    const response = NextResponse.json(respuesta, { status: 200 });
+    response.cookies.set('token', respuesta.token, sessionCookie);
+    return response;
   } catch (error: any) {
     console.error('Error detallado en login:', error)
 
