@@ -324,7 +324,8 @@ Comprobantes de capacitación de un usuario. Estados: `PENDIENTE` (default), `AP
 | `GET /api/certificados` | **Sin autenticación** | Listar todos los certificados vigentes (de todos los usuarios) |
 | `GET /api/certificados/:id` | **Sin autenticación** | Detalle (`404` si no existe) |
 | `POST /api/certificados` | Autenticado | Crear |
-| `PATCH /api/certificados/:id` | Coordinador | Aprobar o rechazar un certificado pendiente |
+| `PATCH /api/certificados/:id` | Coordinador (no el dueño) | Aprobar o rechazar un certificado pendiente; rechazar exige `motivo` |
+| `GET /api/certificados/:id/archivo` | Dueño o coordinador | PDF o imagen del certificado (`404` si no tiene) |
 | `PUT /api/certificados/:id` | **Sin autenticación** | Actualizar `estado` y/o `codigoVerificacion` |
 | `DELETE /api/certificados/:id` | **Sin autenticación** | Baja lógica; body `{ "usuarioEliminacionId": string }` obligatorio (`400` si falta) |
 
@@ -358,6 +359,7 @@ Errores `POST`: `401` · `400` faltan `usuarioId` o `codigoVerificacion` (el men
 | Campo | Tipo | Obligatorio |
 | :--- | :--- | :--- |
 | `estado` | `APROBADO` \| `RECHAZADO` | Sí |
+| `motivo` | string (≥ 5 caracteres) | Solo para `RECHAZADO` |
 
 ```bash
 curl -X PATCH https://mdw.guillermonatali.com/api/certificados/<id> \
@@ -365,7 +367,9 @@ curl -X PATCH https://mdw.guillermonatali.com/api/certificados/<id> \
   -d '{ "estado": "APROBADO" }'
 ```
 
-Errores: `401` · `403` · `400` falta `estado` o valor distinto de `APROBADO`/`RECHAZADO` · `404` · `422` el certificado no está en `PENDIENTE`.
+Errores: `401` · `403` sin rol de coordinación, o el certificado es de quien revisa · `400` falta `estado`, valor distinto de `APROBADO`/`RECHAZADO`, o `RECHAZADO` sin `motivo` · `404` · `422` el certificado no está en `PENDIENTE`.
+
+El archivo del certificado se sube desde la interfaz (Formación) junto con el alta: PDF, JPG, PNG o WEBP de hasta 5 MB, validado por su contenido.
 
 ---
 
@@ -397,6 +401,8 @@ Estados: `SIN_GESTIONAR` → `EN_CAMINO` → `GESTIONADA` (también existe `CANC
 | `GET /api/emergencias/:id` | Autenticado | Detalle (`404` si no existe) |
 | `POST /api/emergencias/:id/tomar` | Autenticado | Asignársela y pasar a `EN_CAMINO` |
 | `PUT /api/emergencias/:id/finalizar` | Autenticado (el voluntario asignado) | Pasar a `GESTIONADA` |
+| `GET /api/notificaciones` | Autenticado | Avisos propios y `noLeidas` (`?resumen=1`: solo el contador) |
+| `GET /api/adjuntos/:id` | Autenticado | Foto o audio de un reporte (`401` sin sesión, `404` si no existe) |
 
 > `docs/api.md` marca el reporte de emergencias como público, pero el código **exige token** en `POST /api/emergencias`.
 

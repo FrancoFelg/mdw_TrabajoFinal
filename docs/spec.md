@@ -95,8 +95,10 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 *Como transeúnte o vecino*, quiero reportar una situación de necesidad en la vía pública, *para solicitar asistencia comunitaria inmediata.*
 - **Criterios de aceptación:**
   * No requiere inicio de sesión.
-  * Se registra la descripción del incidente, foto opcional y la ubicación (vía GPS o dirección manual).
+  * Se registra lo que pasa por escrito o en un audio de hasta 60 segundos (alcanza con uno de los dos; si solo hay audio, la descripción remite a él), foto opcional y la ubicación (vía GPS o dirección manual). La foto se comprime en el teléfono; si la foto o el audio no se pueden guardar, el reporte igual queda registrado. Foto y audio solo los ven usuarios con sesión.
   * Se genera la emergencia en estado `SIN GESTIONAR` con prioridad por defecto `VERDE`.
+  * La persona que reporta no elige la prioridad: responde dos preguntas opcionales, "¿Responde si le hablás?" y "¿Respira con normalidad?" (Sí / No / No sé). La prioridad se deriva así: si alguna respuesta es "No", `ROJO`; si alguna es "No sé", `AMARILLO`; si ambas son "Sí", `VERDE`; si no responde ninguna, queda `VERDE` (por defecto). La API no cambia: recibe la prioridad ya derivada.
+  * Antes de completar el formulario se recuerda que, ante un peligro inmediato, hay que llamar al 107 (emergencias médicas) o al 911.
 
 ### 8. Visualizar mapa de emergencias
 *Como voluntario o coordinador*, quiero ver las emergencias activas en un mapa, *para ubicar rápidamente los incidentes reportados en tiempo real.*
@@ -122,6 +124,15 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 - **Criterios de aceptación:**
   * Dado que la emergencia está `EN CAMINO`, el voluntario ingresa un informe/observación final y actualiza el estado a `GESTIONADA`.
 
+### 12. Recibir avisos
+*Como voluntario o coordinador*, quiero enterarme de lo urgente sin tener la app abierta, *para responder a tiempo.*
+- **Criterios de aceptación:**
+  * Cada usuario tiene un centro de avisos dentro de la app, con contador de no leídos, que se actualiza solo.
+  * Además puede activar avisos push en su dispositivo (opcional, con su permiso). En iPhone requiere agregar la app a la pantalla de inicio.
+  * **Caso rojo nuevo:** avisa a los voluntarios con certificado `APROBADO` y a coordinación.
+  * **Cola de coordinación:** avisa a coordinación cuando hay un certificado o un pedido de ascenso nuevo para revisar (nunca a quien lo cargó).
+  * **Caso sin atender:** avisa a coordinación cuando un caso sigue `SIN GESTIONAR` más de 10 minutos (rojo), 30 (amarillo) o 120 (verde). Un mismo caso avisa una sola vez.
+
 ---
 
 ## 5. Flujo principal
@@ -130,19 +141,19 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 
 | Pantalla | Dirección | Acceso | Estado |
 | :--- | :--- | :--- | :--- |
-| Inicio | `/` | Público | Implementada; presentación de la red |
+| Reportar emergencia (inicio) | `/` | Público | Implementada; GPS o dirección, sin cuenta |
 | Iniciar sesión | `/login` | Público; con sesión vuelve al destino permitido | Implementada |
 | Crear cuenta | `/registro` | Público; con sesión vuelve al inicio | Implementada; alta como voluntario |
+| Casos: lista y mapa | `/casos` | Con sesión | Implementada; libres y en camino, filtro por prioridad |
+| Detalle de caso | `/casos/[id]` | Con sesión | Implementada; tomar y finalizar con informe |
+| Formación: certificados y cursos | `/formacion` | Con sesión; validar y crear cursos solo coordinación | Implementada |
+| Equipo: solicitudes de ascenso | `/equipo` | Coordinador y administrador | Implementada |
+| Cuenta | `/cuenta` | Con sesión | Implementada; pedido de ascenso y cierre de sesión |
 | Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
 | Sistema visual | `/sistema` | Público; ejemplos sin datos personales | Implementada |
-| Reportar emergencia | Por definir | Público | Pantalla pendiente; API existente |
-| Mapa y emergencias pendientes | Por definir | Voluntario, coordinador y administrador | Pantalla pendiente; API existente |
-| Cursos y certificados | Por definir | Según rol y operación | Pantallas pendientes; API existente |
-| Solicitudes de ascenso | Por definir | Según rol y operación | Pantalla pendiente; API existente |
 
 El acceso anónimo a `/usuarios` redirige a `/login?next=/usuarios`. Al iniciar sesión se recupera ese destino.
 Un voluntario autenticado recibe un mensaje de acceso restringido sin consultar el directorio.
-Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfaz propia.
 
 ### Recorrido del flujo
 
@@ -164,6 +175,7 @@ Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfa
 5. Una emergencia en estado `SIN GESTIONAR` solo puede ser tomada por un voluntario a la vez.
 6. Un voluntario solo puede tener una emergencia activa en estado `EN CAMINO` en un momento dado.
 7. Las solicitudes de ascensión a coordinador solo pueden ser aprobadas por usuarios con rol `Coordinador` o `Admin`.
+8. Nadie valida su propio certificado ni responde su propio pedido de ascenso: lo revisa otra persona de coordinación. Rechazar un certificado exige un motivo, que la persona ve en su lista de certificados.
 
 ---
 
@@ -179,6 +191,7 @@ Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfa
 - Labels explícitos en todos los formularios.
 - Contraste de texto/fondo mínimo de 4,5:1.
 - Los colores de prioridad (`ROJO`, `AMARILLO`, `VERDE`) se acompañan con texto explícito e iconos distintivos.
+- Modo claro y oscuro: por defecto sigue al del dispositivo; cualquier persona, con o sin cuenta, puede elegir uno a mano y la elección se recuerda en ese dispositivo.
 
 ---
 
@@ -198,4 +211,4 @@ Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfa
 4. Validación automatizada con firma digital en certificados.
 5. Aplicación nativa en tiendas (iOS/Android); el sistema es una PWA/Web responsiva.
 6. Donaciones o transacciones monetarias.
-7. Envío de notificaciones (por mail, push o SMS).
+7. Envío de notificaciones por mail o SMS (los avisos dentro de la app y el push del navegador sí están incluidos, historia 12).

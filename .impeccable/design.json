@@ -1,0 +1,665 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T21:26:38+00:00",
+  "title": "Design System: Red de Apoyo",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Blanco de hoja",
+        "canonical": "#ffffff",
+        "darkValue": "#000000",
+        "cssVar": "--bg",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "bg-2": {
+        "role": "neutral",
+        "displayName": "Gris de relleno",
+        "canonical": "#f3f3f3",
+        "darkValue": "#161616",
+        "cssVar": "--bg-2",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "bg-3": {
+        "role": "neutral",
+        "displayName": "Gris de presión",
+        "canonical": "#e8e8e8",
+        "darkValue": "#262626",
+        "cssVar": "--bg-3",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Línea",
+        "canonical": "#e9e9e9",
+        "darkValue": "#262626",
+        "cssVar": "--line",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Texto",
+        "canonical": "#000000",
+        "darkValue": "#ffffff",
+        "cssVar": "--text",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Texto secundario",
+        "canonical": "#5e5e5e",
+        "darkValue": "#a6a6a6",
+        "cssVar": "--text-2",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Negro de acción",
+        "canonical": "#000000",
+        "darkValue": "#ffffff",
+        "cssVar": "--accent",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Negro de acción, hover",
+        "canonical": "#333333",
+        "darkValue": "#dddddd",
+        "cssVar": "--accent-hover",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "Sobre acción",
+        "canonical": "#ffffff",
+        "darkValue": "#000000",
+        "cssVar": "--on-accent",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "link": {
+        "role": "secondary",
+        "displayName": "Azul de enlace",
+        "canonical": "#1f63e0",
+        "darkValue": "#6ea0ff",
+        "cssVar": "--link",
+        "tonalRamp": [
+          "#020a20",
+          "#09224f",
+          "#173d84",
+          "#255bbe",
+          "#377af8",
+          "#6aa3ff",
+          "#9cc9ff",
+          "#cff0ff"
+        ]
+      },
+      "blue": {
+        "role": "secondary",
+        "displayName": "Azul de recorrido",
+        "canonical": "#276ef1",
+        "darkValue": "#5b93ff",
+        "cssVar": "--blue",
+        "tonalRamp": [
+          "#010921",
+          "#082251",
+          "#153d87",
+          "#225ac1",
+          "#3379fc",
+          "#68a2ff",
+          "#9ac9ff",
+          "#cef0ff"
+        ]
+      },
+      "blue-soft": {
+        "role": "secondary",
+        "displayName": "Azul de recorrido, fondo",
+        "canonical": "#eaf1fe",
+        "darkValue": "#10224a",
+        "cssVar": "--blue-soft",
+        "tonalRamp": [
+          "#0a0b0d",
+          "#232529",
+          "#3f4249",
+          "#5d616a",
+          "#7c838e",
+          "#a0a5af",
+          "#c5c9d1",
+          "#eceff4"
+        ]
+      },
+      "red": {
+        "role": "tertiary",
+        "displayName": "Rojo de gravedad",
+        "canonical": "#d4252b",
+        "darkValue": "#ff4d4f",
+        "cssVar": "--red",
+        "tonalRamp": [
+          "#1c0202",
+          "#480a0b",
+          "#791819",
+          "#ad2728",
+          "#e33a3a",
+          "#fc766d",
+          "#ffa89e",
+          "#ffd9d0"
+        ]
+      },
+      "red-ink": {
+        "role": "tertiary",
+        "displayName": "Rojo de gravedad, texto",
+        "canonical": "#b51f24",
+        "darkValue": "#ff7a7c",
+        "cssVar": "--red-ink",
+        "tonalRamp": [
+          "#1b0303",
+          "#45100f",
+          "#73211f",
+          "#a63330",
+          "#da4945",
+          "#f37d74",
+          "#ffaca3",
+          "#ffdbd4"
+        ]
+      },
+      "red-soft": {
+        "role": "tertiary",
+        "displayName": "Rojo de gravedad, fondo",
+        "canonical": "#fdecec",
+        "darkValue": "#3a1213",
+        "cssVar": "--red-soft",
+        "tonalRamp": [
+          "#0d0a0a",
+          "#292424",
+          "#484040",
+          "#6a5e5e",
+          "#8d7e7e",
+          "#aea2a2",
+          "#d0c6c6",
+          "#f4ecec"
+        ]
+      },
+      "amber": {
+        "role": "tertiary",
+        "displayName": "Ámbar de atención",
+        "canonical": "#f6bc2f",
+        "darkValue": "#ffc043",
+        "cssVar": "--amber",
+        "tonalRamp": [
+          "#130900",
+          "#352100",
+          "#5a3c00",
+          "#835800",
+          "#ae7700",
+          "#ca9e3a",
+          "#e7c47f",
+          "#ffecbd"
+        ]
+      },
+      "amber-ink": {
+        "role": "tertiary",
+        "displayName": "Ámbar de atención, texto",
+        "canonical": "#7a5000",
+        "darkValue": "#ffc96b",
+        "cssVar": "--amber-ink",
+        "tonalRamp": [
+          "#110902",
+          "#32220a",
+          "#563d18",
+          "#7c5a27",
+          "#a57939",
+          "#c39e6d",
+          "#e1c49e",
+          "#ffebd1"
+        ]
+      },
+      "amber-soft": {
+        "role": "tertiary",
+        "displayName": "Ámbar de atención, fondo",
+        "canonical": "#fef6e1",
+        "darkValue": "#33270a",
+        "cssVar": "--amber-soft",
+        "tonalRamp": [
+          "#0c0b08",
+          "#27251e",
+          "#464237",
+          "#666152",
+          "#89826f",
+          "#aba595",
+          "#cdc9bd",
+          "#f2eee6"
+        ]
+      },
+      "green": {
+        "role": "tertiary",
+        "displayName": "Verde de calma",
+        "canonical": "#05944f",
+        "darkValue": "#2fbf71",
+        "cssVar": "--green",
+        "tonalRamp": [
+          "#000f04",
+          "#022e15",
+          "#065029",
+          "#0c743e",
+          "#1c9b56",
+          "#65bb81",
+          "#9bdbae",
+          "#d0fbdb"
+        ]
+      },
+      "green-ink": {
+        "role": "tertiary",
+        "displayName": "Verde de calma, texto",
+        "canonical": "#047a41",
+        "darkValue": "#5ad493",
+        "cssVar": "--green-ink",
+        "tonalRamp": [
+          "#020f05",
+          "#092d18",
+          "#164e2d",
+          "#257244",
+          "#37985d",
+          "#70b887",
+          "#a2d9b2",
+          "#d4fade"
+        ]
+      },
+      "green-soft": {
+        "role": "tertiary",
+        "displayName": "Verde de calma, fondo",
+        "canonical": "#e6f4ec",
+        "darkValue": "#0b2a1a",
+        "cssVar": "--green-soft",
+        "tonalRamp": [
+          "#0a0c0a",
+          "#222624",
+          "#3d4440",
+          "#5a645e",
+          "#79867f",
+          "#9ea8a2",
+          "#c3cbc7",
+          "#eaf0ed"
+        ]
+      },
+      "overlay": {
+        "role": "neutral",
+        "displayName": "Velo de barras fijas",
+        "canonical": "#ffffffeb",
+        "darkValue": "#000000e6",
+        "cssVar": "--overlay",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      }
+    },
+    "colorSchemes": {
+      "mechanism": "prefers-color-scheme: dark redefine los mismos custom properties en :root (src/app/globals.css)",
+      "themeColor": {
+        "light": "#ffffff",
+        "dark": "#000000"
+      },
+      "note": "darkValue en cada colorMeta es el valor del mismo token en oscuro."
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "h1 de cada pantalla; 1.75rem en la hoja de Casos."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Descripción del caso como título del detalle."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "h2 de bloque y preguntas del reporte."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Texto corrido, con números tabulares en todo el documento."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Etiquetas de campo, nombre de prioridad, texto muted."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Píldoras de estado, código de caso, metadatos de fila, encabezados de tabla."
+      },
+      "fontLoading": "Figtree vía next/font/google como --font-texto; --font-body agrega system-ui, -apple-system, Segoe UI, Roboto, sans-serif."
+    },
+    "shadows": [
+      {
+        "name": "shadow-1",
+        "value": "0 1px 2px #0000000f, 0 2px 8px #00000014",
+        "dark": "0 0 0 1px #ffffff14",
+        "purpose": "Segmento activo y card."
+      },
+      {
+        "name": "shadow-2",
+        "value": "0 4px 16px #0000001f, 0 1px 3px #00000014",
+        "dark": "0 0 0 1px #ffffff1a, 0 8px 24px #000000",
+        "purpose": "Lo que flota sobre el mapa: volver, avisos, controles, popups."
+      },
+      {
+        "name": "shadow-hoja",
+        "value": "0 -6px 24px #00000024",
+        "dark": "0 -1px 0 #ffffff1f",
+        "purpose": "La hoja que sube sobre el mapa."
+      },
+      {
+        "name": "pin",
+        "value": "0 2px 8px #00000059",
+        "purpose": "Marcadores del mapa."
+      }
+    ],
+    "glass": {
+      "value": "background: var(--overlay); backdrop-filter: saturate(1.8) blur(16px)",
+      "purpose": "Solo barras fijas: barra superior, pestañas, envío del reporte (blur 12px), acciones del caso (blur 12px)."
+    },
+    "focus": {
+      "value": "outline: 3px solid var(--blue); outline-offset: 2px",
+      "purpose": "Foco global; los campos cambian a borde de 2px en --text."
+    },
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Escala al presionar y entradas."
+      },
+      {
+        "name": "press",
+        "value": "transform: scale(.98) en .12s",
+        "purpose": "Botones; filas .99, volver y pestañas .94."
+      },
+      {
+        "name": "state",
+        "value": ".15s background-color / color / border-color",
+        "purpose": "Hover y cambios de estado."
+      },
+      {
+        "name": "avance",
+        "value": "2.4s barrido infinito",
+        "purpose": "Etapa actual del caso."
+      },
+      {
+        "name": "subir",
+        "value": ".5s opacity + translateY(12px)",
+        "purpose": "Confirmación de reporte enviado."
+      },
+      {
+        "name": "barrido",
+        "value": "1.4s linear infinite",
+        "purpose": "Esqueletos de carga."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce anula animaciones y transiciones",
+        "purpose": "Accesibilidad."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "base",
+        "value": "375px",
+        "purpose": "Móvil; probar siempre acá."
+      },
+      {
+        "name": "md",
+        "value": "720px",
+        "purpose": "Margen 24px; colas en grilla."
+      },
+      {
+        "name": "lg",
+        "value": "960px",
+        "purpose": "Escritorio: pestañas arriba, hoja de 440px + mapa a altura completa."
+      }
+    ],
+    "layout": {
+      "gutter": "16px (24px desde 720px)",
+      "container": "640px",
+      "headHeight": "60px (68px desde 960px)",
+      "tabHeight": "64px + safe-area",
+      "sheetColumn": "440px",
+      "mapHeight": "40dvh en Casos, 34dvh en el detalle"
+    }
+  },
+  "components": [
+    {
+      "name": "Botón principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "La única acción negra de la pantalla; en grande ocupa el ancho y va fija abajo.",
+      "html": "<button class=\"ds-btn\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/></svg>Enviar reporte</button>",
+      "css": ".ds-btn { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 12px 22px; border: 0; border-radius: 12px; background: var(--accent, #000); color: var(--on-accent, #fff); font-weight: 700; font-size: 1rem; cursor: pointer; transition: background-color .15s, transform .12s cubic-bezier(.16,1,.3,1); } .ds-btn:hover { background: var(--accent-hover, #333); } .ds-btn:active { transform: scale(.98); } .ds-btn:focus-visible { outline: 3px solid var(--blue, #276ef1); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón secundario",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Segunda opción: relleno gris, nunca negro.",
+      "html": "<button class=\"ds-btn-sec\">Reportar otra emergencia</button>",
+      "css": ".ds-btn-sec { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 12px 22px; border: 0; border-radius: 12px; background: var(--bg-2, #f3f3f3); color: var(--text, #000); font-weight: 700; font-size: 1rem; cursor: pointer; transition: background-color .15s; } .ds-btn-sec:hover { background: var(--bg-3, #e8e8e8); } .ds-btn-sec:focus-visible { outline: 3px solid var(--blue, #276ef1); outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Relleno gris sin borde; al enfocar pasa a blanco con borde negro de 2 px.",
+      "html": "<label class=\"ds-field\"><span>Dirección</span><input class=\"ds-input\" placeholder=\"Calle y altura, o una esquina\"></label>",
+      "css": ".ds-field { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: flex; flex-direction: column; gap: 6px; font-size: .9375rem; font-weight: 600; color: var(--text, #000); } .ds-input { font: inherit; font-weight: 400; font-size: 1rem; min-height: 52px; padding: 12px 14px; border: 2px solid transparent; border-radius: 12px; background: var(--bg-2, #f3f3f3); color: var(--text, #000); caret-color: var(--blue, #276ef1); transition: border-color .15s, background-color .15s; } .ds-input:hover { background: var(--bg-3, #e8e8e8); } .ds-input:focus-visible { outline: none; border-color: var(--text, #000); background: var(--bg, #fff); }"
+    },
+    {
+      "name": "Fila de opción",
+      "kind": "custom",
+      "refersTo": "opcion-fila",
+      "description": "Como una sugerencia de destino: fila gris de 64 px con ícono negro circular.",
+      "html": "<button class=\"ds-opcion\"><span class=\"ds-opcion-icono\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"7\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M2 12h3M19 12h3M12 2v3M12 19v3\"/></svg></span><span class=\"ds-opcion-texto\"><strong>Usar mi ubicación</strong><span>Para que el voluntario llegue directo</span></span></button>",
+      "css": ".ds-opcion { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 10px 14px 10px 10px; border: 0; border-radius: 12px; background: var(--bg-2, #f3f3f3); color: var(--text, #000); text-align: left; cursor: pointer; transition: background-color .15s, transform .12s; } .ds-opcion:hover { background: var(--bg-3, #e8e8e8); } .ds-opcion:active { transform: scale(.99); } .ds-opcion:focus-visible { outline: 3px solid var(--blue, #276ef1); outline-offset: 2px; } .ds-opcion-icono { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--text, #000); color: var(--bg, #fff); flex-shrink: 0; } .ds-opcion-texto { display: flex; flex-direction: column; } .ds-opcion-texto strong { font-size: 1rem; font-weight: 600; } .ds-opcion-texto span { font-size: .875rem; color: var(--text-2, #5e5e5e); }"
+    },
+    {
+      "name": "Marca de prioridad",
+      "kind": "chip",
+      "refersTo": "disco",
+      "description": "Disco de color con ícono propio más el nombre: la prioridad nunca va solo por color.",
+      "html": "<div class=\"ds-prios\"><span class=\"ds-prioridad\"><span class=\"ds-disco ds-rojo\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 2h8.2L22 7.9v8.2L16.1 22H7.9L2 16.1V7.9z\"/><path d=\"M12 8v4M12 16h.01\"/></svg></span>Rojo</span><span class=\"ds-prioridad\"><span class=\"ds-disco ds-amarillo\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><path d=\"M12 9v4M12 17h.01\"/></svg></span>Amarillo</span><span class=\"ds-prioridad\"><span class=\"ds-disco ds-verde\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 22h14M5 2h14M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2\"/></svg></span>Verde</span><span class=\"ds-disco ds-disco-grande ds-rojo\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 2h8.2L22 7.9v8.2L16.1 22H7.9L2 16.1V7.9z\"/><path d=\"M12 8v4M12 16h.01\"/></svg></span></div>",
+      "css": ".ds-prios { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; color: var(--text, #000); } .ds-prioridad { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: .9375rem; } .ds-disco { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: #fff; flex-shrink: 0; } .ds-disco-grande { width: 44px; height: 44px; } .ds-rojo { background: var(--red, #d4252b); } .ds-amarillo { background: var(--amber, #f6bc2f); color: #000; } .ds-verde { background: var(--green, #05944f); }"
+    },
+    {
+      "name": "Píldoras de estado",
+      "kind": "chip",
+      "refersTo": "estado-en-camino",
+      "description": "Estado de emergencia y de revisión: píldora teñida con ícono y texto.",
+      "html": "<div class=\"ds-estados\"><span class=\"ds-estado ds-azul\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"3 11 22 2 13 21 11 13 3 11\"/></svg>En camino</span><span class=\"ds-estado ds-ok\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/></svg>Gestionada</span><span class=\"ds-estado ds-mal\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m15 9-6 6M9 9l6 6\"/></svg>Rechazado</span><span class=\"ds-estado\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\" stroke-dasharray=\"3 3\"/></svg>Sin gestionar</span><span class=\"ds-codigo\">#0R3N</span></div>",
+      "css": ".ds-estados { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; } .ds-estado { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px 4px 8px; border-radius: 999px; font-size: .8125rem; font-weight: 600; background: var(--bg-2, #f3f3f3); color: var(--text-2, #5e5e5e); } .ds-azul { background: var(--blue-soft, #eaf1fe); color: var(--blue, #276ef1); } .ds-ok { background: var(--green-soft, #e6f4ec); color: var(--green-ink, #047a41); } .ds-mal { background: var(--red-soft, #fdecec); color: var(--red-ink, #b51f24); } .ds-codigo { padding: 1px 6px; border-radius: 6px; background: var(--bg-2, #f3f3f3); color: var(--text-2, #5e5e5e); font-weight: 700; font-size: .8125rem; letter-spacing: .02em; }"
+    },
+    {
+      "name": "Filtros y segmentado",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Segmentado Libres/En camino y chips de prioridad; lo elegido se invierte.",
+      "html": "<div class=\"ds-filtros\"><div class=\"ds-seg\"><button aria-pressed=\"true\">Libres <span class=\"ds-cont\">3</span></button><button aria-pressed=\"false\">En camino <span class=\"ds-cont\">1</span></button></div><div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\"><span class=\"ds-disco ds-rojo\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 2h8.2L22 7.9v8.2L16.1 22H7.9L2 16.1V7.9z\"/><path d=\"M12 8v4M12 16h.01\"/></svg></span>Rojo <span class=\"ds-cont\">1</span></button><button class=\"ds-chip\" aria-pressed=\"false\"><span class=\"ds-disco ds-amarillo\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><path d=\"M12 9v4M12 17h.01\"/></svg></span>Amarillo <span class=\"ds-cont\">2</span></button></div></div>",
+      "css": ".ds-filtros { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: flex; flex-direction: column; gap: 12px; color: var(--text, #000); } .ds-seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; background: var(--bg-2, #f3f3f3); border-radius: 999px; } .ds-seg button, .ds-chip { font: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 999px; cursor: pointer; font-weight: 600; font-size: .9375rem; transition: background-color .2s, color .2s; } .ds-seg button { min-height: 44px; background: transparent; color: var(--text-2, #5e5e5e); } .ds-seg button[aria-pressed=true] { background: var(--bg, #fff); color: var(--text, #000); font-weight: 700; box-shadow: var(--shadow-1, 0 1px 2px #0000000f, 0 2px 8px #00000014); } .ds-chips { display: flex; gap: 8px; } .ds-chip { min-height: 40px; padding: 0 10px 0 8px; background: var(--bg-2, #f3f3f3); color: var(--text, #000); } .ds-chip:hover { background: var(--bg-3, #e8e8e8); } .ds-chip[aria-pressed=true] { background: var(--text, #000); color: var(--bg, #fff); } .ds-cont { display: inline-grid; place-items: center; min-width: 1.5em; height: 1.5em; padding: 0 .4em; border-radius: 999px; background: var(--bg-3, #e8e8e8); color: var(--text, #000); font-size: .75rem; font-weight: 700; } .ds-seg button[aria-pressed=true] .ds-cont { background: var(--text, #000); color: var(--bg, #fff); } .ds-seg button:focus-visible, .ds-chip:focus-visible { outline: 3px solid var(--blue, #276ef1); outline-offset: 2px; } .ds-disco { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; color: #fff; flex-shrink: 0; } .ds-disco-grande { width: 44px; height: 44px; } .ds-rojo { background: var(--red, #d4252b); } .ds-amarillo { background: var(--amber, #f6bc2f); color: #000; } .ds-verde { background: var(--green, #05944f); }"
+    },
+    {
+      "name": "Grupo de detalle",
+      "kind": "card",
+      "refersTo": "grupo",
+      "description": "Filas agrupadas en relleno gris con divisores de 1 px; avatar con iniciales para quien atiende.",
+      "html": "<section class=\"ds-grupo\"><div class=\"ds-gfila\"><span class=\"ds-getq\">Quién lo atiende</span><span class=\"ds-gval\"><span class=\"ds-av\">V</span>Vos</span></div><div class=\"ds-gfila\"><span class=\"ds-getq\">Dónde</span><span class=\"ds-gval\">CABA</span></div><a class=\"ds-gfila ds-genl\" href=\"#\"><span class=\"ds-getq\">Cómo llegar</span><span class=\"ds-gval\">Abrir en Google Maps</span></a></section>",
+      "css": ".ds-grupo { font-family: var(--font-body, Figtree, system-ui, sans-serif); border-radius: 16px; background: var(--bg-2, #f3f3f3); color: var(--text, #000); } .ds-gfila { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 16px; min-height: 56px; color: inherit; text-decoration: none; } .ds-gfila + .ds-gfila { border-top: 1px solid var(--line, #e9e9e9); } .ds-getq { color: var(--text-2, #5e5e5e); font-size: .9375rem; } .ds-gval { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; } .ds-genl .ds-gval { color: var(--link, #1f63e0); } .ds-genl:hover { background: var(--bg-3, #e8e8e8); border-radius: 0 0 16px 16px; } .ds-genl:focus-visible { outline: 3px solid var(--blue, #276ef1); outline-offset: 2px; } .ds-av { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--blue, #276ef1); color: #fff; font-size: .75rem; font-weight: 700; }"
+    },
+    {
+      "name": "Etapas del caso",
+      "kind": "custom",
+      "refersTo": "etapas",
+      "description": "Tres tramos como el avance de un viaje; el actual en azul con barrido.",
+      "html": "<ol class=\"ds-etapas\"><li class=\"ds-hecha\"><strong>Reportada</strong><span>hace 1 hora</span></li><li class=\"ds-actual\"><strong>En camino</strong><span>hace 5 min</span></li><li><strong>Gestionada</strong></li></ol>",
+      "css": ".ds-etapas { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; list-style: none; padding: 0; margin: 0; } .ds-etapas li { position: relative; display: flex; flex-direction: column; gap: 2px; padding-top: 12px; font-size: .8125rem; color: var(--text-2, #5e5e5e); } .ds-etapas li::before { content: \"\"; position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 2px; background: var(--bg-3, #e8e8e8); } .ds-etapas strong { font-size: .875rem; } .ds-hecha, .ds-actual { color: var(--text, #000) !important; } .ds-hecha::before { background: var(--text, #000) !important; } .ds-actual strong { color: var(--blue, #276ef1); } .ds-actual::before { background: linear-gradient(90deg, var(--blue, #276ef1) 50%, var(--bg-3, #e8e8e8) 50%) !important; background-size: 200% 100% !important; animation: ds-avance 2.4s cubic-bezier(.16,1,.3,1) infinite; } @keyframes ds-avance { from { background-position: 100% 0; } to { background-position: 0 0; } } @media (prefers-reduced-motion: reduce) { .ds-actual::before { animation: none; background-position: 0 0; } }"
+    },
+    {
+      "name": "Pin del mapa",
+      "kind": "custom",
+      "refersTo": "pin",
+      "description": "Píldora negra con código y disco de prioridad que crece con la gravedad; azul si el caso está tomado.",
+      "html": "<div class=\"ds-mapa\"><span class=\"ds-pin\"><span class=\"ds-iman ds-p-rojo\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 2h8.2L22 7.9v8.2L16.1 22H7.9L2 16.1V7.9z\"/><path d=\"M12 8v4M12 16h.01\"/></svg></span>#0R3N</span><span class=\"ds-pin\"><span class=\"ds-iman ds-p-amarillo\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><path d=\"M12 9v4M12 17h.01\"/></svg></span>#UWBQ</span><span class=\"ds-pin ds-tomado\"><span class=\"ds-iman ds-p-verde\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 22h14M5 2h14M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2\"/></svg></span>#TWO5</span></div>",
+      "css": ".ds-mapa { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: flex; gap: 12px; flex-wrap: wrap; padding: 24px; border-radius: 16px; background: var(--bg-2, #f3f3f3); } .ds-pin { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border: 1px solid #ffffff2e; border-radius: 999px; background: #000; color: #fff; box-shadow: 0 2px 8px #00000059; font-size: 12px; font-weight: 700; } .ds-tomado { background: var(--blue, #276ef1); } .ds-iman { display: grid; place-items: center; border-radius: 50%; color: #fff; } .ds-p-rojo { width: 30px; height: 30px; background: var(--red, #d4252b); } .ds-p-amarillo { width: 26px; height: 26px; background: var(--amber, #f6bc2f); color: #000; } .ds-p-verde { width: 22px; height: 22px; background: var(--green, #05944f); }"
+    },
+    {
+      "name": "Navegación",
+      "kind": "nav",
+      "refersTo": "pestana-activa-escritorio",
+      "description": "Escritorio: nombre en texto, pestañas con píldora negra para la activa y avatar a la derecha. En móvil las pestañas van fijas abajo.",
+      "html": "<header class=\"ds-nav\"><span class=\"ds-marca\">Red de Apoyo</span><nav class=\"ds-tabs\"><a href=\"#\">Reportar</a><a href=\"#\" aria-current=\"page\">Casos</a><a href=\"#\">Formación</a><a href=\"#\">Cuenta</a></nav><a class=\"ds-avatar\" href=\"#\" aria-label=\"Tu cuenta\">D</a></header>",
+      "css": ".ds-nav { font-family: var(--font-body, Figtree, system-ui, sans-serif); display: flex; align-items: center; gap: 32px; height: 68px; padding: 0 32px; background: var(--overlay, #ffffffeb); backdrop-filter: saturate(1.8) blur(16px); border-bottom: 1px solid var(--line, #e9e9e9); color: var(--text, #000); } .ds-marca { font-weight: 800; font-size: 1.25rem; letter-spacing: -.03em; } .ds-tabs { display: flex; gap: 4px; } .ds-tabs a { padding: 8px 14px; border-radius: 999px; color: var(--text-2, #5e5e5e); font-weight: 600; font-size: .9375rem; text-decoration: none; transition: background-color .15s, color .15s; } .ds-tabs a:hover { background: var(--bg-2, #f3f3f3); color: var(--text, #000); } .ds-tabs a[aria-current=page] { background: var(--text, #000); color: var(--bg, #fff); font-weight: 700; } .ds-tabs a:focus-visible, .ds-avatar:focus-visible { outline: 3px solid var(--blue, #276ef1); outline-offset: 2px; } .ds-avatar { margin-left: auto; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-2, #f3f3f3); color: var(--text, #000); font-weight: 700; text-decoration: none; } .ds-avatar:hover { background: var(--bg-3, #e8e8e8); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La app de viajes que atiende emergencias",
+    "overview": "**Creative North Star: \"La app de viajes que atiende emergencias\"**\n\nLa app se usa como una app de viajes: el mapa arriba, una hoja blanca que sube sobre él con lo que importa y una sola acción negra para seguir. Es el estándar de categoría de las apps móviles actuales, elegido por el equipo con Uber como referencia. No hay metáfora propia ni ornamento: blanco y negro de alto contraste, rellenos grises en lugar de bordes y tarjetas, Figtree pesada con tracking negativo y radios generosos (12, 16 y 24 px).\n\nEl color está racionado. Vive en el disco de prioridad (rojo, ámbar, verde), en las píldoras de estado y en el azul de \"en curso\" y de \"sos vos\". Todo lo demás es negro, blanco y dos grises de relleno. El modo oscuro sale de los mismos tokens bajo `prefers-color-scheme: dark`: no es un tema aparte sino la misma interfaz invertida.\n\nLa densidad es de app móvil: filas de 56 a 64 px, objetivos táctiles de 44 px o más, una columna de 640 px como máximo en las pantallas de formulario y lista. En escritorio (≥960 px) la hoja se vuelve una columna de 440 px a la izquierda y el mapa ocupa el resto a altura completa.",
+    "keyCharacteristics": [
+      "Blanco y negro de alto contraste; grises de relleno (`bg-2`, `bg-3`) en lugar de bordes.",
+      "Mapa protagonista en escala de grises, con hoja de esquinas de 24 px encima.",
+      "Una sola acción negra por pantalla, grande y abajo cuando es la acción del flujo.",
+      "Color solo en prioridad y estado; azul solo para \"en curso\" y \"vos\".",
+      "Figtree en 700–800 con tracking negativo para títulos; números tabulares en todo el cuerpo.",
+      "Claro y oscuro desde los mismos tokens."
+    ],
+    "rules": [
+      {
+        "name": "The Color Is Signal Rule",
+        "body": "El color vive solo en la prioridad y el estado (y el azul de \"en curso\" o \"vos\"). Ningún fondo, título, ícono de navegación ni botón principal lleva color. Si un elemento nuevo pide color, preguntá qué prioridad o estado está diciendo; si no dice ninguno, va en negro o gris.",
+        "section": "colors"
+      },
+      {
+        "name": "The Same Tokens Rule",
+        "body": "Claro y oscuro salen de los mismos tokens de `src/app/globals.css`. Ningún componente escribe un color propio para un modo; si hace falta un valor nuevo, se agrega como token en los dos bloques. La excepción documentada es el pin del mapa, negro en ambos modos para leerse sobre el mapa gris.",
+        "section": "colors"
+      },
+      {
+        "name": "The Never By Color Alone Rule",
+        "body": "Prioridad, estado de emergencia y estado de revisión siempre llevan texto **e** ícono propio: Rojo = octógono con alerta, Amarillo = triángulo, Verde = reloj de arena; Sin gestionar = círculo punteado, En camino = flecha de navegación, Gestionada = círculo con tilde, Cancelada = círculo con cruz.",
+        "section": "colors"
+      },
+      {
+        "name": "The Weight Not Family Rule",
+        "body": "Una sola familia. La jerarquía se hace con 800/700/600/400 y tamaño. No se suma una fuente de display, manuscrita ni monoespaciada.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glass Only On Bars Rule",
+        "body": "El vidrio (`overlay` + `backdrop-filter: blur`) se usa solo en las barras fijas: barra superior, pestañas inferiores, barra de envío del reporte y acciones del caso. Ninguna tarjeta, hoja ni modal lleva vidrio.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Fill Before Shadow Rule",
+        "body": "Para agrupar se usa `bg-2`; la sombra queda para lo que flota sobre el mapa.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** dejar una sola acción negra por pantalla; lo demás va en relleno gris (`button-secondary`) o como enlace.",
+      "**Do** poner el color solo en prioridad y estado, y siempre junto a texto e ícono propio.",
+      "**Do** agrupar con relleno `bg-2` y esquinas de 16 px, con divisores de 1 px entre filas.",
+      "**Do** usar el mapa arriba con la hoja de 24 px encima en móvil, y la columna de 440 px + mapa a altura completa desde 960 px.",
+      "**Do** sacar todo valor nuevo de los tokens de `globals.css` y definirlo en el bloque claro y en el oscuro.",
+      "**Do** mantener objetivos táctiles de 44 px o más y probar a 375 px.",
+      "**Do** respetar `prefers-reduced-motion`: el barrido de etapas, los esqueletos y las entradas se apagan."
+    ],
+    "donts": [
+      "**Don't** usar color en fondos, títulos, navegación o en el botón principal.",
+      "**Don't** agregar ornamento: texturas, ilustraciones, gradientes decorativos, bordes de tarjeta o sombras sobre superficies que no flotan.",
+      "**Don't** usar vidrio (`backdrop-filter`) fuera de las barras fijas.",
+      "**Don't** usar el emblema de la Cruz Roja ni cruces rojas, ni un logo inventado: la marca es solo el nombre en texto.",
+      "**Don't** distinguir prioridades o estados solo por color.",
+      "**Don't** sumar una segunda familia tipográfica.",
+      "**Don't** escribir colores fijos para un modo dentro de un componente."
+    ]
+  }
+}

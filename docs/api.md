@@ -20,8 +20,12 @@
 | `POST /api/certificados` | Cargar un nuevo certificado (asociando curso de forma opcional) | Autenticado | H5 |
 | `GET /api/solicitudes-certificados` | Obtener la tabla de solicitudes de validación de certificados | Coordinador | H6 |
 | `PATCH /api/solicitudes-certificados/:id` | Aprobar o rechazar la validación de un certificado | Coordinador | H6 |
+| `PATCH /api/certificados/:id` | Implementado así: `{ estado, motivo? }`; rechazar exige motivo; `403` si quien revisa es el dueño | Coordinador (no el dueño) | H6 |
+| `GET /api/certificados/:id/archivo` | PDF o imagen del certificado | Dueño o coordinador | H5 |
 | `POST /api/emergencias` | Reportar una nueva emergencia en la vía pública | **Público** | H7 |
 | `GET /api/emergencias` | Listar y filtrar emergencias activas para el mapa | Autenticado | H8 |
 | `GET /api/emergencias/:id` | Obtener detalle y ficha completa de una emergencia | Autenticado | H8 |
 | `POST /api/emergencias/:id/tomar` | Asignarse y marcar la emergencia como `EN CAMINO` | Voluntario | H10 |
 | `POST /api/emergencias/:id/finalizar` | Registrar informe de atención y marcar como `GESTIONADA` | Voluntario (asignado) | H11 |
+| `GET /api/notificaciones` | Avisos del usuario (historia 12) con `noLeidas`; `?resumen=1` devuelve solo el contador. Si consulta coordinación, revisa los casos sin atender (una vez por minuto como máximo) | Autenticado | H12 |
+| `GET /api/adjuntos/:id` | Foto o audio de un reporte (binario con su `Content-Type`). `401` sin sesión, `404` si no existe. La subida va con el reporte desde la interfaz (Server Action); el `POST` REST no recibe archivos | Autenticado | H7 |
