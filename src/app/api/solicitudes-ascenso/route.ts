@@ -1,3 +1,4 @@
+import { avisarAscensoNuevo } from '@/lib/avisos';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { SolicitudAscensoController } from '../../../../controllers/solicitudAscenso.controller';
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const solicitud = await controller.crear(usuario.id);
+    avisarAscensoNuevo(solicitud.id, usuario.id);
 
     return NextResponse.json(solicitud, { status: 201 });
   } catch (error) {

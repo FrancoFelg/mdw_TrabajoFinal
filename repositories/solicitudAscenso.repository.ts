@@ -29,13 +29,16 @@ export class SolicitudAscensoRepository {
     });
   }
 
+  // Solo campos públicos del usuario: nunca el hash de la contraseña (este listado lo devuelve la API).
   async findAll() {
     return await db.solicitudAscenso.findMany({
       orderBy: {
         creadoEn: 'desc',
       },
       include: {
-        usuario: true,
+        usuario: {
+          select: { id: true, nombreUsuario: true, rol: true, persona: { select: { nombre: true, apellido: true } } },
+        },
       },
     });
   }

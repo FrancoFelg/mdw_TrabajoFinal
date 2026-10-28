@@ -1,4 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { CertificadoEstado } from '@prisma/client';
+import { detectarArchivo } from './adjunto.service';
+import { almacenamiento } from './almacenamiento';
 import {
     ActualizarCertificadoData,
   CertificadoRepository,
@@ -11,6 +14,8 @@ export type CrearCertificadoInput = Omit<
 > & {
   estado?: CertificadoEstado;
 };
+
+export const ARCHIVO_MAX_BYTES = 5 * 1024 * 1024;
 
 export class CertificadoService {
   private repo: CertificadoRepository;
@@ -67,20 +72,60 @@ export class CertificadoService {
     return await this.repo.actualizar(id, data);
   }
 
-  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado) {
+  // Aprobar o rechazar. Nadie valida su propio certificado (regla 2: los casos rojos los toma
+  // quien tiene una capacitación validada por otra persona). Rechazar exige motivo (historia 6).
+  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado, revisorId: string, motivo?: string) {
     if (nuevoEstado !== CertificadoEstado.APROBADO && nuevoEstado !== CertificadoEstado.RECHAZADO) {
       throw new Error('ESTADO_INVALIDO');
     }
 
     const certificado = await this.obtenerPorId(id);
 
+    if (certificado.usuarioId === revisorId) {
+      throw new Error('AUTOVALIDACION_NO_PERMITIDA');
+    }
     if (certificado.estado !== CertificadoEstado.PENDIENTE) {
       throw new Error('ESTADO_NO_PENDIENTE');
     }
+    const motivoLimpio = motivo?.trim();
+    if (nuevoEstado === CertificadoEstado.RECHAZADO && (!motivoLimpio || motivoLimpio.length < 5)) {
+      throw new Error('MOTIVO_RECHAZO_REQUERIDO');
+    }
 
-    return await this.repo.actualizar(id, { estado: nuevoEstado });
+    return await this.repo.actualizar(id, {
+      estado: nuevoEstado,
+      motivoRechazo: nuevoEstado === CertificadoEstado.RECHAZADO ? motivoLimpio : null,
+    });
   }
 
+  // Archivo del certificado: PDF o imagen, hasta 5 MB, validado por su contenido real.
+  // Se valida antes de crear el certificado, así un archivo inválido no deja nada a medias.
+  async validarArchivo(archivo: File) {
+    if (archivo.size === 0) throw new Error('ARCHIVO_VACIO');
+    if (archivo.size > ARCHIVO_MAX_BYTES) throw new Error('ARCHIVO_DEMASIADO_GRANDE');
+    const datos = Buffer.from(await archivo.arrayBuffer());
+    const firma = detectarArchivo(datos, ['DOCUMENTO', 'IMAGEN']);
+    if (!firma) throw new Error('ARCHIVO_TIPO_NO_PERMITIDO');
+    return { datos, firma };
+  }
+
+  async guardarArchivo(certificadoId: string, { datos, firma }: Awaited<ReturnType<CertificadoService['validarArchivo']>>) {
+    const clave = `certificados/${certificadoId}/${randomUUID()}.${firma.ext}`;
+    await almacenamiento().guardar(clave, datos, firma.mime);
+    return await this.repo.actualizar(certificadoId, { archivoClave: clave, archivoMime: firma.mime, archivoTamano: datos.length });
+  }
+
+  async leerArchivo(id: string) {
+    const certificado = await this.obtenerPorId(id);
+    if (!certificado.archivoClave || !certificado.archivoMime) throw new Error('ARCHIVO_NO_ENCONTRADO');
+    return { certificado, datos: await almacenamiento().leer(certificado.archivoClave) };
+  }
+
+
+  // Borrado físico: solo para un alta que falló a mitad de camino (libera el código de verificación).
+  async descartarAlta(id: string) {
+    await this.repo.borrarDefinitivo(id);
+  }
 
   async eliminar(id: string, usuarioEliminacionId: string) {
     await this.obtenerPorId(id);

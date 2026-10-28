@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest, { params }: Contexto) {
 
   try {
     const { id } = await params;
-    const { estado } = await req.json();
+    const { estado, motivo } = await req.json();
 
     if (!estado) {
       return NextResponse.json(
@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest, { params }: Contexto) {
       );
     }
 
-    const actualizado = await controller.cambiarEstado(id, estado as CertificadoEstado);
+    const actualizado = await controller.cambiarEstado(id, estado as CertificadoEstado, usuario.id, typeof motivo === 'string' ? motivo : undefined);
     return NextResponse.json(actualizado, { status: 200 });
 
   } catch (error: any) {
@@ -66,6 +66,14 @@ export async function PATCH(req: NextRequest, { params }: Contexto) {
         { error: 'Solo se permite cambiar el estado a APROBADO o RECHAZADO.' },
         { status: 400 }
       );
+    }
+
+    if (error.message === 'AUTOVALIDACION_NO_PERMITIDA') {
+      return NextResponse.json({ error: 'No podés aprobar ni rechazar tu propio certificado: lo revisa otra persona.' }, { status: 403 });
+    }
+
+    if (error.message === 'MOTIVO_RECHAZO_REQUERIDO') {
+      return NextResponse.json({ error: 'Para rechazar un certificado indicá el motivo (campo "motivo", al menos 5 caracteres).' }, { status: 400 });
     }
 
     if (error.message === 'ESTADO_NO_PENDIENTE') {

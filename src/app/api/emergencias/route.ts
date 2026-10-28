@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
+import { avisarEmergenciaNueva } from '@/lib/avisos';
 import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
 import { EmergenciaController } from '../../../../controllers/emergencia.controller';
 import { CrearEmergenciaSchema, EmergenciaService } from '../../../../services/emergencia.service';
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
     try {
         // Se pasa directamente el objeto validado sin comprobación de autenticación
         const emergencia = await controller.crear(validacion.data);
+        avisarEmergenciaNueva(emergencia);
         return NextResponse.json(emergencia, { status: 201 });
     } catch (error) {
         const mensaje = error instanceof Error ? error.message : '';

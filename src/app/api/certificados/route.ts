@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CertificadoController } from '../../../../controllers/certificado.controller';
 import { getUserIdFromRequest } from '@/lib/auth';
+import { avisarCertificadoNuevo } from '@/lib/avisos';
 
 const controller = new CertificadoController();
 
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
 
         const body = await req.json();
         const nuevoCertificado = await controller.crear(body, usuarioCreacionId);
+        avisarCertificadoNuevo(nuevoCertificado.id, nuevoCertificado.usuarioId);
 
         return NextResponse.json(nuevoCertificado, { status: 201 });
     } catch (error: any) {

@@ -28,8 +28,8 @@ export class CertificadoController {
     return await this.service.actualizar(id, datos);
   }
 
-  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado) {
-    return await this.service.cambiarEstado(id, nuevoEstado);
+  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado, revisorId: string, motivo?: string) {
+    return await this.service.cambiarEstado(id, nuevoEstado, revisorId, motivo);
   }
 
   async eliminar(id: string, usuarioEliminacionId: string) {

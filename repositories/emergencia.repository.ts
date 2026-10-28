@@ -46,6 +46,7 @@ export class EmergenciaRepository {
     return await db.emergencia.findMany({
       include: {
         ubicacion: true,
+        adjuntos: { select: { tipo: true } },
         usuarios: {
           include: {
             usuario: {

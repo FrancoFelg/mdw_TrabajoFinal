@@ -8,8 +8,8 @@ export interface AtributoValorInput {
 }
 
 export interface CrearCertificadoConAtributosData {
-  cursoId: string;
-  estadoId: string;
+  cursoId?: string; // opcional: spec §6, regla 6
+  estadoId?: string;
   estado: CertificadoEstado;
   usuarioId: string;
   codigoVerificacion: string;
@@ -21,6 +21,10 @@ export interface ActualizarCertificadoData {
   estadoId?: string;
   estado?: CertificadoEstado;
   codigoVerificacion?: string;
+  motivoRechazo?: string | null;
+  archivoClave?: string;
+  archivoMime?: string;
+  archivoTamano?: number;
 }
 
 export class CertificadoRepository {
@@ -108,6 +112,10 @@ export class CertificadoRepository {
         },
       },
     });
+  }
+
+  async borrarDefinitivo(id: string) {
+    await db.certificado.delete({ where: { id } });
   }
 
   async eliminar(id: string, usuarioEliminacionId: string) {
