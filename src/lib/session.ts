@@ -16,12 +16,17 @@ export async function getSession(): Promise<UsuarioToken | null> {
   } catch { return null; }
 }
 
-export async function requireSession() {
+export async function requireSession(next?: string) {
   const session = await getSession();
-  if (!session) redirect('/login?next=/usuarios');
+  if (!session) redirect(next ? `/login?next=${encodeURIComponent(next)}` : '/login');
   return session;
 }
 
+// Destinos permitidos después del login. Nunca redirigir a un `next` arbitrario.
+const DESTINOS = ['/casos', '/formacion', '/equipo', '/cuenta', '/notificaciones', '/usuarios', '/sistema'];
+
 export function safeDestination(value: unknown) {
-  return value === '/usuarios' || value === '/sistema' ? value : '/';
+  if (typeof value !== 'string') return '/casos';
+  if (DESTINOS.includes(value) || /^\/casos\/[a-z0-9]{20,40}$/.test(value)) return value;
+  return '/casos';
 }

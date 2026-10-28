@@ -8,5 +8,5 @@ export const metadata = { title: 'Ingresar | Red de Apoyo' };
 export default async function Login({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const next = safeDestination((await searchParams).next);
   if (await getSession()) redirect(next);
-  return <section className="login-layout"><div><p className="eyebrow">Cada persona cuenta</p><h1>Tu ayuda empieza por estar conectado.</h1><p className="lead">Un espacio para quienes acompañan, se capacitan y hacen comunidad.</p></div><Card><p className="eyebrow">Bienvenido a la red</p><h2>Iniciar sesión</h2><LoginForm next={next} /></Card></section>;
+  return <section className="login-layout"><div className="stack-chico"><h1>Ingresá a la red</h1><p className="lead">Para ver los casos libres, tomar uno y cargar tus certificados.</p></div><Card><h2>Iniciar sesión</h2><LoginForm next={next} /></Card></section>;
 }

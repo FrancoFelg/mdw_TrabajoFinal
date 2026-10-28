@@ -9,10 +9,9 @@ export default async function Registro() {
   if (await getSession()) redirect('/');
   return (
     <section className="login-layout">
-      <div>
-        <p className="eyebrow">Sumate a la comunidad</p>
-        <h1>Tu compromiso hace la diferencia.</h1>
-        <p className="lead">Creá tu cuenta para formar parte de la red de apoyo. Tu perfil inicial será Voluntario.</p>
+      <div className="stack-chico">
+        <h1>Sumate como voluntario</h1>
+        <p className="lead">Con tu cuenta vas a poder tomar casos y cargar tus certificados. Arrancás con el rol de Voluntario.</p>
       </div>
       <Card>
         <h2>Crear cuenta</h2>
