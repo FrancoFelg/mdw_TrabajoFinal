@@ -65,6 +65,10 @@ COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=build --chown=nextjs:nodejs /app/public ./public
 
+# Fotos y audios de los reportes (ALMACENAMIENTO_PROVEEDOR=local). En prod la monta
+# un volumen con nombre: al crearse copia este dueño, así nextjs puede escribir.
+RUN mkdir -p /app/almacenamiento && chown nextjs:nodejs /app/almacenamiento
+
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000

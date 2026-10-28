@@ -50,3 +50,6 @@ next-env.d.ts
 
 # datos de MySQL en prod (bind mount del compose)
 infra/docker/db_data/
+
+# fotos y audios de reportes guardados en disco (ALMACENAMIENTO_PROVEEDOR=local)
+/almacenamiento/

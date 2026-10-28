@@ -47,6 +47,22 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
       # Opcional: sin key, geocoding, autocompletado y ETA responden 503
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      # Fotos y audios de los reportes: local (volumen de abajo), s3 o azure
+      ALMACENAMIENTO_PROVEEDOR: ${ALMACENAMIENTO_PROVEEDOR:-local}
+      ALMACENAMIENTO_DIR: /app/almacenamiento
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_REGION: ${S3_REGION:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AZURE_STORAGE_CONNECTION_STRING: ${AZURE_STORAGE_CONNECTION_STRING:-}
+      AZURE_STORAGE_CONTAINER: ${AZURE_STORAGE_CONTAINER:-}
+      # Avisos push (historia 12). Sin claves, los avisos quedan solo dentro de la app.
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
+    volumes:
+      # Volumen con nombre (no bind mount): hereda el dueño nextjs de la imagen
+      - archivos:/app/almacenamiento
     expose:
       - "3000"
     healthcheck:
@@ -128,6 +144,10 @@ services:
       start_period: 30s
     networks:
       - internal
+
+volumes:
+  # Fotos y audios de los reportes. Entra en el backup junto con db_data.
+  archivos:
 
 networks:
   # Ya existe en el VPS; la comparten todas las apps con global-nginx

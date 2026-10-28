@@ -81,6 +81,18 @@ El script **no hace rollback automático**: loguea el error y sale con 1. El con
 
 Si alguien editó archivos trackeados a mano en el VPS, el script se niega a pisarlos y avisa. Resolver con `git stash` o `git checkout -- <archivo>` y volver a correr.
 
+## Fotos y audios de los reportes
+
+- Se guardan en el volumen con nombre `archivos` (`/app/almacenamiento` dentro de `mdw-app`). Hay que incluirlo en el backup junto con `db_data`, por ejemplo: `docker run --rm -v mdw_archivos:/datos -v $PWD:/backup alpine tar czf /backup/archivos.tgz -C /datos .` (el nombre real del volumen lo da `docker volume ls`).
+- `infra/nginx/mdw.conf` sube `client_max_body_size` a 8 MB. **El CD no copia la config de nginx**: después de mergear, copiarla a `/opt/nginx/conf.d/mdw.conf` y recargar (`docker exec global-nginx nginx -t && docker exec global-nginx nginx -s reload`). Sin esto, los reportes con foto o audio de más de 1 MB fallan con `413`.
+- Para pasar a la nube, definir `ALMACENAMIENTO_PROVEEDOR=s3` (con `S3_BUCKET`, `S3_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) o `ALMACENAMIENTO_PROVEEDOR=azure` (con `AZURE_STORAGE_CONNECTION_STRING`, `AZURE_STORAGE_CONTAINER`) en el `.env` del server. Los archivos ya guardados en disco no se migran solos.
+
+## Avisos push
+
+- Generar un par de claves una sola vez: `node -e "console.log(require('web-push').generateVAPIDKeys())"` y cargarlas en el `.env` del server como `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` y `VAPID_SUBJECT` (`mailto:` de contacto). Cambiarlas después invalida todas las suscripciones.
+- El push necesita HTTPS (ya lo da global-nginx) y `public/sw.js` servido desde la raíz.
+- Los casos sin atender se revisan cuando alguien de coordinación tiene la app abierta (la campanita consulta cada 30 s). Si se quiere aviso aunque nadie tenga la app abierta, un cron en el VPS puede llamar a `GET /api/notificaciones?resumen=1` con un token de coordinación cada pocos minutos.
+
 ## Checklist antes de dar por terminado
 
 - [ ] `docker ps` muestra `mdw-app` healthy y `mdw-db` healthy; `mdw-migrate` salió con 0
