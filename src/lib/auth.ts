@@ -11,11 +11,8 @@ export interface UsuarioToken {
 // Devuelve el payload del JWT (id, nombreUsuario, rol) o null si no hay token válido.
 export function getUserFromRequest(req: NextRequest): UsuarioToken | null {
   const authHeader = req.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-
-  const token = authHeader.split(' ')[1];
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : req.cookies.get('token')?.value;
+  if (!token) return null;
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as UsuarioToken;
     return decoded;
