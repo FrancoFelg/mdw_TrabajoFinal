@@ -122,6 +122,15 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 - **Criterios de aceptación:**
   * Dado que la emergencia está `EN CAMINO`, el voluntario ingresa un informe/observación final y actualiza el estado a `GESTIONADA`.
 
+### 12. Recibir avisos
+*Como voluntario o coordinador*, quiero enterarme de lo urgente sin tener la app abierta, *para responder a tiempo.*
+- **Criterios de aceptación:**
+  * Cada usuario tiene un centro de avisos dentro de la app, con contador de no leídos, que se actualiza solo.
+  * Además puede activar avisos push en su dispositivo (opcional, con su permiso). En iPhone requiere agregar la app a la pantalla de inicio.
+  * **Caso rojo nuevo:** avisa a los voluntarios con certificado `APROBADO` y a coordinación.
+  * **Cola de coordinación:** avisa a coordinación cuando hay un certificado o un pedido de ascenso nuevo para revisar (nunca a quien lo cargó).
+  * **Caso sin atender:** avisa a coordinación cuando un caso sigue `SIN GESTIONAR` más de 10 minutos (rojo), 30 (amarillo) o 120 (verde). Un mismo caso avisa una sola vez.
+
 ---
 
 ## 5. Flujo principal
@@ -133,16 +142,17 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Inicio | `/` | Público | Implementada; presentación de la red |
 | Iniciar sesión | `/login` | Público; con sesión vuelve al destino permitido | Implementada |
 | Crear cuenta | `/registro` | Público; con sesión vuelve al inicio | Implementada; alta como voluntario |
+| Casos: lista y mapa | `/casos` | Con sesión | Implementada; libres y en camino, filtro por prioridad |
+| Detalle de caso | `/casos/[id]` | Con sesión | Implementada; tomar y finalizar con informe |
+| Avisos | `/notificaciones` | Con sesión | Implementada; no leídos, marcar como leído y push opcional |
 | Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
 | Sistema visual | `/sistema` | Público; ejemplos sin datos personales | Implementada |
 | Reportar emergencia | Por definir | Público | Pantalla pendiente; API existente |
-| Mapa y emergencias pendientes | Por definir | Voluntario, coordinador y administrador | Pantalla pendiente; API existente |
 | Cursos y certificados | Por definir | Según rol y operación | Pantallas pendientes; API existente |
 | Solicitudes de ascenso | Por definir | Según rol y operación | Pantalla pendiente; API existente |
 
 El acceso anónimo a `/usuarios` redirige a `/login?next=/usuarios`. Al iniciar sesión se recupera ese destino.
 Un voluntario autenticado recibe un mensaje de acceso restringido sin consultar el directorio.
-Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfaz propia.
 
 ### Recorrido del flujo
 
@@ -179,6 +189,7 @@ Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfa
 - Labels explícitos en todos los formularios.
 - Contraste de texto/fondo mínimo de 4,5:1.
 - Los colores de prioridad (`ROJO`, `AMARILLO`, `VERDE`) se acompañan con texto explícito e iconos distintivos.
+- Modo claro y oscuro: por defecto sigue al del dispositivo; cualquier persona, con o sin cuenta, puede elegir uno a mano y la elección se recuerda en ese dispositivo.
 
 ---
 
@@ -198,4 +209,4 @@ Tomar y finalizar una emergencia son operaciones del flujo, todavía sin interfa
 4. Validación automatizada con firma digital en certificados.
 5. Aplicación nativa en tiendas (iOS/Android); el sistema es una PWA/Web responsiva.
 6. Donaciones o transacciones monetarias.
-7. Envío de notificaciones (por mail, push o SMS).
+7. Envío de notificaciones por mail o SMS (los avisos dentro de la app y el push del navegador sí están incluidos, historia 12).
