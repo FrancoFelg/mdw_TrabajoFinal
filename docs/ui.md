@@ -11,7 +11,7 @@ El sistema visual completo está en `DESIGN.md`.
 
 | Ruta | Para quién | Qué hace |
 | :--- | :--- | :--- |
-| `/casos` | Con sesión | Mapa arriba y hoja con la lista (en escritorio, lista a la izquierda y mapa a la derecha). Libres o en camino, con filtro por prioridad. Se refresca cada 30 s. Si tenés un caso en camino, aparece primero. Muestra tu ubicación en vivo (punto azul con margen), la distancia a cada caso y el orden "Más cerca" (historia 8: filtro por proximidad). |
+| `/casos` | Con sesión | Mapa arriba y hoja con la lista (en escritorio, lista a la izquierda y mapa a la derecha). Libres o en camino, con filtro por prioridad. Se refresca cada 30 s. Si tenés un caso en camino, aparece primero. Muestra tu ubicación en vivo (punto azul con margen), la distancia a cada caso y el orden "Más cerca" (historia 8: filtro por proximidad). Tocar una marca abre una tarjeta con prioridad, descripción, código, estado y "Ver caso". |
 | `/casos/[id]` | Con sesión | Detalle, etapas, mapa con tu ubicación, distancia en línea recta y "Cómo llegar". Tomar el caso o finalizarlo con informe. Explica por qué no podés tomarlo (caso rojo sin certificado, otro caso activo, ya tomado). |
 | `/notificaciones` | Con sesión | Avisos (caso rojo nuevo, cola de coordinación, caso sin atender) con no leídos marcados, "Marcar todo como leído" y el interruptor de push para este dispositivo. La campanita del encabezado muestra el contador. |
 
@@ -20,6 +20,14 @@ En el celular la navegación va en pestañas abajo; desde 960 px sube a la barra
 ## Componentes y estilos
 
 `src/components/ui/index.tsx` contiene Button, Card, Badge, Input, Skeleton y Alert. `src/components/marcas.tsx` tiene las marcas compartidas: prioridad (disco de color con ícono, más el nombre), estados, código de caso, persona asignada (avatar con iniciales) y etapas. Íconos de `lucide-react`; mapa con Leaflet y teselas de OpenStreetMap en gris (no necesita clave; respetar su política de uso si el tráfico crece). Sin shadcn/ui ni Tailwind: CSS global con una única fuente de tokens en `src/app/globals.css`. La galería `/sistema` muestra las piezas con datos de ejemplo.
+
+## Mapa (Leaflet)
+
+`leaflet.css` se carga después de `globals.css`, así que sus reglas empatan o ganan. Por eso los estilos propios del mapa llevan un prefijo con más especificidad: la tarjeta de una marca usa la clase `pop-caso` (se pasa en `bindPopup`) y se arma con nodos del DOM, nunca con `innerHTML`, porque la descripción la escribe quien reporta.
+
+## Inicio provisorio
+
+`/` sigue siendo el inicio de presentación de la base de front. Sus clases (`hero`, `card-grid`, `callout`, `eyebrow`…) están al final de `globals.css`, pasadas a los tokens nuevos. Se borran cuando `/` pase a ser la pantalla de Reportar.
 
 ## Avisos (historia 12)
 
