@@ -397,6 +397,7 @@ Estados: `SIN_GESTIONAR` → `EN_CAMINO` → `GESTIONADA` (también existe `CANC
 | `GET /api/emergencias/:id` | Autenticado | Detalle (`404` si no existe) |
 | `POST /api/emergencias/:id/tomar` | Autenticado | Asignársela y pasar a `EN_CAMINO` |
 | `PUT /api/emergencias/:id/finalizar` | Autenticado (el voluntario asignado) | Pasar a `GESTIONADA` |
+| `GET /api/notificaciones` | Autenticado | Avisos propios y `noLeidas` (`?resumen=1`: solo el contador) |
 
 > `docs/api.md` marca el reporte de emergencias como público, pero el código **exige token** en `POST /api/emergencias`.
 
