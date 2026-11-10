@@ -15,6 +15,41 @@ const FORMAS = {
   VERDE: '<path d="M5 22h14M5 2h14M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2"/>',
 };
 
+// Tarjeta del globo de una marca. Se arma con nodos (no innerHTML) porque la descripción la escribe
+// quien reporta; solo los íconos fijos van como SVG.
+function tarjetaCaso(c: CasoFila) {
+  const el = <K extends keyof HTMLElementTagNameMap>(tag: K, clase: string, texto?: string) => {
+    const n = document.createElement(tag);
+    n.className = clase;
+    if (texto !== undefined) n.textContent = texto;
+    return n;
+  };
+  const caja = el('div', 'pop');
+
+  const cabecera = el('div', 'pop-cabecera');
+  const prioridad = el('span', `pop-prioridad pop-${c.prioridad.toLowerCase()}`);
+  const disco = el('span', 'pop-disco');
+  disco.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${FORMAS[c.prioridad]}</svg>`;
+  prioridad.append(disco, el('span', '', `${PRIORIDADES[c.prioridad].nombre} · ${PRIORIDADES[c.prioridad].detalle}`));
+  cabecera.append(prioridad);
+
+  const descripcion = el('p', 'pop-desc', c.descripcion);
+  const estado = c.estado === 'EN_CAMINO'
+    ? (c.propio ? 'Vas en camino' : `En camino${c.asignado ? ` · ${c.asignado}` : ''}`)
+    : 'Sin asignar';
+  const meta = el('p', 'pop-meta');
+  meta.append(el('span', 'pop-codigo', `#${codigoCaso(c.id)}`), ` ${estado} · ${c.hace}`);
+
+  const boton = el('a', 'button button-chico pop-boton');
+  boton.href = `/casos/${c.id}`;
+  boton.append(el('span', '', 'Ver caso'));
+  boton.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>');
+  boton.setAttribute('aria-label', `Ver caso #${codigoCaso(c.id)}`);
+
+  caja.append(cabecera, descripcion, meta, boton);
+  return caja;
+}
+
 const CENTRO_ARGENTINA: [number, number] = [-34.6, -58.45];
 
 type Props = { casos: CasoFila[]; solo?: boolean; etiqueta?: string; yo?: MiUbicacion };
@@ -75,17 +110,7 @@ export default function MapaCasos({ casos, solo = false, etiqueta, yo }: Props) 
         iconSize: [0, 0],
       });
       const marca = mod.marker([c.lat, c.lng], { icon: icono, title: etiqueta ?? `Caso #${codigoCaso(c.id)}, prioridad ${PRIORIDADES[c.prioridad].nombre}`, keyboard: !solo });
-      if (!solo) {
-        const enlace = document.createElement('a');
-        enlace.href = `/casos/${c.id}`;
-        enlace.className = 'pin-enlace';
-        enlace.textContent = `Ver caso #${codigoCaso(c.id)}`;
-        const caja = document.createElement('div');
-        const texto = document.createElement('p');
-        texto.textContent = c.descripcion.length > 120 ? `${c.descripcion.slice(0, 120)}…` : c.descripcion;
-        caja.append(texto, enlace);
-        marca.bindPopup(caja);
-      }
+      if (!solo) marca.bindPopup(tarjetaCaso(c), { className: 'pop-caso', minWidth: 240, maxWidth: 280, autoPanPaddingTopLeft: [16, 16], autoPanPaddingBottomRight: [16, 48] });
       marca.addTo(capa);
     }
     // Encuadre solo la primera vez: después manda quien mira el mapa.
