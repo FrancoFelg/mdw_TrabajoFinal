@@ -663,3 +663,34 @@ tr:last-child td { border-bottom: 0; }
   animation: ola-tema 945ms cubic-bezier(.35, 0, .4, 1) both;
 }
 @keyframes ola-tema { from { mask-position: 100% 100%; } to { mask-position: 0 0; } }
+
+/* Inicio de presentación (base de Franco). Se mantiene hasta que "/" pase a ser la pantalla de Reportar.
+   Son sus clases originales, pasadas a los tokens nuevos para que funcionen en claro y oscuro. */
+.container:has(.hero) { max-width: 1100px; }
+.eyebrow { text-transform: uppercase; font-size: .75rem; font-weight: 700; letter-spacing: .14em; color: var(--text-2); margin-bottom: 14px; }
+.hero { display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: 40px; padding: 26px 0 64px; }
+.hero h1 { font-size: clamp(2.25rem, 6vw, 3.5rem); line-height: 1.05; }
+.hero h1 span { color: var(--text-2); }
+.hero .lead { margin: 20px 0 24px; }
+.hero-note { color: var(--text-2); font-size: .8125rem; margin-top: 22px; }
+.hero-art { position: relative; background: var(--bg-2); border-radius: 140px 140px var(--r-xl) var(--r-xl); height: 380px; overflow: hidden; display: grid; place-items: center; }
+.aid-symbol { width: 125px; height: 125px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); border-radius: 32px; font-size: 116px; line-height: 1; transform: rotate(-9deg); box-shadow: 16px 18px 0 var(--bg-3); }
+.orbit { position: absolute; border: 1px solid var(--text); opacity: .14; border-radius: 50%; width: 290px; height: 290px; }
+.orbit-two { width: 450px; height: 450px; }
+.art-label { position: absolute; background: var(--bg); border-radius: var(--r); padding: 12px 18px; font-size: .8125rem; font-weight: 600; box-shadow: var(--shadow-2); }
+.label-top { top: 53px; right: 22px; transform: rotate(6deg); }
+.label-bottom { bottom: 46px; left: 20px; transform: rotate(-5deg); }
+.section-heading { display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+.card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.step { font-weight: 700; font-size: .8125rem; background: var(--bg-2); border-radius: var(--r-s); padding: 8px 12px; align-self: flex-start; font-variant-numeric: tabular-nums; }
+.callout { background: var(--bg-2); border-radius: var(--r-xl); margin-top: 40px; padding: 32px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.callout p:last-child { color: var(--text-2); margin-top: 12px; max-width: 670px; }
+.callout .button { flex-shrink: 0; }
+@media (max-width: 1000px) { .hero { gap: 24px; } .hero-art { height: 330px; } }
+@media (max-width: 700px) {
+  .hero { grid-template-columns: 1fr; padding-bottom: 40px; }
+  .hero-art { height: 290px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .section-heading, .callout { flex-direction: column; align-items: flex-start; }
+  .callout { padding: 24px; }
+}
