@@ -23,7 +23,8 @@ export class AuthService {
     }
 
     // 3. Generar el Token JWT
-    const secret = process.env.JWT_SECRET || 'secret_fallback';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT_SECRET_NO_CONFIGURADO');
     const token = jwt.sign(
       {
         id: usuario.id,

@@ -4,6 +4,8 @@ API REST (Next.js + Prisma + MySQL) para coordinar la asistencia a personas en s
 
 El relevamiento completo (problema, roles, entidades e historias de usuario) está en [`docs/spec.md`](docs/spec.md).
 
+La interfaz incluye inicio (`/`), login (`/login`), directorio con búsqueda (`/usuarios`, coordinador o administrador) y galería de componentes (`/sistema`). Ver [sesión, componentes y verificación manual](docs/ui.md). Para ingresar y consultar usuarios, MySQL debe estar activo y `DATABASE_URL` y `JWT_SECRET` deben estar configurados.
+
 ## Integrantes
 
 | Nombre | GitHub |
@@ -395,6 +397,7 @@ Estados: `SIN_GESTIONAR` → `EN_CAMINO` → `GESTIONADA` (también existe `CANC
 | `GET /api/emergencias/:id` | Autenticado | Detalle (`404` si no existe) |
 | `POST /api/emergencias/:id/tomar` | Autenticado | Asignársela y pasar a `EN_CAMINO` |
 | `PUT /api/emergencias/:id/finalizar` | Autenticado (el voluntario asignado) | Pasar a `GESTIONADA` |
+| `GET /api/notificaciones` | Autenticado | Avisos propios y `noLeidas` (`?resumen=1`: solo el contador) |
 
 > `docs/api.md` marca el reporte de emergencias como público, pero el código **exige token** en `POST /api/emergencias`.
 

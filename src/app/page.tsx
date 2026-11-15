@@ -1,20 +1,10 @@
-import { PanelSalud } from "@/features/salud/components/PanelSalud";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import { Card, Badge } from '@/components/ui';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <header className={styles.intro}>
-          <p className={styles.eyebrow}>Metodologías de Desarrollo Web · UAI</p>
-          <h1>mdw</h1>
-          <p>
-            Gestión de cursos y certificados. Esta página muestra el estado en
-            vivo del servicio.
-          </p>
-        </header>
-        <PanelSalud />
-      </main>
-    </div>
+    <><section className="hero"><div><p className="eyebrow">Una comunidad que acompaña</p><h1>Conectamos personas.<br /><span>Multiplicamos ayuda.</span></h1><p className="lead">Una red de voluntarios y coordinadores para acompañar a quienes más lo necesitan. Organización, formación y compromiso en un mismo lugar.</p><div className="actions"><Link href="/usuarios" className="button">Ver nuestra comunidad ↗</Link><Link href="/login" className="button button-secondary">Acceder a mi cuenta</Link></div><p className="hero-note">Emergencias comunitarias · Formación · Trabajo en equipo</p></div><div className="hero-art" aria-hidden="true"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="aid-symbol">+</div><div className="art-label label-top">Personas que ayudan</div><div className="art-label label-bottom">Una red, un propósito</div></div></section>
+    <section className="stack"><div className="section-heading"><div><p className="eyebrow">Juntos, mejor preparados</p><h2>El apoyo empieza con una buena red.</h2></div><Badge>Compromiso compartido</Badge></div><div className="card-grid">{[{ n: '01', title: 'Comunidad organizada', text: 'Personas y roles claros para coordinar esfuerzos y acompañarnos en cada intervención.' }, { n: '02', title: 'Formación que fortalece', text: 'Cursos y certificados para construir una asistencia cada vez más preparada.' }, { n: '03', title: 'Asistencia con propósito', text: 'Conectamos necesidades con el compromiso de quienes pueden ayudar.' }].map(item => <Card key={item.n}><span className="step">{item.n}</span><h3>{item.title}</h3><p className="muted">{item.text}</p></Card>)}</div></section>
+    <section className="callout"><div><p className="eyebrow">Cada rol suma</p><h2>Una misión. Muchas formas de ayudar.</h2><p>Voluntarios, coordinadores y administradores construyen esta comunidad todos los días.</p></div><Link href="/usuarios" className="button">Explorar la red</Link></section></>
   );
 }

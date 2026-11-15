@@ -9,6 +9,9 @@ export async function GET(req: NextRequest) {
   try {
     const usuario = getUserFromRequest(req);
     if (!usuario) return RESPUESTA_NO_AUTORIZADO();
+    if (usuario.rol !== 'ADMIN' && usuario.rol !== 'COORDINADOR') {
+      return NextResponse.json({ error: 'El directorio requiere rol coordinador o administrador.' }, { status: 403 });
+    }
     const usuarios = await usuarioService.listarUsuarios();
 
     return NextResponse.json(usuarios, { status: 200 });

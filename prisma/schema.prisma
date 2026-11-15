@@ -113,6 +113,8 @@ model Usuario {
   creadoEn                           DateTime                   @default(now())
 
   solicitudesAscenso SolicitudAscenso[]
+  notificaciones     Notificacion[]
+  suscripcionesPush  SuscripcionPush[]
 }
 
 // ---------- CURSOS ----------
@@ -288,4 +290,41 @@ model SolicitudAscenso {
   usuario   Usuario                @relation(fields: [usuarioId], references: [id])
   estado    SolicitudAscensoEstado @default(PENDIENTE)
   creadoEn  DateTime                @default(now())
+}
+
+// Avisos de la historia 12. `clave` evita repetir el mismo aviso a la misma persona
+// (p. ej. "sin_atender:<emergenciaId>").
+enum NotificacionTipo {
+  CASO_ROJO
+  VALIDACION_PENDIENTE
+  CASO_SIN_ATENDER
+}
+
+model Notificacion {
+  id        String           @id @default(cuid())
+  usuarioId String
+  usuario   Usuario          @relation(fields: [usuarioId], references: [id])
+  tipo      NotificacionTipo
+  titulo    String
+  cuerpo    String           @db.Text
+  enlace    String
+  clave     String
+  leidaEn   DateTime?
+  creadoEn  DateTime         @default(now())
+
+  @@unique([usuarioId, clave])
+  @@index([usuarioId, leidaEn])
+}
+
+// Suscripción Web Push de un dispositivo. Se borra sola si el navegador la da de baja.
+model SuscripcionPush {
+  id        String   @id @default(cuid())
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  endpoint  String   @unique @db.VarChar(512)
+  p256dh    String
+  auth      String
+  creadoEn  DateTime @default(now())
+
+  @@index([usuarioId])
 }
