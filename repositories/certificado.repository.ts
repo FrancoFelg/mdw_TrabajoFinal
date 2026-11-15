@@ -56,9 +56,10 @@ export class CertificadoRepository {
     });
   }
 
-  async findAll() {
+  // Con usuarioId devuelve solo los certificados de ese usuario
+  async findAll(usuarioId?: string) {
     return await db.certificado.findMany({
-      where: { fechaEliminacion: null },
+      where: { fechaEliminacion: null, usuarioId },
       include: {
         curso: true,
         usuario: {

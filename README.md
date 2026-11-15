@@ -319,12 +319,12 @@ Comprobantes de capacitación de un usuario. Estados: `PENDIENTE` (default), `AP
 
 | Método y ruta | Rol (según el código) | Qué hace |
 | :--- | :--- | :--- |
-| `GET /api/certificados` | **Sin autenticación** | Listar todos los certificados vigentes (de todos los usuarios) |
-| `GET /api/certificados/:id` | **Sin autenticación** | Detalle (`404` si no existe) |
+| `GET /api/certificados` | Autenticado | Listar certificados vigentes: coordinador y admin ven todos, un voluntario solo los suyos |
+| `GET /api/certificados/:id` | Autenticado | Detalle; un voluntario solo ve los suyos (`404` si no existe o es de otro usuario) |
 | `POST /api/certificados` | Autenticado | Crear |
 | `PATCH /api/certificados/:id` | Coordinador | Aprobar o rechazar un certificado pendiente |
-| `PUT /api/certificados/:id` | **Sin autenticación** | Actualizar `estado` y/o `codigoVerificacion` |
-| `DELETE /api/certificados/:id` | **Sin autenticación** | Baja lógica; body `{ "usuarioEliminacionId": string }` obligatorio (`400` si falta) |
+| `PUT /api/certificados/:id` | Coordinador | Actualizar `estado` y/o `codigoVerificacion` |
+| `DELETE /api/certificados/:id` | Coordinador | Baja lógica; el usuario que elimina se toma del token |
 
 Campos de `POST /api/certificados`:
 
