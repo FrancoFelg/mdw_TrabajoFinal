@@ -17,15 +17,18 @@ export class EmergenciaRepository {
   // Crea la ubicación y la emergencia juntas (nested create = una sola transacción).
   // Convención de Ubicacion: coordenada_x = longitud, coordenada_y = latitud.
   async crear(datos: {
+    id?: string;
     descripcion: string;
     imagen?: string;
     prioridad: Prioridad;
-    coordenada_x: number;
-    coordenada_y: number;
-    provincia: Provincia;
+    coordenada_x: number | null;
+    coordenada_y: number | null;
+    provincia: Provincia | null;
+    direccion?: string;
   }): Promise<Emergencia> {
     return await db.emergencia.create({
       data: {
+        id: datos.id,
         descripcion: datos.descripcion,
         imagen: datos.imagen,
         fecha: new Date(),
@@ -35,6 +38,7 @@ export class EmergenciaRepository {
             coordenada_x: datos.coordenada_x,
             coordenada_y: datos.coordenada_y,
             provincia: datos.provincia,
+            direccion: datos.direccion,
           },
         },
       },

@@ -59,7 +59,7 @@ export default async function Caso({ params }: { params: Promise<{ id: string }>
         </div>
         <div className="grupo-fila">
           <span className="grupo-etiqueta">Dónde</span>
-          <span className="grupo-valor">{NOMBRES_PROVINCIA[provincia]}{conMapa && <span className="coordenadas"> · {lat.toFixed(5)}, {lng.toFixed(5)}</span>}</span>
+          <span className="grupo-valor">{emergencia.ubicacion.direccion || (provincia ? NOMBRES_PROVINCIA[provincia] : 'Ubicación pendiente de verificar')}{conMapa && <span className="coordenadas"> · {lat.toFixed(5)}, {lng.toFixed(5)}</span>}{!conMapa && <small className="muted"> · Sin coordenadas; dirección pendiente de verificar.</small>}</span>
         </div>
         {conMapa && <DistanciaCaso lat={lat} lng={lng} />}
         {conMapa && <a className="grupo-fila grupo-enlace" href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`} target="_blank" rel="noopener noreferrer">
@@ -68,6 +68,12 @@ export default async function Caso({ params }: { params: Promise<{ id: string }>
         </a>}
       </section>
 
+      {emergencia.imagen && <a className="adjunto-foto-caso" href={emergencia.imagen} target="_blank" rel="noopener noreferrer">
+        {/* La foto puede estar en almacenamiento local autenticado o en una URL del backend existente. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={emergencia.imagen} alt="Foto del incidente reportado" />
+        <span className="sr-only">Abrir foto en otra pestaña</span>
+      </a>}
       <CasoAcciones id={emergencia.id} estado={emergencia.estado} propio={propio} asignado={nombreAsignado} bloqueo={bloqueo} />
     </div>
   </article>;

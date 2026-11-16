@@ -37,7 +37,7 @@ export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | nul
   }, [cuentaAbierta]);
   const coordinador = usuario && usuario.rol !== 'VOLUNTARIO';
   const links = usuario ? [
-    { href: '/', label: 'Reportar', Icono: Megaphone },
+    { href: '/reportar', label: 'Reportar', Icono: Megaphone },
     { href: '/casos', label: 'Casos', Icono: ClipboardList },
     ...(coordinador ? [{ href: '/usuarios', label: 'Usuarios', Icono: Users }] : []),
   ] : [];

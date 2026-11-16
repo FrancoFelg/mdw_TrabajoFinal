@@ -267,7 +267,8 @@ model Ubicacion {
   id           String       @id @default(cuid())
   coordenada_x Float?
   coordenada_y Float?
-  provincia    Provincia
+  provincia    Provincia?
+  direccion    String?      @db.VarChar(250)
   emergencias  Emergencia[]
 }
 

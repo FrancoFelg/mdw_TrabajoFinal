@@ -6,17 +6,18 @@ import { EmergenciaEstado, Prioridad, Provincia } from '@prisma/client';
 
 // Body de POST /api/emergencias. La ubicación llega de una de dos formas:
 //   - GPS: coordenada_x + coordenada_y + provincia
-//   - Dirección manual: direccion (se geocodifica con Google Maps)
+//   - Dirección manual: direccion (se guarda sin depender de Google Maps)
 
 const ERROR_X = 'coordenada_x (longitud) debe estar entre -180 y 180.';
 const ERROR_Y = 'coordenada_y (latitud) debe estar entre -90 y 90.';
 
 export const CrearEmergenciaSchema = z
   .object({
-    descripcion: z.string().trim().min(5, 'La descripción debe tener al menos 5 caracteres.'),
-    imagen: z.string().url('La imagen debe ser una URL válida.').optional(),
+    descripcion: z.string().trim().min(5, 'La descripción debe tener al menos 5 caracteres.').max(191, 'La descripción admite hasta 191 caracteres.'),
+    imagen: z.string().url('La imagen debe ser una URL válida.').max(191)
+      .refine(url => /^https?:\/\//i.test(url), 'La imagen debe usar HTTP o HTTPS.').optional(),
     prioridad: z.nativeEnum(Prioridad, { message: 'La prioridad debe ser ROJO, AMARILLO o VERDE.' }).optional(),
-    direccion: z.string().trim().min(3, 'La dirección es demasiado corta.').optional(),
+    direccion: z.string().trim().min(3, 'La dirección es demasiado corta.').max(250).optional(),
     coordenada_x: z.number().min(-180, ERROR_X).max(180, ERROR_X).optional(),
     coordenada_y: z.number().min(-90, ERROR_Y).max(90, ERROR_Y).optional(),
     provincia: z.nativeEnum(Provincia).optional(),
@@ -40,13 +41,13 @@ export class EmergenciaService {
     this.rutas = new RutasService();
   }
 
-  // Alta de emergencia (requiere login). Nace SIN_GESTIONAR; la prioridad es la que
+  // Alta de emergencia pública (no requiere cuenta). Nace SIN_GESTIONAR; la prioridad es la que
   // mande el cliente o VERDE por defecto.
-  // Si llegan coordenadas de GPS se usan tal cual; si no, se geocodifica la dirección.
-  async crear(datos: CrearEmergenciaInput) {
-    let coordenada_x: number;
-    let coordenada_y: number;
-    let provincia: Provincia;
+  // Si llegan coordenadas de GPS se usan tal cual; si no, se conserva la dirección textual.
+  async crear(datos: CrearEmergenciaInput, id?: string) {
+    let coordenada_x: number | null = null;
+    let coordenada_y: number | null = null;
+    let provincia: Provincia | null = datos.provincia ?? null;
     let direccionFormateada: string | undefined;
 
     if (datos.coordenada_x !== undefined && datos.coordenada_y !== undefined && datos.provincia !== undefined) {
@@ -54,20 +55,20 @@ export class EmergenciaService {
       coordenada_y = datos.coordenada_y;
       provincia = datos.provincia;
     } else {
-      const geo = await this.geocoding.geocodificar(datos.direccion as string);
-      coordenada_x = geo.lng;
-      coordenada_y = geo.lat;
-      provincia = geo.provincia;
-      direccionFormateada = geo.direccionFormateada;
+      // La dirección declarada permite registrar el caso sin depender de Google.
+      // Las coordenadas quedan pendientes de verificar; nunca se inventan.
+      direccionFormateada = datos.direccion;
     }
 
     const emergencia = await this.emergenciaRepo.crear({
+      id,
       descripcion: datos.descripcion,
       imagen: datos.imagen,
       prioridad: datos.prioridad ?? Prioridad.VERDE,
       coordenada_x,
       coordenada_y,
       provincia,
+      direccion: datos.direccion,
     });
 
     return {

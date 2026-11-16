@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
+import { Prisma } from '@prisma/client';
+import { db } from '../../../../config/database';
+import { permisoFoto } from '@/lib/fotos-emergencia';
 import { getUserFromRequest } from '@/lib/auth';
 import { avisarEmergenciaNueva } from '@/lib/avisos';
 import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
@@ -25,11 +29,22 @@ export async function GET(req: NextRequest) {
     }
 }
 
-// POST /api/emergencias — reportar una emergencia (autenticado).
+// POST /api/emergencias — reportar una emergencia (sin cuenta).
 // Body: { descripcion, imagen?, prioridad?, direccion }
 //    ó { descripcion, imagen?, prioridad?, coordenada_x, coordenada_y, provincia }
 // coordenada_x = longitud, coordenada_y = latitud. Sin prioridad, nace VERDE.
 export async function POST(req: NextRequest) {
+    // Reintentar la misma clave recupera el caso si su respuesta se perdió.
+    const clave = req.headers.get('Idempotency-Key');
+    if (clave && !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(clave)) {
+        return NextResponse.json({ error: 'La clave de envío no es válida.' }, { status: 400 });
+    }
+    const id = clave ? createHash('sha256').update(clave).digest('hex') : undefined;
+    const respuesta = (emergencia: { id: string; descripcion: string; prioridad: string; estado: string }, status: number) => {
+        let permiso: string | null = null;
+        try { permiso = permisoFoto(emergencia.id); } catch { /* El reporte sigue disponible sin foto. */ }
+        return NextResponse.json({ ...emergencia, permisoFoto: permiso }, { status });
+    };
     let body: unknown;
     try {
         body = await req.json();
@@ -47,10 +62,18 @@ export async function POST(req: NextRequest) {
 
     try {
         // Se pasa directamente el objeto validado sin comprobación de autenticación
-        const emergencia = await controller.crear(validacion.data);
+        if (id) {
+            const existente = await db.emergencia.findUnique({ where: { id }, select: { id: true, descripcion: true, prioridad: true, estado: true } });
+            if (existente) return respuesta(existente, 200);
+        }
+        const emergencia = await controller.crear(validacion.data, id);
         avisarEmergenciaNueva(emergencia);
-        return NextResponse.json(emergencia, { status: 201 });
+        return respuesta(emergencia, 201);
     } catch (error) {
+        if (id && error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            const existente = await db.emergencia.findUnique({ where: { id }, select: { id: true, descripcion: true, prioridad: true, estado: true } }).catch(() => null);
+            if (existente) return respuesta(existente, 200);
+        }
         const mensaje = error instanceof Error ? error.message : '';
 
         switch (mensaje) {
@@ -67,7 +90,7 @@ export async function POST(req: NextRequest) {
             case 'GOOGLE_MAPS_NO_CONFIGURADO':
             case 'GOOGLE_MAPS_NO_DISPONIBLE':
                 return NextResponse.json(
-                    { error: 'No se pudo ubicar la dirección en este momento. Intentá enviando tu ubicación GPS.' },
+                    { error: 'No se pudo ubicar la dirección en este momento. Intentá enviando tu ubicación GPS.', reporteGuardado: false },
                     { status: 503 },
                 );
             default:
