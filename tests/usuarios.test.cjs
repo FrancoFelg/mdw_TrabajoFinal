@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const ts = require('typescript');
 const { NextRequest } = require('next/server');
 function cargar(ruta, mocks) {
-  const codigo = ts.transpileModule(fs.readFileSync(ruta, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+  const codigo = ts.transpileModule(fs.readFileSync(ruta, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   const modulo = { exports: {} };
   new Function('require', 'module', 'exports', codigo)(nombre => mocks[nombre] ?? require(nombre), modulo, modulo.exports);
   return modulo.exports;
@@ -41,4 +41,40 @@ test('permisos, validación y edición administrativa', async () => {
   destino = 'ADMIN';
   assert.equal((await ruta.PATCH(request({ rol: 'VOLUNTARIO' }), contexto)).status, 403);
   assert.equal((await ruta.PATCH(request({ rol: 'VOLUNTARIO' }), { params: Promise.resolve({ id: 'inexistente' }) })).status, 404);
+});
+
+test('cuenta propia permite datos personales y rechaza rol e identidad ajena', async () => {
+  const cuenta = cargar('src/app/api/usuarios/me/route.ts', {
+    '@/lib/auth': { getUserFromRequest: () => autenticado ? { id: 'actor', rol: 'VOLUNTARIO' } : null },
+    '@/lib/cursoErrores': { leerBody: req => req.json(), RESPUESTA_NO_AUTORIZADO: () => new Response(null, { status: 401 }) },
+    '@/lib/usuarios-admin': admin,
+    '../../../../../services/usuario.service': { UsuarioService: class {} },
+  });
+  autenticado = true; rol = 'VOLUNTARIO';
+  assert.equal((await cuenta.PATCH(request({ persona: { nombre: 'Ana', telefonos: [] } }))).status, 200);
+  assert.equal(cambios.where.id, 'actor');
+  assert.equal(cambios.data.rol, undefined);
+  for (const body of [{ rol: 'COORDINADOR' }, { id: 'destino', nombreUsuario: 'otro' }, { password: 'secreto' }]) {
+    assert.equal((await cuenta.PATCH(request(body))).status, 400);
+  }
+  rol = 'ADMIN';
+  assert.equal((await cuenta.PATCH(request({ nombreUsuario: 'admin' }))).status, 200);
+  autenticado = false;
+  assert.equal((await cuenta.PATCH(request({ nombreUsuario: 'intruso' }))).status, 401);
+});
+
+test('historial filtra por usuario y excluye certificados eliminados', async () => {
+  let emergencias, certificados;
+  const { UsuarioHistorial } = cargar('src/components/usuario-historial.tsx', {
+    '../../config/database': { db: {
+      usuarioEmergencia: { findMany: async consulta => { emergencias = consulta; return []; } },
+      certificado: { findMany: async consulta => { certificados = consulta; return []; } },
+    } },
+    './ui': { Card: () => null },
+  });
+  await UsuarioHistorial({ usuarioId: 'perfil-autorizado' });
+  assert.deepEqual(emergencias.where, { usuarioId: 'perfil-autorizado' });
+  assert.deepEqual(certificados.where, { usuarioId: 'perfil-autorizado', fechaEliminacion: null });
+  assert.equal(certificados.select.curso.select.titulo, true);
+  assert.equal(emergencias.select.emergencia.select.estado, true);
 });

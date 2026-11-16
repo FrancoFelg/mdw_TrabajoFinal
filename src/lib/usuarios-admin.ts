@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { db } from '../../config/database';
 
 const texto = z.string().trim().min(1).max(100);
-export const editarUsuarioSchema = z.object({
+const camposUsuario = z.object({
   nombreUsuario: texto.optional(),
   rol: z.enum(['VOLUNTARIO', 'COORDINADOR']).optional(),
   persona: z.object({
@@ -13,18 +13,20 @@ export const editarUsuarioSchema = z.object({
     }, 'Fecha de nacimiento inválida').optional(),
     telefonos: z.array(z.object({ tipo: texto, numero: z.string().trim().min(1).max(50) }).strict()).max(10).optional(),
   }).strict().optional(),
-}).strict().refine(datos => Object.keys(datos).length > 0, 'Indicá los cambios');
+}).strict();
+export const editarUsuarioSchema = camposUsuario.refine(datos => Object.keys(datos).length > 0, 'Indicá los cambios');
+export const editarCuentaSchema = camposUsuario.omit({ rol: true }).strict().refine(datos => Object.keys(datos).length > 0, 'Indicá los cambios');
 
 export async function puedeGestionarUsuarios(id: string) {
   const usuario = await db.usuario.findUnique({ where: { id }, select: { rol: true } });
   return usuario?.rol === 'COORDINADOR' || usuario?.rol === 'ADMIN';
 }
 
-export async function editarUsuario(id: string, entrada: unknown) {
-  const datos = editarUsuarioSchema.parse(entrada);
+export async function editarUsuario(id: string, entrada: unknown, propia = false) {
+  const datos = propia ? editarCuentaSchema.parse(entrada) : editarUsuarioSchema.parse(entrada);
   const destino = await db.usuario.findUnique({ where: { id }, select: { rol: true } });
   if (!destino) throw new Error('USUARIO_NO_ENCONTRADO');
-  if (destino.rol === 'ADMIN') throw new Error('ADMIN_PROTEGIDO');
+  if (!propia && destino.rol === 'ADMIN') throw new Error('ADMIN_PROTEGIDO');
   const { persona, ...cuenta } = datos;
   const resultado = await db.usuario.update({ where: { id }, data: {
     ...cuenta,

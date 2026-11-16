@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { RESPUESTA_NO_AUTORIZADO, leerBody } from '@/lib/cursoErrores'; // O la librería genérica de errores de tu app
 import { UsuarioService } from '../../../../../services/usuario.service';
-import { editarUsuario, puedeGestionarUsuarios } from '@/lib/usuarios-admin';
+import { editarUsuario } from '@/lib/usuarios-admin';
 import { ZodError } from 'zod';
 
 const service = new UsuarioService();
@@ -29,15 +29,14 @@ export async function PATCH(req: NextRequest) {
   if (!usuario) return RESPUESTA_NO_AUTORIZADO();
 
   try {
-    if (!await puedeGestionarUsuarios(usuario.id)) return NextResponse.json({ error: 'Solo coordinación puede editar usuarios.' }, { status: 403 });
     const body = await leerBody(req);
-    const perfilActualizado = await editarUsuario(usuario.id, body);
+    const perfilActualizado = await editarUsuario(usuario.id, body, true);
     
     return NextResponse.json(perfilActualizado);
   } catch (error: unknown) {
     return NextResponse.json(
-      { error: error instanceof ZodError ? 'Datos inválidos.' : 'No se pudo actualizar el perfil.' },
-      { status: 400 }
+      { error: error instanceof ZodError ? 'Datos inválidos.' : (error as { code?: string })?.code === 'P2002' ? 'Ese nombre de usuario ya existe.' : 'No se pudo actualizar el perfil.' },
+      { status: (error as { code?: string })?.code === 'P2002' ? 409 : 400 }
     );
   }
 }
