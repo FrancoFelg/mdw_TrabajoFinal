@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { UsuarioService } from '../../../../services/usuario.service';
 import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
 import { getUserFromRequest } from '@/lib/auth';
+import { puedeGestionarUsuarios } from '@/lib/usuarios-admin';
 
 const usuarioService = new UsuarioService();
 
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const usuario = getUserFromRequest(req);
     if (!usuario) return RESPUESTA_NO_AUTORIZADO();
-    if (usuario.rol !== 'ADMIN' && usuario.rol !== 'COORDINADOR') {
+    if (!await puedeGestionarUsuarios(usuario.id)) {
       return NextResponse.json({ error: 'El directorio requiere rol coordinador o administrador.' }, { status: 403 });
     }
     const usuarios = await usuarioService.listarUsuarios();
