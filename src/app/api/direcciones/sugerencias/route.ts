@@ -2,7 +2,6 @@ import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { DireccionController } from '../../../../../controllers/direccion.controller';
-import { getUserFromRequest } from '@/lib/auth';
 
 const controller = new DireccionController();
 
@@ -12,13 +11,8 @@ const QuerySchema = z.object({
 });
 
 // GET /api/direcciones/sugerencias?q=corrientes 12&sessionToken=<uuid>
-// Autocompletado de direcciones para el formulario de reporte (autenticado,
-// igual que el alta de emergencias). La key de Google queda en el server.
+// Autocompletado público, igual que el reporte. La key de Google queda en el server.
 export async function GET(req: NextRequest) {
-  if (!getUserFromRequest(req)) {
-    return jsonPublico({ error: 'No autorizado' }, { status: 401 });
-  }
-
   const validacion = QuerySchema.safeParse(Object.fromEntries(req.nextUrl.searchParams));
   if (!validacion.success) {
     return jsonPublico(

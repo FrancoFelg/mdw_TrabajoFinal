@@ -39,6 +39,7 @@ export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | nul
   const links = usuario ? [
     { href: '/reportar', label: 'Reportar', Icono: Megaphone },
     { href: '/casos', label: 'Casos', Icono: ClipboardList },
+    { href: '/ascensos', label: 'Mis ascensos', Icono: Users },
     ...(coordinador ? [{ href: '/usuarios', label: 'Usuarios', Icono: Users }] : []),
   ] : [];
   const activo = (href: string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);

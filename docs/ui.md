@@ -35,7 +35,7 @@ En el celular la navegación va en pestañas abajo; desde 960 px sube a la barra
 Los avisos se guardan por persona (`Notificacion`, con clave única para no repetirlos) y se muestran en `/notificaciones`. La campanita del encabezado consulta `GET /api/notificaciones?resumen=1` cada 30 s con la pestaña visible. Los disparadores (`src/lib/avisos.ts`) corren con `after()`, después de responder, para no demorar reportes ni altas:
 
 - **Caso rojo nuevo** → coordinación y voluntarios con certificado aprobado. Conectado en `POST /api/emergencias`.
-- **Certificado o pedido de ascenso nuevo** → coordinación, nunca a quien lo cargó. `avisarCertificadoNuevo` y `avisarAscensoNuevo` quedan listos para conectarlos desde esas pantallas.
+- **Certificado o pedido de ascenso nuevo** → coordinación, nunca a quien lo cargó. Certificados conserva su disparador pendiente de conectar. Ascensos guarda avisos transaccionales al solicitar, aprobar o rechazar; ver `docs/ascensos.md`.
 - **Caso sin atender** (10 min rojo, 30 amarillo, 120 verde) → coordinación, una sola vez por caso. Se revisa cuando coordinación consulta la campanita.
 
 El push es opcional por dispositivo: `public/sw.js` muestra el aviso y abre el enlace al tocarlo; la suscripción se guarda en `SuscripcionPush` y se borra sola si el navegador la da de baja. En iPhone hace falta agregar la app a la pantalla de inicio (`src/app/manifest.ts`). Sin claves VAPID, la sección de push no aparece y los avisos quedan solo en la app.
@@ -74,7 +74,7 @@ Las rutas que todavía no tienen pantalla se documentan en la sección 5 de `doc
 
 - **GPS:** solicita permiso solo al tocar el botón; espera hasta 10 segundos. La provincia se estima con la función local existente y queda editable. La persona verifica que el incidente esté en ese lugar.
 - **GPS denegado, no disponible o vencido:** destaca la dirección manual sin borrar descripción ni foto.
-- **Dirección manual:** se guarda tal como fue escrita, sin llamar a Google ni requerir `GOOGLE_MAPS_API_KEY`. Se recomienda incluir localidad y provincia, pero no se bloquea el reporte por su ausencia. Las coordenadas y provincia desconocidas quedan en NULL. La lista y el detalle muestran la dirección; sin coordenadas no se ofrecen mapa ni rutas. La dirección queda pendiente de verificar.
+- **Dirección manual:** ofrece sugerencias de Google Maps desde tres caracteres, con espera de 400 ms entre cambios. Se puede elegir una sugerencia o conservar el texto libre. Al enviar se intenta geocodificar la dirección y guardar coordenadas y provincia para mostrar el marcador. Si Google falla o no encuentra el lugar, se conserva la dirección original y el reporte se guarda con coordenadas NULL. Incluí localidad y provincia para evitar ambigüedades. El listado reintenta ubicar casos activos anteriores en lotes rotativos de hasta cinco, una vez por minuto por proceso; sin coordenadas, el caso sigue disponible en la lista. Requiere GOOGLE_MAPS_API_KEY con Places API (New) habilitada para sugerencias y geocodificación; la clave nunca llega al navegador.
 - **Conexión interrumpida o respuesta perdida:** conserva el envío en memoria y reintenta la misma clave `Idempotency-Key`. La API deriva un identificador estable y la unicidad de MySQL evita duplicados, incluso ante dos solicitudes simultáneas. Mientras el resultado sea incierto, se bloquea la edición para no mezclar dos incidentes. Esta recuperación funciona mientras se conserve abierta la pantalla; no hay cola offline persistente.
 - **Foto opcional:** JPG, PNG o WebP, hasta 5 MB. El servidor verifica firma binaria y tamaño. Primero se registra el caso; después se adjunta el archivo. Si falla el adjunto, el caso permanece guardado y aparece Reintentar foto, sin volver a crear la emergencia.
 - **Permiso de foto:** la creación entrega una capacidad firmada con `JWT_SECRET`, válida por 24 horas y solo para ese caso. No es un JWT de sesión. Sin secreto, se guarda el reporte pero no se habilitan fotos. La lectura de fotos locales requiere sesión.
@@ -88,3 +88,7 @@ Verificación manual: abrir Home sin sesión, entrar a Reportar, enviar sin foto
 
 - El informe final se pide en la interfaz, pero `EmergenciaRepository.finalizarEmergencia` no lo guarda: el schema no tiene campo para observaciones.
 - El bloqueo de casos rojos enlaza a `/formacion` y el avatar del encabezado a `/cuenta`; esas pantallas las suma su responsable.
+
+## Solicitudes de ascenso
+
+La navegación incluye «Mis ascensos». En «Usuarios», «Solicitudes» muestra un círculo rojo si hay un pedido pendiente. Abre el historial completo de esa persona, con acciones para aprobar o denegar los pendientes. Detalles y contingencias en docs/ascensos.md.

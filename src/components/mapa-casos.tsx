@@ -34,6 +34,7 @@ function tarjetaCaso(c: CasoFila) {
   cabecera.append(prioridad);
 
   const descripcion = el('p', 'pop-desc', c.descripcion);
+  const direccion = el('p', 'pop-meta', c.provincia);
   const estado = c.estado === 'EN_CAMINO'
     ? (c.propio ? 'Vas en camino' : `En camino${c.asignado ? ` · ${c.asignado}` : ''}`)
     : 'Sin asignar';
@@ -46,7 +47,7 @@ function tarjetaCaso(c: CasoFila) {
   boton.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>');
   boton.setAttribute('aria-label', `Ver caso #${codigoCaso(c.id)}`);
 
-  caja.append(cabecera, descripcion, meta, boton);
+  caja.append(cabecera, descripcion, direccion, meta, boton);
   return caja;
 }
 
@@ -170,6 +171,6 @@ export default function MapaCasos({ casos, solo = false, etiqueta, yo }: Props) 
     <div ref={nodo} className="mapa-lienzo" role="region" aria-label={solo ? 'Ubicación del caso' : `Mapa con ${casos.length} casos`} />
     {yoActiva && <button type="button" className="centrar" onClick={centrarEnMi} aria-label="Centrar el mapa en tu ubicación"><LocateFixed aria-hidden="true" size={22} /></button>}
     {!solo && !casos.length && <p className="mapa-aviso" role="status">No hay casos para mostrar en el mapa con este filtro.</p>}
-    {sinUbicar > 0 && <p className="mapa-aviso">{sinUbicar} caso{sinUbicar > 1 ? 's' : ''} sin coordenadas: miralos en la lista.</p>}
+    {sinUbicar > 0 && <p className="mapa-aviso">{sinUbicar} caso{sinUbicar > 1 ? 's' : ''} con ubicación pendiente. Se reintentará al actualizar; consultá la dirección en la lista.</p>}
   </div>;
 }
