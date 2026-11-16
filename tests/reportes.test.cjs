@@ -27,6 +27,7 @@ function cargar(archivo, dobles = {}) {
 let creado;
 let errorGeocoding;
 const servicio = cargar('services/emergencia.service.ts', {
+  '../config/database': { db: {} },
   '../repositories/emergencia.repository': { EmergenciaRepository: class {
     async crear(datos) { creado = datos; return { ...datos, id: datos.id || 'caso-test', fecha: new Date(), estado: 'SIN_GESTIONAR' }; }
   } },
@@ -64,7 +65,7 @@ test('GPS crea sin geocodificar, conserva ejes y usa VERDE por defecto', async (
 });
 
 test('dirección manual guarda sin GPS aunque Google falle, sin inventar coordenadas', async () => {
-  for (const fallo of [undefined, 'GOOGLE_MAPS_NO_CONFIGURADO', 'GOOGLE_MAPS_NO_DISPONIBLE', 'DIRECCION_NO_ENCONTRADA']) {
+  for (const fallo of ['GOOGLE_MAPS_NO_CONFIGURADO', 'GOOGLE_MAPS_NO_DISPONIBLE', 'DIRECCION_NO_ENCONTRADA', 'PROVINCIA_NO_RECONOCIDA']) {
     errorGeocoding = fallo;
     await new servicio.EmergenciaService().crear({ descripcion: 'se está prendiendo fuego un auto', direccion: 'Mariano Moreno 1810' });
     assert.equal(creado.direccion, 'Mariano Moreno 1810');
@@ -73,6 +74,51 @@ test('dirección manual guarda sin GPS aunque Google falle, sin inventar coorden
     assert.equal(creado.coordenada_y, null);
   }
   errorGeocoding = undefined;
+});
+
+test('dirección manual resuelta guarda coordenadas para el mapa y conserva el texto original', async () => {
+  const resultado = await new servicio.EmergenciaService().crear({ descripcion: 'Persona necesita ayuda', direccion: 'Callao 100, CABA' });
+  assert.equal(creado.coordenada_x, -58.4);
+  assert.equal(creado.coordenada_y, -34.6);
+  assert.equal(creado.provincia, 'CABA');
+  assert.equal(creado.direccion, 'Callao 100, CABA');
+  assert.equal(resultado.direccionFormateada, 'Dirección encontrada');
+});
+
+test('listado recupera coordenadas de casos anteriores y conserva casos que Google no resuelve', async () => {
+  const casos = ['conocido', 'desconocido'].map(id => ({ id, estado: 'SIN_GESTIONAR', ubicacion: {
+    id, direccion: id, coordenada_x: null, coordenada_y: null,
+  } }));
+  const modulo = cargar('services/emergencia.service.ts', {
+    '../config/database': { db: { ubicacion: { updateMany: async ({ where, data }) => {
+      Object.assign(casos.find(c => c.ubicacion.id === where.id).ubicacion, data);
+    } } } },
+    '../repositories/emergencia.repository': { EmergenciaRepository: class { async findAll() { return casos; } } },
+    './geocoding.service': { GeocodingService: class { async geocodificar(direccion) {
+      if (direccion === 'desconocido') throw new Error('GOOGLE_MAPS_NO_DISPONIBLE');
+      return { lat: -34.6, lng: -58.4, provincia: 'CABA' };
+    } } },
+    './rutas.service': { RutasService: class {} },
+  });
+  const resultado = await new modulo.EmergenciaService().listarEmergencias();
+  assert.equal(resultado[0].ubicacion.coordenada_y, -34.6);
+  assert.equal(resultado[0].ubicacion.coordenada_x, -58.4);
+  assert.equal(resultado[1].ubicacion.coordenada_x, null);
+  assert.equal(resultado[1].ubicacion.direccion, 'desconocido');
+});
+
+test('sugerencias disponibles sin cuenta y fallo de Google devuelve 503', async () => {
+  let fallo = false;
+  const api = cargar('src/app/api/direcciones/sugerencias/route.ts', {
+    '../../../../../controllers/direccion.controller': { DireccionController: class { async sugerir() {
+      if (fallo) throw new Error('GOOGLE_MAPS_NO_DISPONIBLE');
+      return [{ placeId: 'lugar', texto: 'Callao 100, CABA' }];
+    } } },
+  });
+  const req = () => new NextRequest('http://localhost/api/direcciones/sugerencias?q=Callao');
+  assert.equal((await api.GET(req())).status, 200);
+  fallo = true;
+  assert.equal((await api.GET(req())).status, 503);
 });
 
 let existente = null;

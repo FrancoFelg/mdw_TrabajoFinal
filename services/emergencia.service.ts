@@ -3,6 +3,12 @@ import { EmergenciaRepository } from '../repositories/emergencia.repository';
 import { GeocodingService } from './geocoding.service';
 import { ModoViaje, Punto, RutasService } from './rutas.service';
 import { EmergenciaEstado, Prioridad, Provincia } from '@prisma/client';
+import { db } from '../config/database';
+
+// Evita consultar repetidamente direcciones pendientes durante el refresco del mapa.
+let proximoIntentoUbicaciones = 0;
+let ubicandoPendientes = false;
+let desplazamientoPendientes = 0;
 
 // Body de POST /api/emergencias. La ubicación llega de una de dos formas:
 //   - GPS: coordenada_x + coordenada_y + provincia
@@ -43,7 +49,7 @@ export class EmergenciaService {
 
   // Alta de emergencia pública (no requiere cuenta). Nace SIN_GESTIONAR; la prioridad es la que
   // mande el cliente o VERDE por defecto.
-  // Si llegan coordenadas de GPS se usan tal cual; si no, se conserva la dirección textual.
+  // Si llegan coordenadas de GPS se usan tal cual; si no, se intenta ubicar la dirección textual.
   async crear(datos: CrearEmergenciaInput, id?: string) {
     let coordenada_x: number | null = null;
     let coordenada_y: number | null = null;
@@ -58,6 +64,15 @@ export class EmergenciaService {
       // La dirección declarada permite registrar el caso sin depender de Google.
       // Las coordenadas quedan pendientes de verificar; nunca se inventan.
       direccionFormateada = datos.direccion;
+      try {
+        const lugar = await this.geocoding.geocodificar(datos.direccion!);
+        coordenada_x = lugar.lng;
+        coordenada_y = lugar.lat;
+        provincia = lugar.provincia;
+        direccionFormateada = lugar.direccionFormateada;
+      } catch {
+        // Sin Google o sin coincidencias, el reporte conserva la dirección textual.
+      }
     }
 
     const emergencia = await this.emergenciaRepo.crear({
@@ -112,7 +127,32 @@ export class EmergenciaService {
 
   // Listar todas las emergencias
   async listarEmergencias() {
-    return await this.emergenciaRepo.findAll();
+    const emergencias = await this.emergenciaRepo.findAll();
+    if (ubicandoPendientes || Date.now() < proximoIntentoUbicaciones) return emergencias;
+    const candidatos = emergencias.filter(e =>
+      e.estado !== EmergenciaEstado.GESTIONADA && e.ubicacion.direccion &&
+      (e.ubicacion.coordenada_x === null || e.ubicacion.coordenada_y === null),
+    );
+    const inicio = desplazamientoPendientes % Math.max(candidatos.length, 1);
+    const pendientes = [...candidatos.slice(inicio), ...candidatos.slice(0, inicio)].slice(0, 5);
+    desplazamientoPendientes = inicio + pendientes.length;
+    if (!pendientes.length) return emergencias;
+    ubicandoPendientes = true;
+    proximoIntentoUbicaciones = Date.now() + 60_000;
+    try {
+      await Promise.all(pendientes.map(async e => {
+        try {
+          const lugar = await this.geocoding.geocodificar(e.ubicacion.direccion!);
+          await db.ubicacion.updateMany({
+            where: { id: e.ubicacion.id, OR: [{ coordenada_x: null }, { coordenada_y: null }] },
+            data: { coordenada_x: lugar.lng, coordenada_y: lugar.lat, provincia: lugar.provincia },
+          });
+        } catch {
+          // El caso permanece visible en la lista y se reintentará más adelante.
+        }
+      }));
+      return await this.emergenciaRepo.findAll();
+    } finally { ubicandoPendientes = false; }
   }
 
   // Obtener detalle de una emergencia

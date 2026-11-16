@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { LocateFixed, CheckCircle } from 'lucide-react';
 import { MAX_FOTO, TIPOS_FOTO } from '@/lib/reporte';
 import { estimarProvincia, NOMBRES_PROVINCIA, PRIORIDADES } from '@/lib/casos';
@@ -28,6 +28,33 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
   const cuerpo = useRef<string | null>(null);
   const bloqueo = useRef(false);
   const entradaDireccion = useRef<HTMLInputElement>(null);
+  const [sugerencias, setSugerencias] = useState<{ placeId: string; texto: string }[]>([]);
+  const [direccionElegida, setDireccionElegida] = useState('');
+  const [avisoDireccion, setAvisoDireccion] = useState('');
+
+  useEffect(() => {
+    if (gps || direccion.trim().length < 3 || direccion === direccionElegida) return;
+    const controller = new AbortController();
+    const espera = setTimeout(async () => {
+      try {
+        const respuesta = await fetch(`/api/direcciones/sugerencias?q=${encodeURIComponent(direccion.slice(0, 200))}`, {
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(6500)]),
+        });
+        if (!respuesta.ok) throw new Error('Sin sugerencias');
+        const opciones = await respuesta.json();
+        if (!controller.signal.aborted) {
+          setSugerencias(opciones.filter((opcion: { texto: string }) => opcion.texto.length <= 250));
+          setAvisoDireccion(opciones.length ? '' : 'Sin coincidencias. Incluí localidad y provincia; podés reportar igual.');
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          setSugerencias([]);
+          setAvisoDireccion('Google Maps no está disponible. Podés reportar con la dirección escrita.');
+        }
+      }
+    }, 400);
+    return () => { clearTimeout(espera); controller.abort(); };
+  }, [direccion, direccionElegida, gps]);
 
   function localizar() {
     if (!navigator.geolocation) {
@@ -150,7 +177,15 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
           <button type="button" className="button button-secondary" onClick={() => { setGps(null); setMensajeGps('Escribí la dirección del incidente.'); }}>Usar dirección manual</button>
         </div> : <div className="field"><label htmlFor="direccion">Dirección del incidente</label>
           <input ref={entradaDireccion} className="input" id="direccion" value={direccion} required minLength={3} maxLength={250}
-            placeholder="Calle, altura, localidad y provincia" onChange={e => setDireccion(e.target.value)} />
+            placeholder="Calle, altura, localidad y provincia" autoComplete="off" aria-describedby="direccion-ayuda"
+            onKeyDown={e => { if (e.key === 'Escape') setSugerencias([]); }}
+            onChange={e => { setDireccion(e.target.value); setSugerencias([]); setAvisoDireccion(''); }} />
+          {sugerencias.length > 0 && <div className="stack" aria-label="Direcciones sugeridas">
+            {sugerencias.map(s => <button type="button" className="button button-secondary" key={s.placeId}
+              onClick={() => { setDireccion(s.texto); setDireccionElegida(s.texto); setSugerencias([]); }}>{s.texto}</button>)}
+            <small className="muted">Google Maps</small>
+          </div>}
+          <small id="direccion-ayuda" role="status">{avisoDireccion}</small>
           <small className="muted">Se guarda aunque no tengas GPS ni acceso a Google Maps. Incluí localidad y provincia para facilitar la atención.</small></div>}
       </div>
       <div className="field"><label htmlFor="foto">Foto (opcional)</label>
