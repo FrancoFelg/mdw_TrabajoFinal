@@ -129,3 +129,14 @@ test('todas las respuestas JSON de API usan el filtro público', () => {
     assert.doesNotMatch(codigo, /\b(?:NextResponse|Response)\.json\(/, ruta);
   }
 });
+
+test('destinos de login conservan cuenta y ascensos sin permitir redirecciones externas', () => {
+  const { safeDestination } = cargar('src/lib/session.ts', {
+    '../../config/database': { db: {} },
+    'next/headers': {}, 'next/navigation': {},
+  });
+  assert.equal(safeDestination('/cuenta'), '/cuenta');
+  assert.equal(safeDestination('/ascensos'), '/ascensos');
+  assert.equal(safeDestination('https://example.com'), '/casos');
+  assert.equal(safeDestination('//example.com'), '/casos');
+});
