@@ -23,8 +23,8 @@ export class SolicitudAscensoService {
     return await this.repo.crear(usuarioId);
   }
 
-  async listar() {
-    return await this.repo.findAll();
+  async listar(usuarioId?: string) {
+    return await this.repo.findAll(usuarioId);
   }
 
   async obtenerPorId(id: string) {
@@ -37,7 +37,7 @@ export class SolicitudAscensoService {
     return solicitud;
   }
 
-  async aprobar(id: string) {
+  async aprobar(id: string, actorId?: string) {
     const solicitud = await this.obtenerPorId(id);
 
     if (solicitud.estado !== SolicitudAscensoEstado.PENDIENTE) {
@@ -48,10 +48,10 @@ export class SolicitudAscensoService {
       throw new Error('USUARIO_YA_ES_COORDINADOR');
     }
 
-    return await this.repo.aprobar(id, solicitud.usuarioId);
+    return await this.repo.aprobar(id, solicitud.usuarioId, actorId);
   }
 
-  async rechazar(id: string) {
+  async rechazar(id: string, actorId?: string) {
     const solicitud = await this.obtenerPorId(id);
 
     if (solicitud.estado !== SolicitudAscensoEstado.PENDIENTE) {
@@ -61,6 +61,7 @@ export class SolicitudAscensoService {
     return await this.repo.actualizarEstado(
       id,
       SolicitudAscensoEstado.RECHAZADO,
+      actorId,
     );
   }
 }

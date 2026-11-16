@@ -149,7 +149,7 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Sistema visual | `/sistema` | Público; ejemplos sin datos personales | Implementada |
 | Reportar emergencia | `/reportar` | Público | Implementada; descripción, GPS o dirección manual y foto opcional con reintento |
 | Cursos y certificados | Por definir | Según rol y operación | Pantallas pendientes; API existente |
-| Solicitudes de ascenso | Por definir | Según rol y operación | Pantalla pendiente; API existente |
+| Solicitudes de ascenso | `/ascensos` y `/usuarios/:id/solicitudes` | Según rol y operación | Implementada; historial, evaluación y avisos. Ver `docs/ascensos.md` |
 
 El acceso anónimo a `/usuarios` redirige a `/login?next=/usuarios`. Al iniciar sesión se recupera ese destino.
 Un voluntario autenticado recibe un mensaje de acceso restringido sin consultar el directorio.

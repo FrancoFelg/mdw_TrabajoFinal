@@ -23,7 +23,7 @@ export async function requireSession(next?: string) {
 }
 
 // Destinos permitidos después del login. Nunca redirigir a un `next` arbitrario.
-const DESTINOS = ['/casos', '/notificaciones', '/usuarios', '/sistema'];
+const DESTINOS = ['/casos', '/notificaciones', '/usuarios', '/sistema', '/ascensos'];
 
 export function safeDestination(value: unknown) {
   if (typeof value !== 'string') return '/casos';
