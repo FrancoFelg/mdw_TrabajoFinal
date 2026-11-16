@@ -1,0 +1,1213 @@
+{
+  "base": "mdw_e2e (localhost:3306)",
+  "navegador": "Google Chrome",
+  "stats": {
+    "startTime": "2026-11-16T04:56:11.127Z",
+    "duration": 82153.86700000001,
+    "expected": 109,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "casos": [
+    {
+      "titulo": "certificados.spec.ts / H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 12275,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "certificados.spec.ts / H5/H6: archivos privados, rechazo de archivos inválidos y permisos vigentes",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 3454,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "concurrencia.spec.ts / H10: diez voluntarios toman el mismo caso; exactamente uno gana",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 3297,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "concurrencia.spec.ts / H10: un voluntario no puede tomar diez casos simultáneos",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1120,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H2/H7-H11: reporte público, login, tomar y finalizar desde navegador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 10008,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H1/H2: perfil propio, login por nombre/email, duplicidad y privacidad",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 809,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H3: solicitud, duplicado, rechazo, historial y aprobación con avisos",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 6168,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H10: rojo exige certificado aprobado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 288,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H8/H9: mapa con marcadores por prioridad y filtro de casos libres",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 3617,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H7: reporte anónimo con GPS, prioridades, idempotencia y foto",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1490,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H1/H3: coordinador consulta perfil, cambia rol y no ve Mis ascensos",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 9334,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H11: finalizar exige asignado; POST y PUT guardan el informe",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 3818,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H5/H6: acceso a formación desde el bloqueo de un caso rojo",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 2212,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/usuarios exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 35,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/usuarios exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 37,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 29,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 30,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/auth/login exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 30,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/auth/logout exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 87,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 24,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/solicitudes-ascenso exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 24,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 41,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 41,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/cursos exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 25,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/cursos exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 21,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1490,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / DELETE /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 43,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 23,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 22,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/solicitudes-certificados exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 21,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 41,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 26,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/emergencias exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 25,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/emergencias/:id exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 53,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias/:id/tomar exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 63,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 58,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/notificaciones exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 32,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/usuarios exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 227,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/usuarios exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 214,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 202,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 191,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/auth/login exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 318,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/auth/logout exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 276,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 1401,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/solicitudes-ascenso exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 193,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 195,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 205,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/cursos exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 212,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/cursos exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 279,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 222,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / DELETE /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 207,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 214,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 237,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/solicitudes-certificados exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 271,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 232,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 209,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/emergencias exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 240,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/emergencias/:id exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 194,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias/:id/tomar exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 253,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 273,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/notificaciones exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 213,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/usuarios exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 199,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/usuarios exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 252,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 223,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 270,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/auth/login exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 213,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/auth/logout exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 194,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 218,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/solicitudes-ascenso exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 255,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 282,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 226,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/cursos exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 194,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/cursos exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 220,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 224,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / DELETE /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 229,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 246,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 214,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/solicitudes-certificados exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 196,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 259,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 232,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/emergencias exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 275,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/emergencias/:id exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 240,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias/:id/tomar exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 229,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 261,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/notificaciones exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 679,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/usuarios exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 196,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/usuarios exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 270,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 203,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/usuarios/me exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 197,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/auth/login exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 185,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/auth/logout exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 213,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 205,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/solicitudes-ascenso exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 217,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 288,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 229,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/cursos exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 256,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/cursos exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 344,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 262,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / DELETE /api/cursos/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 227,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 196,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/certificados exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 222,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/solicitudes-certificados exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 194,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 194,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias exige Público",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 195,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/emergencias exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 223,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/emergencias/:id exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 224,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias/:id/tomar exige Voluntario",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 239,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 246,
+          "errores": []
+        }
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/notificaciones exige Autenticado",
+      "estado": "expected",
+      "resultados": [
+        {
+          "estado": "passed",
+          "duracionMs": 267,
+          "errores": []
+        }
+      ]
+    }
+  ]
+}

@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "test:e2e": "node scripts/e2e.cjs",
+    "test:e2e:mutation": "node scripts/e2e-mutation.cjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -21,6 +24,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@prisma/client": "^5.22.0",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",

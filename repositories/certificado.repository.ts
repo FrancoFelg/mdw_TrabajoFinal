@@ -9,8 +9,8 @@ export interface AtributoValorInput {
 }
 
 export interface CrearCertificadoConAtributosData {
-  cursoId: string;
-  estadoId: string;
+  cursoId?: string;
+  archivo?: string;
   estado: CertificadoEstado;
   usuarioId: string;
   codigoVerificacion: string;
@@ -19,7 +19,6 @@ export interface CrearCertificadoConAtributosData {
 }
 
 export interface ActualizarCertificadoData {
-  estadoId?: string;
   estado?: CertificadoEstado;
   codigoVerificacion?: string;
 }
@@ -29,7 +28,7 @@ export class CertificadoRepository {
     return await db.certificado.create({
       data: {
         cursoId: data.cursoId,
-        estadoId: data.estadoId,
+        archivo: data.archivo,
         estado: data.estado,
         usuarioId: data.usuarioId,
         codigoVerificacion: data.codigoVerificacion,

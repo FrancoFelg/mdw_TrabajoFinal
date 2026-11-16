@@ -137,6 +137,9 @@ test('destinos de login conservan cuenta y ascensos sin permitir redirecciones e
   });
   assert.equal(safeDestination('/cuenta'), '/cuenta');
   assert.equal(safeDestination('/ascensos'), '/ascensos');
+  const casoPublico = `/casos/${'a'.repeat(64)}`;
+  assert.equal(safeDestination(casoPublico), casoPublico);
+  assert.equal(safeDestination(`/casos/${'a'.repeat(65)}`), '/casos');
   assert.equal(safeDestination('https://example.com'), '/casos');
   assert.equal(safeDestination('//example.com'), '/casos');
 });

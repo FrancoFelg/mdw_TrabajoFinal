@@ -9,6 +9,8 @@ import { getSession } from '@/lib/session';
 export type ResultadoCaso = { ok: boolean; error: string };
 
 const ERRORES_CASO: Record<string, string> = {
+  ROL_VOLUNTARIO_REQUERIDO: 'Solo voluntarios pueden atender emergencias.',
+  INFORME_INVALIDO: 'Ingresá un informe de 10 a 10000 caracteres.',
   EMERGENCIA_NO_ENCONTRADA: 'Este caso ya no existe.',
   EMERGENCIA_YA_ASIGNADA: 'Otro voluntario tomó este caso antes que vos.',
   CONCURRENCIA_EMERGENCIA_TOMADA: 'Otro voluntario tomó este caso antes que vos.',

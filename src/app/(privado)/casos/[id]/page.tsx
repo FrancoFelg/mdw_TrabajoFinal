@@ -32,7 +32,8 @@ export default async function Caso({ params }: { params: Promise<{ id: string }>
 
   let bloqueo: { texto: string; enlace?: { href: string; texto: string } } | null = null;
   if (emergencia.estado === 'SIN_GESTIONAR') {
-    if (activa) bloqueo = { texto: 'Ya tenés un caso en camino. Finalizalo antes de tomar otro.', enlace: { href: `/casos/${activa.id}`, texto: `Ir a tu caso #${codigoCaso(activa.id)}` } };
+    if (sesion.rol !== 'VOLUNTARIO') bloqueo = { texto: 'Solo voluntarios pueden tomar emergencias.' };
+    else if (activa) bloqueo = { texto: 'Ya tenés un caso en camino. Finalizalo antes de tomar otro.', enlace: { href: `/casos/${activa.id}`, texto: `Ir a tu caso #${codigoCaso(activa.id)}` } };
     else if (emergencia.prioridad === 'ROJO' && !certificado) bloqueo = { texto: 'Los casos rojos los toma quien tiene un certificado aprobado.', enlace: { href: '/formacion', texto: 'Cargar un certificado' } };
   }
 
@@ -74,7 +75,8 @@ export default async function Caso({ params }: { params: Promise<{ id: string }>
         <img src={emergencia.imagen} alt="Foto del incidente reportado" />
         <span className="sr-only">Abrir foto en otra pestaña</span>
       </a>}
-      <CasoAcciones id={emergencia.id} estado={emergencia.estado} propio={propio} asignado={nombreAsignado} bloqueo={bloqueo} />
+      {emergencia.observacionesCierre && <section className="grupo"><h2>Informe final</h2><p>{emergencia.observacionesCierre}</p></section>}
+      <CasoAcciones id={emergencia.id} estado={emergencia.estado} propio={propio && sesion.rol === 'VOLUNTARIO'} asignado={nombreAsignado} bloqueo={bloqueo} />
     </div>
   </article>;
 }

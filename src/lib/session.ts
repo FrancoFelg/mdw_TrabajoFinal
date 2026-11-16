@@ -25,10 +25,10 @@ export async function requireSession(next?: string) {
 }
 
 // Destinos permitidos después del login. Nunca redirigir a un `next` arbitrario.
-const DESTINOS = ['/cuenta', '/casos', '/notificaciones', '/usuarios', '/sistema', '/ascensos'];
+const DESTINOS = ['/cuenta', '/casos', '/notificaciones', '/usuarios', '/sistema', '/ascensos', '/formacion'];
 
 export function safeDestination(value: unknown) {
   if (typeof value !== 'string') return '/casos';
-  if (DESTINOS.includes(value) || /^\/casos\/[a-z0-9]{20,40}$/.test(value)) return value;
+  if (DESTINOS.includes(value) || /^\/casos\/[a-z0-9]{20,64}$/.test(value)) return value;
   return '/casos';
 }

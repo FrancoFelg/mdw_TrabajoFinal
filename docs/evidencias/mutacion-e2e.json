@@ -1,0 +1,15 @@
+{
+  "fecha": "2026-11-16T04:08:15.713Z",
+  "base": "mdw_e2e (localhost:3306)",
+  "regla": "Solo un voluntario puede tomar un caso SIN_GESTIONAR",
+  "mutacion": "Quitar estado SIN_GESTIONAR del where en updateMany",
+  "stats": {
+    "startTime": "2026-11-16T04:06:39.949Z",
+    "duration": 4083.723,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  },
+  "fallo": "Error: expect(received).toHaveLength(expected)\n\nExpected length: 1\nReceived length: 10\nReceived array:  [200, 200, 200, 200, 200, 200, 200, 200, 200, 200]\n\n  11 |     const statuses = responses.map(response => response.status());\n  12 |     console.log('Diez solicitudes, HTTP:', statuses);\n> 13 |     expect(statuses.filter(status => status === 200)).toHaveLength(1);\n     |                                                       ^\n  14 |     expect(statuses.filter(status => status === 409)).toHaveLength(9);\n  15 |     expect(await db.usuarioEmergencia.count({ where: { emergenciaId: caso.id } })).toBe(1);\n  16 |   } finally { await Promise.all(clients.map(client => client.dispose())); }\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\concurrencia.spec.ts:13:55"
+}

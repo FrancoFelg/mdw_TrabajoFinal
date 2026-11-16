@@ -11,23 +11,29 @@ type ContextoRoute = {
 };
 
 // PUT /api/emergencias/[id]/finalizar — Finalizar emergencia
-export async function PUT(req: NextRequest, { params }: ContextoRoute) {
+export async function POST(req: NextRequest, { params }: ContextoRoute) {
     const usuario = getUserFromRequest(req);
     if (!usuario) return RESPUESTA_NO_AUTORIZADO();
 
     try {
         const { id } = await params;
-        const finalizada = await service.finalizarEmergencia(id, usuario.id);
+        const texto = await req.text();
+        const body = texto.trim() ? JSON.parse(texto) : {};
+        if (!body || typeof body !== 'object' || Array.isArray(body)) throw new Error('BODY_INVALIDO');
+        await service.finalizarEmergencia(id, usuario.id, body.observaciones as string);
 
         return jsonPublico(
             { mensaje: 'Emergencia finalizada con éxito.' },
             { status: 200 }
         );
     } catch (error: any) {
+        if (error.message === 'ROL_VOLUNTARIO_REQUERIDO') return jsonPublico({ error: 'Solo voluntarios.' }, { status: 403 });
+        if (error.message === 'EMERGENCIA_NO_ENCONTRADA') return jsonPublico({ error: 'Emergencia no encontrada.' }, { status: 404 });
+        if (error instanceof SyntaxError || error.message === 'INFORME_INVALIDO' || error.message === 'BODY_INVALIDO') return jsonPublico({ error: 'Ingresá un informe de 10 a 10000 caracteres.' }, { status: 400 });
         if (error.message === 'EMERGENCIA_NO_ESTA_EN_PROCESO') {
             return jsonPublico(
                 { error: 'La emergencia debe estar en estado EN_CAMINO para ser finalizada.' },
-                { status: 400 }
+                { status: 409 }
             );
         }
 
@@ -45,3 +51,6 @@ export async function PUT(req: NextRequest, { params }: ContextoRoute) {
         );
     }
 }
+
+// Compatibilidad con clientes que utilizan PUT.
+export { POST as PUT };

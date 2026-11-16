@@ -15,5 +15,5 @@ export default async function Perfil({ params }: { params: Promise<{ id: string 
     if (error instanceof Error && error.message === 'USUARIO_NO_ENCONTRADO') notFound();
     throw error;
   });
-  return <section className="stack"><Link href="/usuarios">Volver a usuarios</Link><UsuarioPerfil key={`${usuario.id}-${usuario.nombreUsuario}-${usuario.rol}`} usuario={{ id: usuario.id, nombreUsuario: usuario.nombreUsuario, email: usuario.email, rol: usuario.rol, persona: { ...usuario.persona, fechaNac: usuario.persona.fechaNac.toISOString().slice(0, 10) } }} /><UsuarioHistorial usuarioId={id} /></section>;
+  return <section className="stack"><Link href="/usuarios">Volver a usuarios</Link><UsuarioPerfil key={usuario.id} usuario={{ id: usuario.id, nombreUsuario: usuario.nombreUsuario, email: usuario.email, rol: usuario.rol, persona: { ...usuario.persona, fechaNac: usuario.persona.fechaNac.toISOString().slice(0, 10) } }} /><UsuarioHistorial usuarioId={id} /></section>;
 }

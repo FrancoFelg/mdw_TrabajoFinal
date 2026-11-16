@@ -69,7 +69,7 @@ export class NotificacionService {
       tipo: 'VALIDACION_PENDIENTE',
       titulo: tipo === 'certificado' ? 'Certificado para validar' : 'Pedido de ascenso',
       cuerpo: tipo === 'certificado' ? `${persona} cargó un certificado.` : `${persona} pidió ascenso a coordinador.`,
-      enlace: '/equipo',
+      enlace: tipo === 'certificado' ? '/formacion' : '/usuarios',
       clave: `${tipo}:${id}`,
     });
   }

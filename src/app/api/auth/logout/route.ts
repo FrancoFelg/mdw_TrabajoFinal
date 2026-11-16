@@ -1,8 +1,11 @@
 import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextRequest } from 'next/server';
+import { getUserFromRequest } from '@/lib/auth';
+import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
 
 // POST /api/auth/logout
 export async function POST(req: NextRequest) {
+  if (!getUserFromRequest(req)) return RESPUESTA_NO_AUTORIZADO();
   try {
     const response = jsonPublico(
       { mensaje: 'Sesión cerrada correctamente.' },
