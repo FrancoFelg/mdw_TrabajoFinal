@@ -9,9 +9,9 @@ export class EmergenciaController {
     this.emergenciaService = new EmergenciaService();
   }
 
-  // POST /api/emergencias — reportar una emergencia (autenticado)
-  async crear(datos: CrearEmergenciaInput) {
-    return await this.emergenciaService.crear(datos);
+  // POST /api/emergencias — reportar una emergencia (sin cuenta)
+  async crear(datos: CrearEmergenciaInput, id?: string) {
+    return await this.emergenciaService.crear(datos, id);
   }
 
   // GET /api/emergencias/:id/eta — tiempo de llegada del voluntario

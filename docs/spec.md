@@ -147,7 +147,7 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Avisos | `/notificaciones` | Con sesión | Implementada; no leídos, marcar como leído y push opcional |
 | Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
 | Sistema visual | `/sistema` | Público; ejemplos sin datos personales | Implementada |
-| Reportar emergencia | Por definir | Público | Pantalla pendiente; API existente |
+| Reportar emergencia | `/reportar` | Público | Implementada; descripción, GPS o dirección manual y foto opcional con reintento |
 | Cursos y certificados | Por definir | Según rol y operación | Pantallas pendientes; API existente |
 | Solicitudes de ascenso | Por definir | Según rol y operación | Pantalla pendiente; API existente |
 

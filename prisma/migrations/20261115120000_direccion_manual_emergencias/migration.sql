@@ -1,0 +1,4 @@
+-- Permite reportar con dirección textual sin GPS ni geocodificación.
+ALTER TABLE `Ubicacion`
+    ADD COLUMN `direccion` VARCHAR(250) NULL,
+    MODIFY `provincia` ENUM('BUENOS_AIRES', 'CABA', 'CATAMARCA', 'CHACO', 'CHUBUT', 'CORDOBA', 'CORRIENTES', 'ENTRE_RIOS', 'FORMOSA', 'JUJUY', 'LA_PAMPA', 'LA_RIOJA', 'MENDOZA', 'MISIONES', 'NEUQUEN', 'RIO_NEGRO', 'SALTA', 'SAN_JUAN', 'SAN_LUIS', 'SANTA_CRUZ', 'SANTA_FE', 'SANTIAGO_DEL_ESTERO', 'TIERRA_DEL_FUEGO', 'TUCUMAN') NULL;

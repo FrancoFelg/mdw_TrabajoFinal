@@ -11,6 +11,7 @@ El sistema visual completo está en `DESIGN.md`.
 
 | Ruta | Para quién | Qué hace |
 | :--- | :--- | :--- |
+| `/reportar` | Público, sin cuenta | Reporte en una pantalla, accesible desde Home y desde la pestaña Reportar. Descripción, GPS o dirección manual y foto opcional. Confirmación con código del caso. |
 | `/casos` | Con sesión | Mapa arriba y hoja con la lista (en escritorio, lista a la izquierda y mapa a la derecha). Libres o en camino, con filtro por prioridad. Se refresca cada 30 s. Si tenés un caso en camino, aparece primero. Muestra tu ubicación en vivo (punto azul con margen), la distancia a cada caso y el orden "Más cerca" (historia 8: filtro por proximidad). Tocar una marca abre una tarjeta con prioridad, descripción, código, estado y "Ver caso". |
 | `/casos/[id]` | Con sesión | Detalle, etapas, mapa con tu ubicación, distancia en línea recta y "Cómo llegar". Tomar el caso o finalizarlo con informe. Explica por qué no podés tomarlo (caso rojo sin certificado, otro caso activo, ya tomado). |
 | `/notificaciones` | Con sesión | Avisos (caso rojo nuevo, cola de coordinación, caso sin atender) con no leídos marcados, "Marcar todo como leído" y el interruptor de push para este dispositivo. La campanita del encabezado muestra el contador. |
@@ -66,6 +67,22 @@ El destino después del login se limita a rutas explícitas del sistema. El cier
 11. Con un voluntario sin certificado aprobado, abrir un caso rojo: el botón queda bloqueado con el motivo.
 
 Las rutas que todavía no tienen pantalla se documentan en la sección 5 de `docs/spec.md`.
+
+## Reportar una emergencia (historia 7)
+
+`POST /api/emergencias` ya era público; faltaba su interfaz. `/reportar` usa esa API sin iniciar sesión. El caso nace `SIN_GESTIONAR`, con la prioridad elegida: Rojo (Grave), Amarillo (Urgente) o Verde (Puede esperar). Verde queda seleccionado por defecto. La descripción admite entre 5 y 191 caracteres, conforme al campo actual de MySQL. Requiere aplicar la migración `20261115120000_direccion_manual_emergencias` para guardar direcciones textuales y admitir provincia desconocida.
+
+- **GPS:** solicita permiso solo al tocar el botón; espera hasta 10 segundos. La provincia se estima con la función local existente y queda editable. La persona verifica que el incidente esté en ese lugar.
+- **GPS denegado, no disponible o vencido:** destaca la dirección manual sin borrar descripción ni foto.
+- **Dirección manual:** se guarda tal como fue escrita, sin llamar a Google ni requerir `GOOGLE_MAPS_API_KEY`. Se recomienda incluir localidad y provincia, pero no se bloquea el reporte por su ausencia. Las coordenadas y provincia desconocidas quedan en NULL. La lista y el detalle muestran la dirección; sin coordenadas no se ofrecen mapa ni rutas. La dirección queda pendiente de verificar.
+- **Conexión interrumpida o respuesta perdida:** conserva el envío en memoria y reintenta la misma clave `Idempotency-Key`. La API deriva un identificador estable y la unicidad de MySQL evita duplicados, incluso ante dos solicitudes simultáneas. Mientras el resultado sea incierto, se bloquea la edición para no mezclar dos incidentes. Esta recuperación funciona mientras se conserve abierta la pantalla; no hay cola offline persistente.
+- **Foto opcional:** JPG, PNG o WebP, hasta 5 MB. El servidor verifica firma binaria y tamaño. Primero se registra el caso; después se adjunta el archivo. Si falla el adjunto, el caso permanece guardado y aparece Reintentar foto, sin volver a crear la emergencia.
+- **Permiso de foto:** la creación entrega una capacidad firmada con `JWT_SECRET`, válida por 24 horas y solo para ese caso. No es un JWT de sesión. Sin secreto, se guarda el reporte pero no se habilitan fotos. La lectura de fotos locales requiere sesión.
+- **Persistencia:** los archivos viven en `.data/emergencias` o en `EMERGENCY_UPLOAD_DIR`. El proceso necesita escritura y ese directorio debe conservarse y respaldarse junto a la DB. Producción Docker usa el volumen `emergency_photos` en `/app/uploads`; no incluye fotos en la imagen. Varias instancias requieren almacenamiento compartido.
+
+Verificación automatizada: `node --test tests/reportes.test.cjs`. Las pruebas aíslan DB y Google; comprueban validación, estado/prioridad inicial, errores del proveedor, repetición de envío, permisos y persistencia de archivos temporales.
+
+Verificación manual: abrir Home sin sesión, entrar a Reportar, enviar sin foto usando una dirección válida; luego probar GPS permitido, denegado y timeout. Enviar con foto válida, probar archivo inválido y mayor de 5 MB. Interrumpir la conexión al enviar, recuperarla y reintentar; comprobar que hay un solo caso. Simular almacenamiento sin escritura: debe quedar el caso y permitir reintentar solo la foto. Con sesión, abrir el caso y comprobar la imagen.
 
 ## Pendientes conocidos
 

@@ -20,7 +20,7 @@ export default async function Casos() {
         estado: e.estado,
         hace: haceCuanto(e.fecha),
         fecha: e.fecha.toISOString(),
-        provincia: NOMBRES_PROVINCIA[e.ubicacion.provincia],
+        provincia: e.ubicacion.direccion || (e.ubicacion.provincia ? NOMBRES_PROVINCIA[e.ubicacion.provincia] : 'Ubicación pendiente'),
         lat: e.ubicacion.coordenada_y,
         lng: e.ubicacion.coordenada_x,
         asignado: asignado ? `${asignado.persona.nombre} ${asignado.persona.apellido.charAt(0)}.` : null,
