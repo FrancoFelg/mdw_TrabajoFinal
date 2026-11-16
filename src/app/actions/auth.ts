@@ -20,5 +20,5 @@ export async function loginAction(_state: { error: string }, data: FormData) {
 
 export async function logoutAction() {
   (await cookies()).delete('token');
-  redirect('/login');
+  redirect('/');
 }
