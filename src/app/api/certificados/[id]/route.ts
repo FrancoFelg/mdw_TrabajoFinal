@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { CertificadoController } from '../../../../../controllers/certificado.controller';
 import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
 import { ACCESO_NO_AUTORIZADO, RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
@@ -18,14 +19,14 @@ export async function GET(req: NextRequest, { params }: Contexto) {
     const certificado = await controller.obtenerPorId(id);
     // Un voluntario solo ve los suyos; respondemos 404 para no revelar que el certificado existe
     if (!esCoordinadorOAdmin(usuario) && certificado.usuarioId !== usuario.id) {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
+      return jsonPublico({ error: 'Certificado no encontrado.' }, { status: 404 });
     }
-    return NextResponse.json(certificado);
+    return jsonPublico(certificado);
   } catch (error: any) {
     if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
+      return jsonPublico({ error: 'Certificado no encontrado.' }, { status: 404 });
     }
-    return NextResponse.json({ error: 'Error al consultar el certificado.' }, { status: 500 });
+    return jsonPublico({ error: 'Error al consultar el certificado.' }, { status: 500 });
   }
 }
 
@@ -38,12 +39,12 @@ export async function PUT(req: NextRequest, { params }: Contexto) {
     const { id } = await params;
     const body = await req.json();
     const actualizado = await controller.actualizar(id, body);
-    return NextResponse.json(actualizado);
+    return jsonPublico(actualizado);
   } catch (error: any) {
     if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
+      return jsonPublico({ error: 'Certificado no encontrado.' }, { status: 404 });
     }
-    return NextResponse.json({ error: 'Error al actualizar el certificado.' }, { status: 500 });
+    return jsonPublico({ error: 'Error al actualizar el certificado.' }, { status: 500 });
   }
 }
 
@@ -58,35 +59,35 @@ export async function PATCH(req: NextRequest, { params }: Contexto) {
     const { estado } = await req.json();
 
     if (!estado) {
-      return NextResponse.json(
+      return jsonPublico(
         { error: 'El campo "estado" es obligatorio.' },
         { status: 400 }
       );
     }
 
     const actualizado = await controller.cambiarEstado(id, estado as CertificadoEstado);
-    return NextResponse.json(actualizado, { status: 200 });
+    return jsonPublico(actualizado, { status: 200 });
 
   } catch (error: any) {
     if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
+      return jsonPublico({ error: 'Certificado no encontrado.' }, { status: 404 });
     }
 
     if (error.message === 'ESTADO_INVALIDO') {
-      return NextResponse.json(
+      return jsonPublico(
         { error: 'Solo se permite cambiar el estado a APROBADO o RECHAZADO.' },
         { status: 400 }
       );
     }
 
     if (error.message === 'ESTADO_NO_PENDIENTE') {
-      return NextResponse.json(
+      return jsonPublico(
         { error: 'Solo se pueden aprobar o rechazar certificados en estado PENDIENTE.' },
         { status: 422 } // Unprocessable Entity
       );
     }
 
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Error al actualizar el estado del certificado.' },
       { status: 500 }
     );
@@ -102,11 +103,11 @@ export async function DELETE(req: NextRequest, { params }: Contexto) {
     const { id } = await params;
     // Quién elimina sale del token, nunca del body
     await controller.eliminar(id, usuario.id);
-    return NextResponse.json({ mensaje: 'Certificado eliminado correctamente.' });
+    return jsonPublico({ mensaje: 'Certificado eliminado correctamente.' });
   } catch (error: any) {
     if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
+      return jsonPublico({ error: 'Certificado no encontrado.' }, { status: 404 });
     }
-    return NextResponse.json({ error: 'Error al eliminar el certificado.' }, { status: 500 });
+    return jsonPublico({ error: 'Error al eliminar el certificado.' }, { status: 500 });
   }
 }

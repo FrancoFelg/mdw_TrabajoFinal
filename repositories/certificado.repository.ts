@@ -1,5 +1,6 @@
 import { db } from '../config/database';
 import { Certificado, CertificadoEstado } from '@prisma/client';
+import { usuarioPublicoSelect } from '../src/lib/usuario-publico';
 
 export interface AtributoValorInput {
   campoId: string;
@@ -63,7 +64,7 @@ export class CertificadoRepository {
       include: {
         curso: true,
         usuario: {
-          include: { persona: true },
+          select: { ...usuarioPublicoSelect, persona: true },
         },
         certificadosRelAtributos: {
           where: { fechaEliminacion: null },
@@ -84,7 +85,7 @@ export class CertificadoRepository {
       include: {
         curso: true,
         usuario: {
-          include: { persona: true },
+          select: { ...usuarioPublicoSelect, persona: true },
         },
         certificadosRelAtributos: {
           where: { fechaEliminacion: null },

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { RESPUESTA_NO_AUTORIZADO, leerBody } from '@/lib/cursoErrores';
 import { EmergenciaService } from '../../../../../services/emergencia.service';
@@ -19,16 +20,16 @@ export async function GET(req: NextRequest, { params }: ContextoRoute) {
     const emergencia = await service.obtenerPorId(id);
 
     if (!emergencia) {
-      return NextResponse.json(
+      return jsonPublico(
         { error: 'Emergencia no encontrada.' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(emergencia, { status: 200 });
+    return jsonPublico(emergencia, { status: 200 });
   } catch (error: any) {
     console.error('Error en GET /api/emergencias/[id]:', error);
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Error interno al obtener la emergencia.' },
       { status: 500 }
     );

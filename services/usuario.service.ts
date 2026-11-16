@@ -23,6 +23,7 @@ export class UsuarioService {
     // 3. Crear el usuario en la BD
     const nuevoUsuario = await this.usuarioRepo.crear({
       nombreUsuario: dto.nombreUsuario,
+      email: dto.email,
       passwordHash,
       persona: dto.persona
     });
@@ -52,7 +53,8 @@ export class UsuarioService {
       throw new Error('USUARIO_NO_ENCONTRADO');
     }
 
-    return await this.usuarioRepo.actualizarRol(usuarioId, nuevoRol);
+    const { password: _password, ...publico } = await this.usuarioRepo.actualizarRol(usuarioId, nuevoRol);
+    return publico;
   }
 
   async actualizarPerfil(usuarioId: string, datos: { persona?: Record<string, any> }) {

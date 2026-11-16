@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 
 // POST /api/auth/logout
 export async function POST(req: NextRequest) {
   try {
-    const response = NextResponse.json(
+    const response = jsonPublico(
       { mensaje: 'Sesión cerrada correctamente.' },
       { status: 200 }
     );
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error: any) {
     console.error('Error en POST /api/auth/logout:', error);
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Error interno al cerrar sesión.' },
       { status: 500 }
     );

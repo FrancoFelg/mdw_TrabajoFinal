@@ -11,7 +11,7 @@ export class AuthService {
 
   async login(nombreUsuario: string, passwordPlano: string) {
     // 1. Verificar si el usuario existe
-    const usuario = await this.usuarioRepo.findByNombreUsuario(nombreUsuario);
+    const usuario = await this.usuarioRepo.findParaLogin(nombreUsuario.trim());
     if (!usuario) {
       throw new Error('CREDANCIALES_INVALIDAS');
     }

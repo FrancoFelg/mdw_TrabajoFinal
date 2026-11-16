@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 
 import { SolicitudAscensoController } from '../../../../controllers/solicitudAscenso.controller';
 import { getUserFromRequest, esCoordinadorOAdmin } from '@/lib/auth';
@@ -9,7 +10,7 @@ export async function POST(req: NextRequest) {
   const usuario = getUserFromRequest(req);
 
   if (!usuario) {
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'No autorizado' },
       { status: 401 },
     );
@@ -18,19 +19,21 @@ export async function POST(req: NextRequest) {
   try {
     const solicitud = await controller.crear(usuario.id);
 
-    return NextResponse.json(solicitud, { status: 201 });
+    return jsonPublico(solicitud, { status: 201 });
   } catch (error) {
     const mensaje =
       error instanceof Error ? error.message : 'Error al crear la solicitud';
 
+    if (mensaje === 'SOLO_VOLUNTARIOS') return jsonPublico({ error: 'Solo los voluntarios pueden solicitar ascenso.' }, { status: 403 });
+
     if (mensaje === 'SOLICITUD_PENDIENTE_EXISTENTE') {
-      return NextResponse.json(
+      return jsonPublico(
         { error: 'Ya existe una solicitud de ascenso pendiente.' },
         { status: 409 },
       );
     }
 
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Error al crear la solicitud.' },
       { status: 500 },
     );
@@ -41,14 +44,14 @@ export async function GET(req: NextRequest) {
   const usuario = getUserFromRequest(req);
 
   if (!usuario) {
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'No autorizado' },
       { status: 401 },
     );
   }
 
   if (!esCoordinadorOAdmin(usuario)) {
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Prohibido' },
       { status: 403 },
     );
@@ -57,9 +60,9 @@ export async function GET(req: NextRequest) {
   try {
     const solicitudes = await controller.listar();
 
-    return NextResponse.json(solicitudes);
+    return jsonPublico(solicitudes);
   } catch {
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Error al consultar las solicitudes.' },
       { status: 500 },
     );

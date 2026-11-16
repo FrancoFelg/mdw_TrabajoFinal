@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 
 import { SolicitudAscensoController } from '../../../../../../controllers/solicitudAscenso.controller';
 import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
@@ -16,14 +17,14 @@ export async function POST(
   const usuario = getUserFromRequest(req);
 
   if (!usuario) {
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'No autorizado' },
       { status: 401 },
     );
   }
 
   if (!esCoordinadorOAdmin(usuario)) {
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Prohibido' },
       { status: 403 },
     );
@@ -33,26 +34,26 @@ export async function POST(
     const { id } = await params;
     const solicitud = await controller.rechazar(id);
 
-    return NextResponse.json(solicitud);
+    return jsonPublico(solicitud);
   } catch (error) {
     const mensaje =
       error instanceof Error ? error.message : '';
 
     if (mensaje === 'SOLICITUD_NO_ENCONTRADA') {
-      return NextResponse.json(
+      return jsonPublico(
         { error: 'Solicitud no encontrada.' },
         { status: 404 },
       );
     }
 
     if (mensaje === 'SOLICITUD_NO_PENDIENTE') {
-      return NextResponse.json(
+      return jsonPublico(
         { error: 'La solicitud no está pendiente.' },
         { status: 409 },
       );
     }
 
-    return NextResponse.json(
+    return jsonPublico(
       { error: 'Error al rechazar la solicitud.' },
       { status: 500 },
     );

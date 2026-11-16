@@ -4,6 +4,7 @@ import { db } from '../../config/database';
 const texto = z.string().trim().min(1).max(100);
 const camposUsuario = z.object({
   nombreUsuario: texto.optional(),
+  email: z.string().trim().toLowerCase().email().max(191).optional(),
   rol: z.enum(['VOLUNTARIO', 'COORDINADOR']).optional(),
   persona: z.object({
     nombre: texto.optional(), apellido: texto.optional(),

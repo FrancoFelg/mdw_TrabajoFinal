@@ -1,5 +1,6 @@
 import { db } from '../config/database';
 import { SolicitudAscensoEstado, Rol } from '@prisma/client';
+import { usuarioPublicoSelect } from '../src/lib/usuario-publico';
 
 export class SolicitudAscensoRepository {
   async crear(usuarioId: string) {
@@ -24,7 +25,7 @@ export class SolicitudAscensoRepository {
     return await db.solicitudAscenso.findUnique({
       where: { id },
       include: {
-        usuario: true,
+        usuario: { select: usuarioPublicoSelect },
       },
     });
   }
@@ -35,7 +36,7 @@ export class SolicitudAscensoRepository {
         creadoEn: 'desc',
       },
       include: {
-        usuario: true,
+        usuario: { select: usuarioPublicoSelect },
       },
     });
   }

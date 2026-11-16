@@ -8,7 +8,7 @@ export default async function Cuenta() {
   const usuario = await new UsuarioService().obtenerPerfil(actor.id);
   return <section className="stack">
     <h1>Mi cuenta</h1>
-    <UsuarioPerfil propia usuario={{ id: usuario.id, nombreUsuario: usuario.nombreUsuario, rol: usuario.rol,
+    <UsuarioPerfil propia usuario={{ id: usuario.id, nombreUsuario: usuario.nombreUsuario, email: usuario.email, rol: usuario.rol,
       persona: { ...usuario.persona, fechaNac: usuario.persona.fechaNac.toISOString().slice(0, 10) } }} />
     <UsuarioHistorial usuarioId={actor.id} />
   </section>;

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { RESPUESTA_NO_AUTORIZADO, leerBody } from '@/lib/cursoErrores'; // O la librería genérica de errores de tu app
 import { UsuarioService } from '../../../../../services/usuario.service';
@@ -14,9 +15,9 @@ export async function GET(req: NextRequest) {
 
   try {
     const perfil = await service.obtenerPerfil(usuario.id);
-    return NextResponse.json(perfil);
+    return jsonPublico(perfil);
   } catch (error: unknown) {
-    return NextResponse.json(
+    return jsonPublico(
       { error: error instanceof Error ? error.message : 'Error al obtener el perfil del usuario.' },
       { status: 500 }
     );
@@ -32,10 +33,10 @@ export async function PATCH(req: NextRequest) {
     const body = await leerBody(req);
     const perfilActualizado = await editarUsuario(usuario.id, body, true);
     
-    return NextResponse.json(perfilActualizado);
+    return jsonPublico(perfilActualizado);
   } catch (error: unknown) {
-    return NextResponse.json(
-      { error: error instanceof ZodError ? 'Datos inválidos.' : (error as { code?: string })?.code === 'P2002' ? 'Ese nombre de usuario ya existe.' : 'No se pudo actualizar el perfil.' },
+    return jsonPublico(
+      { error: error instanceof ZodError ? 'Datos inválidos.' : (error as { code?: string })?.code === 'P2002' ? 'Ese nombre de usuario o email ya existe.' : 'No se pudo actualizar el perfil.' },
       { status: (error as { code?: string })?.code === 'P2002' ? 409 : 400 }
     );
   }

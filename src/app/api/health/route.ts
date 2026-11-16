@@ -1,3 +1,4 @@
+import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextResponse } from 'next/server';
 import { db } from '../../../../config/database';
 
@@ -11,7 +12,7 @@ export async function GET() {
   const inicio = Date.now();
   try {
     await db.$queryRaw`SELECT 1`;
-    return NextResponse.json(
+    return jsonPublico(
       {
         status: 'ok',
         db: 'ok',
@@ -23,7 +24,7 @@ export async function GET() {
     );
   } catch {
     // No se filtra el error de la DB: este endpoint es público
-    return NextResponse.json(
+    return jsonPublico(
       {
         status: 'degraded',
         db: 'unreachable',

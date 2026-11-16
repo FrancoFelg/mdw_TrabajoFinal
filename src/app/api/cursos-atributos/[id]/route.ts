@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { CursoAtributoController } from '../../../../../controllers/cursoAtributo.controller';
 import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
 import { RESPUESTA_NO_AUTORIZADO, RESPUESTA_PROHIBIDO, responderErrorCurso } from '@/lib/cursoErrores';
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest, { params }: Contexto) {
   if (!getUserFromRequest(req)) return RESPUESTA_NO_AUTORIZADO();
   try {
     const { id } = await params;
-    return NextResponse.json(await controller.obtenerPorId(id));
+    return jsonPublico(await controller.obtenerPorId(id));
   } catch (error) {
     return responderErrorCurso(error, 'Error al consultar el atributo de curso.');
   }
@@ -27,7 +28,7 @@ export async function DELETE(req: NextRequest, { params }: Contexto) {
   try {
     const { id } = await params;
     await controller.eliminar(id, usuario.id);
-    return NextResponse.json({ mensaje: 'Atributo eliminado correctamente.' });
+    return jsonPublico({ mensaje: 'Atributo eliminado correctamente.' });
   } catch (error) {
     return responderErrorCurso(error, 'Error al eliminar el atributo de curso.');
   }

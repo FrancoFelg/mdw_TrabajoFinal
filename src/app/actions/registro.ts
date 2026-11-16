@@ -1,15 +1,18 @@
 'use server';
 
 import { UsuarioService } from '../../../services/usuario.service';
+import { z } from 'zod';
 
 export async function registroAction(_state: { error: string; success: boolean }, data: FormData) {
   const nombreUsuario = String(data.get('nombreUsuario') ?? '').trim();
+  const email = String(data.get('email') ?? '').trim().toLowerCase();
   const nombre = String(data.get('nombre') ?? '').trim();
   const apellido = String(data.get('apellido') ?? '').trim();
   const password = String(data.get('password') ?? '');
   const fechaTexto = String(data.get('fechaNac') ?? '');
   const fechaNac = new Date(`${fechaTexto}T00:00:00.000Z`);
   const fail = (error: string) => ({ error, success: false });
+  if (!z.string().email().max(191).safeParse(email).success) return fail('Ingresá un email válido.');
 
   if (!nombreUsuario || !nombre || !apellido) return fail('Completá nombre, apellido y nombre de usuario.');
   if ([nombreUsuario, nombre, apellido].some(value => value.length > 100)) return fail('Nombre, apellido y usuario admiten hasta 100 caracteres.');
@@ -20,11 +23,11 @@ export async function registroAction(_state: { error: string; success: boolean }
   }
 
   try {
-    await new UsuarioService().registrarUsuario({ nombreUsuario, password, persona: { nombre, apellido, fechaNac } });
+    await new UsuarioService().registrarUsuario({ nombreUsuario, email, password, persona: { nombre, apellido, fechaNac } });
     return { error: '', success: true };
   } catch (error) {
     if (error instanceof Error && (error.message === 'NOMBRE_USUARIO_EXISTENTE' || ('code' in error && error.code === 'P2002'))) {
-      return fail('El nombre de usuario ya está registrado. Elegí otro.');
+      return fail('El nombre de usuario o email ya está registrado.');
     }
     return fail('No pudimos crear la cuenta. Intentá nuevamente en unos momentos.');
   }

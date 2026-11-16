@@ -6,7 +6,7 @@ const { NextRequest } = require('next/server');
 function cargar(ruta, mocks) {
   const codigo = ts.transpileModule(fs.readFileSync(ruta, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
   const modulo = { exports: {} };
-  new Function('require', 'module', 'exports', codigo)(nombre => mocks[nombre] ?? require(nombre), modulo, modulo.exports);
+  new Function('require', 'module', 'exports', codigo)(nombre => mocks[nombre] ?? (nombre === '@/lib/respuesta-publica' ? cargar('src/lib/respuesta-publica.ts', {}) : require(nombre)), modulo, modulo.exports);
   return modulo.exports;
 }
 let rol = 'VOLUNTARIO', destino = 'VOLUNTARIO', cambios;
@@ -77,4 +77,55 @@ test('historial filtra por usuario y excluye certificados eliminados', async () 
   assert.deepEqual(certificados.where, { usuarioId: 'perfil-autorizado', fechaEliminacion: null });
   assert.equal(certificados.select.curso.select.titulo, true);
   assert.equal(emergencias.select.emergencia.select.estado, true);
+});
+
+test('serialización pública elimina contraseñas anidadas sin perder fechas ni cookies', async () => {
+  const { jsonPublico } = cargar('src/lib/respuesta-publica.ts', {});
+  const respuesta = jsonPublico({ usuario: { password: 'hash', id: 'u' }, lista: [{ passwordHash: 'hash' }], fecha: new Date('2026-01-01') }, { status: 201 });
+  respuesta.cookies.set('token', 'sesion');
+  assert.equal(respuesta.status, 201);
+  assert.equal(respuesta.cookies.get('token').value, 'sesion');
+  assert.deepEqual(await respuesta.json(), { usuario: { id: 'u' }, lista: [{}], fecha: '2026-01-01T00:00:00.000Z' });
+});
+
+test('login resuelve nombre o email y nunca devuelve la contraseña', async () => {
+  let consulta;
+  const { UsuarioRepository } = cargar('repositories/usuario.repository.ts', { '../config/database': { db: { usuario: {
+    findUnique: async args => { consulta = args.where; return args.where.nombreUsuario === 'ana' || args.where.email === 'ana@example.com' ? { id: 'u', nombreUsuario: 'ana', rol: 'VOLUNTARIO', password: 'hash' } : null; },
+  } } } });
+  const { AuthService } = cargar('services/auth.service.ts', {
+    '../repositories/usuario.repository': { UsuarioRepository },
+    bcrypt: { compare: async (plano, hash) => plano === 'correcta' && hash === 'hash' },
+    jsonwebtoken: { sign: () => 'token' },
+  });
+  process.env.JWT_SECRET = 'test';
+  const auth = new AuthService();
+  assert.equal((await auth.login('ana', 'correcta')).usuario.nombreUsuario, 'ana');
+  const resultado = await auth.login(' ANA@EXAMPLE.COM ', 'correcta');
+  assert.equal(consulta.email, 'ana@example.com');
+  assert.equal(JSON.stringify(resultado).includes('hash'), false);
+  await assert.rejects(auth.login('ana', 'incorrecta'), /CREDANCIALES_INVALIDAS/);
+});
+
+test('solo voluntarios con rol vigente pueden pedir ascenso', async () => {
+  let actual = 'COORDINADOR', creada = false;
+  const { SolicitudAscensoService } = cargar('services/solicitudAscenso.service.ts', {
+    '../config/database': { db: { usuario: { findUnique: async () => actual ? { rol: actual } : null } } },
+    '../repositories/solicitudAscenso.repository': { SolicitudAscensoRepository: class {
+      async findPendienteByUsuarioId() { return null; }
+      async crear() { creada = true; return { estado: 'PENDIENTE' }; }
+    } },
+  });
+  const servicio = new SolicitudAscensoService();
+  for (actual of ['COORDINADOR', 'ADMIN', null]) await assert.rejects(servicio.crear('u'), /SOLO_VOLUNTARIOS/);
+  assert.equal(creada, false);
+  actual = 'VOLUNTARIO';
+  assert.equal((await servicio.crear('u')).estado, 'PENDIENTE');
+});
+
+test('todas las respuestas JSON de API usan el filtro público', () => {
+  for (const ruta of fs.readdirSync('src/app/api', { recursive: true }).filter(p => p.endsWith('route.ts'))) {
+    const codigo = fs.readFileSync(`src/app/api/${ruta}`, 'utf8');
+    assert.doesNotMatch(codigo, /\b(?:NextResponse|Response)\.json\(/, ruta);
+  }
 });

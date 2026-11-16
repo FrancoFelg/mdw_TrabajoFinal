@@ -4,7 +4,7 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Card, Input } from './ui';
 
-type Perfil = { id: string; nombreUsuario: string; rol: string; persona: { nombre: string; apellido: string; fechaNac: string; telefonos: { tipo: string; numero: string }[] } };
+type Perfil = { id: string; nombreUsuario: string; email?: string | null; rol: string; persona: { nombre: string; apellido: string; fechaNac: string; telefonos: { tipo: string; numero: string }[] } };
 
 export function UsuarioPerfil({ usuario, propia = false }: { usuario: Perfil; propia?: boolean }) {
   const router = useRouter();
@@ -21,6 +21,7 @@ export function UsuarioPerfil({ usuario, propia = false }: { usuario: Perfil; pr
     try {
       const respuesta = await fetch(propia ? '/api/usuarios/me' : `/api/usuarios/${usuario.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
         nombreUsuario: datos.get('nombreUsuario'), ...(!propia && { rol: datos.get('rol') }),
+        email: datos.get('email'),
         persona: { nombre: datos.get('nombre'), apellido: datos.get('apellido'), fechaNac: datos.get('fechaNac'), telefonos },
       }) });
       const resultado = await respuesta.json();
@@ -33,6 +34,7 @@ export function UsuarioPerfil({ usuario, propia = false }: { usuario: Perfil; pr
     {mensaje && <p role={error ? 'alert' : 'status'}>{mensaje}</p>}
     {!editando ? <><dl><dt>Usuario</dt><dd>{usuario.nombreUsuario}</dd><dt>Rol</dt><dd>{usuario.rol}</dd><dt>Nacimiento</dt><dd>{usuario.persona.fechaNac}</dd><dt>Teléfonos</dt><dd>{usuario.persona.telefonos.map(t => `${t.tipo}: ${t.numero}`).join(' · ') || 'Sin teléfonos'}</dd></dl>{(propia || usuario.rol !== 'ADMIN') && <Button onClick={() => { setTelefonos(usuario.persona.telefonos); setEditando(true); }}>Editar usuario</Button>}</>
       : <form onSubmit={guardar} className="stack"><fieldset disabled={ocupado} className="stack">
+        <div className="field"><label htmlFor="email">Email</label><Input id="email" name="email" type="email" required maxLength={191} defaultValue={usuario.email ?? ''} /></div>
         {(['nombreUsuario', 'nombre', 'apellido'] as const).map(campo => <div className="field" key={campo}><label htmlFor={campo}>{campo === 'nombreUsuario' ? 'Usuario' : campo === 'nombre' ? 'Nombre' : 'Apellido'}</label><Input id={campo} name={campo} required maxLength={100} defaultValue={campo === 'nombreUsuario' ? usuario.nombreUsuario : usuario.persona[campo]} /></div>)}
         <div className="field"><label htmlFor="fechaNac">Fecha de nacimiento</label><Input id="fechaNac" name="fechaNac" type="date" required defaultValue={usuario.persona.fechaNac} /></div>
         {!propia && <div className="field"><label htmlFor="rol">Rol</label><select className="input" id="rol" name="rol" defaultValue={usuario.rol}><option value="VOLUNTARIO">Voluntario</option><option value="COORDINADOR">Coordinador</option></select></div>}
