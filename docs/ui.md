@@ -35,7 +35,7 @@ En el celular la navegación va en pestañas abajo; desde 960 px sube a la barra
 Los avisos se guardan por persona (`Notificacion`, con clave única para no repetirlos) y se muestran en `/notificaciones`. La campanita del encabezado consulta `GET /api/notificaciones?resumen=1` cada 30 s con la pestaña visible. Los disparadores (`src/lib/avisos.ts`) corren con `after()`, después de responder, para no demorar reportes ni altas:
 
 - **Caso rojo nuevo** → coordinación y voluntarios con certificado aprobado. Conectado en `POST /api/emergencias`.
-- **Certificado o pedido de ascenso nuevo** → coordinación, nunca a quien lo cargó. `avisarCertificadoNuevo` y `avisarAscensoNuevo` quedan listos para conectarlos desde esas pantallas.
+- **Certificado o pedido de ascenso nuevo** → coordinación, nunca a quien lo cargó. Certificados conserva su disparador pendiente de conectar. Ascensos guarda avisos transaccionales al solicitar, aprobar o rechazar; ver `docs/ascensos.md`.
 - **Caso sin atender** (10 min rojo, 30 amarillo, 120 verde) → coordinación, una sola vez por caso. Se revisa cuando coordinación consulta la campanita.
 
 El push es opcional por dispositivo: `public/sw.js` muestra el aviso y abre el enlace al tocarlo; la suscripción se guarda en `SuscripcionPush` y se borra sola si el navegador la da de baja. En iPhone hace falta agregar la app a la pantalla de inicio (`src/app/manifest.ts`). Sin claves VAPID, la sección de push no aparece y los avisos quedan solo en la app.
@@ -88,3 +88,7 @@ Verificación manual: abrir Home sin sesión, entrar a Reportar, enviar sin foto
 
 - El informe final se pide en la interfaz, pero `EmergenciaRepository.finalizarEmergencia` no lo guarda: el schema no tiene campo para observaciones.
 - El bloqueo de casos rojos enlaza a `/formacion` y el avatar del encabezado a `/cuenta`; esas pantallas las suma su responsable.
+
+## Solicitudes de ascenso
+
+La navegación incluye «Mis ascensos». En «Usuarios», «Solicitudes» muestra un círculo rojo si hay un pedido pendiente. Abre el historial completo de esa persona, con acciones para aprobar o denegar los pendientes. Detalles y contingencias en docs/ascensos.md.

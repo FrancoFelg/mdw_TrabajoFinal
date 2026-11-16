@@ -9,7 +9,7 @@
 | `POST /api/auth/login` | Iniciar sesión y obtener token/sesión | **Público** | H2 |
 | `POST /api/auth/logout` | Cerrar la sesión activa | Autenticado | H2 |
 | `POST /api/solicitudes-ascenso` | Crear una solicitud para ascender a coordinador | Voluntario | H3 |
-| `GET /api/solicitudes-ascenso` | Listar las solicitudes de ascenso pendientes y resueltas | Coordinador | H3 |
+| `GET /api/solicitudes-ascenso` | Listar solicitudes propias; coordinación puede listar todas o filtrar con `?usuarioId=...` | Autenticado | H3 |
 | `POST /api/solicitudes-ascenso/:id/aprobar` | Aprueba la solicitud de ascenso de la persona | Coordinador | H3 |
 | `POST /api/solicitudes-ascenso/:id/rechazar` | Desaprueba la solicitud de ascenso de la persona | Coordinador | H3 |
 | `GET /api/cursos` | Consultar el catálogo de cursos | Autenticado | H4 |
