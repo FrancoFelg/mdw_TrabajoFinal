@@ -3,6 +3,7 @@ import { Usuario, Persona, Rol } from '@prisma/client';
 
 export interface CrearUsuarioDTO {
   nombreUsuario: string;
+  email?: string;
   passwordHash: string;
   persona: {
     nombre: string;
@@ -34,6 +35,7 @@ export class UsuarioRepository {
     return await db.usuario.create({
       data: {
         nombreUsuario: data.nombreUsuario,
+        email: data.email,
         password: data.passwordHash,
         rol: Rol.VOLUNTARIO,
         persona: {
@@ -72,6 +74,14 @@ async findByNombreUsuario(nombreUsuario: string) {
     },
   });
 }
+
+  async findParaLogin(identificador: string) {
+    // Los nombres existentes con @ conservan prioridad frente a un email ajeno.
+    return await this.findByNombreUsuario(identificador) ?? await db.usuario.findUnique({
+      where: { email: identificador.toLowerCase() },
+      select: { id: true, nombreUsuario: true, password: true, rol: true },
+    });
+  }
 
   // Buscar por ID con detalle de persona y teléfonos
   async findById(id: string) {

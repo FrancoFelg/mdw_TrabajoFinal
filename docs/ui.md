@@ -91,10 +91,15 @@ Verificación automatizada: `node --test tests/reportes.test.cjs`. Las pruebas a
 
 Verificación manual: abrir Home sin sesión, entrar a Reportar, enviar sin foto usando una dirección válida; luego probar GPS permitido, denegado y timeout. Enviar con foto válida, probar archivo inválido y mayor de 5 MB. Interrumpir la conexión al enviar, recuperarla y reintentar; comprobar que hay un solo caso. Simular almacenamiento sin escritura: debe quedar el caso y permitir reintentar solo la foto. Con sesión, abrir el caso y comprobar la imagen.
 
-## Pendientes conocidos
+## Formación y cierre
 
-- El informe final se pide en la interfaz, pero `EmergenciaRepository.finalizarEmergencia` no lo guarda: el schema no tiene campo para observaciones.
-- El bloqueo de casos rojos enlaza a `/formacion` y el avatar del encabezado a `/cuenta`; esas pantallas las suma su responsable.
+`/certificados/nuevo` permite adjuntar PDF o imagen de hasta 5 MB con nombre, entidad emisora, fecha de emisión y número opcional (la vinculación con cursos llega en la parte 2). `/certificados` muestra historial, estado, motivo de rechazo y descarga privada. Coordinación revisa en `/certificados/revisar` y resuelve las pendientes; un rechazo exige motivo. `/formacion` redirige según rol. La API controla propietario, rol vigente y transiciones, y notifica cada decisión.
+
+Los comprobantes se guardan en `.data/certificados` o `CERTIFICATE_UPLOAD_DIR`. Ese directorio necesita escritura, persistencia y respaldo; varias instancias requieren almacenamiento compartido. Las pruebas usan exclusivamente `.data/e2e/certificados`.
+
+El informe final se guarda en `Emergencia.observacionesCierre` y se muestra en el detalle y en el historial del perfil. Solo el voluntario asignado puede cerrar, con informe de 10 a 10000 caracteres. El cambio de estado es condicional para impedir reemplazar el informe por un cierre concurrente.
+
+Para usar estos cambios sobre una instalación existente, aplicar `pnpm exec prisma migrate deploy` y `pnpm exec prisma generate` antes de iniciar la aplicación.
 
 ## Solicitudes de ascenso
 

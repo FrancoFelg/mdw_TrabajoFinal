@@ -2,20 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CertificadoEstado } from '@prisma/client';
 import { ArchivoEntrada, CertificadoEntrada, CertificadoService } from '../../services/certificado.service';
 import { CertificadoAtributoService } from '../../services/certificadoAtributo.service';
-import { esCoordinadorOAdmin, getUserFromRequest } from './auth';
+import { esCoordinadorOAdmin } from './auth';
+import { actorActual } from './actor-actual';
+import { avisarCertificadoNuevo } from './avisos';
 import { leerArchivo, tipoArchivo } from './archivos-certificado';
 import { responderErrorCertificado } from './certificadoErrores';
+import { resolverCertificado } from './certificados';
+import { jsonPublico } from './respuesta-publica';
 
 // Capa HTTP de certificados (historia 5): sesión, multipart y traducción de errores.
 // Las rutas de src/app/api/certificados* solo delegan acá.
 
 const MAX_BODY = 6 * 1024 * 1024;
-const NO_AUTORIZADO = () => NextResponse.json({ error: 'No autorizado o token inválido.' }, { status: 401 });
-const PROHIBIDO = () => NextResponse.json({ error: 'Solo coordinación puede hacer esta acción.' }, { status: 403 });
+const NO_AUTORIZADO = () => jsonPublico({ error: 'No autorizado o token inválido.' }, { status: 401 });
+const PROHIBIDO = () => jsonPublico({ error: 'Solo coordinación puede hacer esta acción.' }, { status: 403 });
 
-function solicitante(req: NextRequest) {
-  const usuario = getUserFromRequest(req);
-  return usuario?.id ? { id: usuario.id, rol: usuario.rol } : null;
+// El JWT identifica la cuenta; el rol se lee vigente de la base (un coordinador degradado pierde permisos ya).
+async function solicitante(req: NextRequest) {
+  const usuario = await actorActual(req);
+  return usuario ? { id: usuario.id, rol: usuario.rol } : null;
 }
 
 // El tamaño se controla antes de leer el body para no cargar en memoria un envío enorme.
@@ -58,81 +63,83 @@ async function leerFormulario(req: NextRequest): Promise<{ entrada: CertificadoE
 }
 
 export async function listarCertificados(req: NextRequest) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   try {
     const estado = req.nextUrl.searchParams.get('estado') || undefined;
     if (estado && !Object.values(CertificadoEstado).includes(estado as CertificadoEstado)) throw new Error('ESTADO_INVALIDO');
     const usuarioId = req.nextUrl.searchParams.get('usuarioId') || undefined;
-    return NextResponse.json(await new CertificadoService().listar({ estado: estado as CertificadoEstado | undefined, usuarioId }, quien));
+    return jsonPublico(await new CertificadoService().listar({ estado: estado as CertificadoEstado | undefined, usuarioId }, quien));
   } catch (error) {
     return responderErrorCertificado(error, 'Error al obtener los certificados.');
   }
 }
 
 export async function crearCertificado(req: NextRequest) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   try {
     const { entrada, archivo } = await leerFormulario(req);
-    return NextResponse.json(await new CertificadoService().crear(entrada, archivo, quien), { status: 201 });
+    const creado = await new CertificadoService().crear(entrada, archivo, quien);
+    avisarCertificadoNuevo(creado.id, quien.id);
+    return jsonPublico(creado, { status: 201 });
   } catch (error) {
     return responderErrorCertificado(error, 'No pudimos guardar el certificado. Intentá de nuevo.');
   }
 }
 
 export async function obtenerCertificado(req: NextRequest, id: string) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   try {
-    return NextResponse.json(await new CertificadoService().obtener(id, quien));
+    return jsonPublico(await new CertificadoService().obtener(id, quien));
   } catch (error) {
     return responderErrorCertificado(error, 'Error al consultar el certificado.');
   }
 }
 
 export async function actualizarCertificado(req: NextRequest, id: string) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   try {
     const { entrada, archivo } = await leerFormulario(req);
-    return NextResponse.json(await new CertificadoService().actualizar(id, entrada, archivo, quien));
+    return jsonPublico(await new CertificadoService().actualizar(id, entrada, archivo, quien));
   } catch (error) {
     return responderErrorCertificado(error, 'No pudimos guardar los cambios. Intentá de nuevo.');
   }
 }
 
 export async function eliminarCertificado(req: NextRequest, id: string) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   try {
     await new CertificadoService().eliminar(id, quien);
-    return NextResponse.json({ mensaje: 'Certificado dado de baja.' });
+    return jsonPublico({ mensaje: 'Certificado dado de baja.' });
   } catch (error) {
     return responderErrorCertificado(error, 'Error al dar de baja el certificado.');
   }
 }
 
-// Aprobación mínima existente; la revisión completa (motivo, avisos) llega en la parte 3.
+// Misma revisión que /api/solicitudes-certificados/:id: motivo obligatorio al rechazar y aviso al dueño.
 export async function cambiarEstadoCertificado(req: NextRequest, id: string) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   if (!esCoordinadorOAdmin(quien)) return PROHIBIDO();
   try {
-    let body: { estado?: unknown };
+    let body: { estado?: unknown; motivo?: unknown };
     try {
       body = await req.json();
     } catch {
       throw new Error('BODY_INVALIDO');
     }
-    return NextResponse.json(await new CertificadoService().cambiarEstado(id, body?.estado as CertificadoEstado));
+    return jsonPublico(await resolverCertificado(id, body?.estado, body?.motivo, quien.id));
   } catch (error) {
     return responderErrorCertificado(error, 'Error al actualizar el estado del certificado.');
   }
 }
 
 export async function descargarArchivo(req: NextRequest, id: string) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   let certificado;
   try {
@@ -144,7 +151,7 @@ export async function descargarArchivo(req: NextRequest, id: string) {
   try {
     bytes = await leerArchivo(id);
   } catch {
-    return NextResponse.json({ error: 'El archivo del certificado no está disponible.', codigo: 'ARCHIVO_NO_DISPONIBLE' }, { status: 404 });
+    return jsonPublico({ error: 'El archivo del certificado no está disponible.', codigo: 'ARCHIVO_NO_DISPONIBLE' }, { status: 404 });
   }
   const nombre = certificado.archivoNombre;
   const ascii = nombre.replace(/[^\x20-\x7e]/g, '_').replace(/["\\]/g, '_');
@@ -162,16 +169,16 @@ export async function descargarArchivo(req: NextRequest, id: string) {
 // ---------- Catálogo de datos adicionales (EAV) ----------
 
 export async function listarAtributos(req: NextRequest) {
-  if (!solicitante(req)) return NO_AUTORIZADO();
+  if (!(await solicitante(req))) return NO_AUTORIZADO();
   try {
-    return NextResponse.json(await new CertificadoAtributoService().obtenerTodos());
+    return jsonPublico(await new CertificadoAtributoService().obtenerTodos());
   } catch (error) {
     return responderErrorCertificado(error, 'Error al listar los atributos.');
   }
 }
 
 export async function crearAtributo(req: NextRequest) {
-  const quien = solicitante(req);
+  const quien = await solicitante(req);
   if (!quien) return NO_AUTORIZADO();
   if (!esCoordinadorOAdmin(quien)) return PROHIBIDO();
   try {
@@ -186,7 +193,7 @@ export async function crearAtributo(req: NextRequest) {
       tipo: body?.tipo as string | undefined,
       usuarioCreacionId: quien.id,
     });
-    return NextResponse.json(atributo, { status: 201 });
+    return jsonPublico(atributo, { status: 201 });
   } catch (error) {
     return responderErrorCertificado(error, 'Error al crear el atributo.');
   }

@@ -16,8 +16,10 @@ const ERRORES: Record<string, { status: number; mensaje: string; campo?: string 
   CURSO_NO_DISPONIBLE: { status: 400, mensaje: 'Todavía no se pueden vincular certificados a cursos.' },
   NO_EDITABLE: { status: 422, mensaje: 'Un certificado aprobado no se puede editar. Podés darlo de baja y cargar otro.' },
   SIN_CAMBIOS: { status: 400, mensaje: 'No hay cambios para guardar.' },
-  ESTADO_INVALIDO: { status: 400, mensaje: 'El estado debe ser PENDIENTE, APROBADO o RECHAZADO (al revisar: APROBADO o RECHAZADO).' },
-  ESTADO_NO_PENDIENTE: { status: 422, mensaje: 'Solo se pueden aprobar o rechazar certificados pendientes.' },
+  ESTADO_INVALIDO: { status: 400, mensaje: 'Estado inválido. Para filtrar: PENDIENTE, APROBADO o RECHAZADO; para revisar: APROBADO o RECHAZADO.' },
+  // 409 como en /api/solicitudes-certificados: otra persona ya resolvió el certificado.
+  ESTADO_NO_PENDIENTE: { status: 409, mensaje: 'Este certificado ya fue revisado.' },
+  MOTIVO_REQUERIDO: { status: 400, mensaje: 'Para rechazar, escribí el motivo (hasta 2000 caracteres).', campo: 'motivo' },
   ID_INVALIDO: { status: 400, mensaje: 'El identificador no es válido.' },
   EL_NOMBRE_ES_REQUERIDO: { status: 400, mensaje: 'El nombre del atributo es obligatorio.' },
   TIPO_INVALIDO: { status: 400, mensaje: 'El tipo debe ser TEXTO, NUMERO, FECHA o BOOLEANO.' },

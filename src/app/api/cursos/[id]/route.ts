@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { CursoController } from '../../../../../controllers/curso.controller';
 import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
 import { leerBody, RESPUESTA_NO_AUTORIZADO, RESPUESTA_PROHIBIDO, responderErrorCurso } from '@/lib/cursoErrores';
@@ -13,7 +14,7 @@ export async function GET(req: NextRequest, { params }: Contexto) {
   try {
     const { id } = await params;
     const curso = await controller.obtenerPorId(id);
-    return NextResponse.json(curso);
+    return jsonPublico(curso);
   } catch (error) {
     return responderErrorCurso(error, 'Error al consultar el curso.');
   }
@@ -29,7 +30,7 @@ export async function PATCH(req: NextRequest, { params }: Contexto) {
     const { id } = await params;
     const body = await leerBody(req);
     const actualizado = await controller.actualizar(id, body, usuario.id);
-    return NextResponse.json(actualizado);
+    return jsonPublico(actualizado);
   } catch (error) {
     return responderErrorCurso(error, 'Error al actualizar el curso.');
   }
@@ -47,7 +48,7 @@ export async function DELETE(req: NextRequest, { params }: Contexto) {
   try {
     const { id } = await params;
     await controller.eliminar(id, usuario.id);
-    return NextResponse.json({ mensaje: 'Curso eliminado correctamente.' });
+    return jsonPublico({ mensaje: 'Curso eliminado correctamente.' });
   } catch (error) {
     return responderErrorCurso(error, 'Error al eliminar el curso.');
   }

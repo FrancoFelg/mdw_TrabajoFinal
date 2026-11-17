@@ -195,17 +195,4 @@ export class CertificadoService {
     await this.obtener(id, solicitante);
     await this.repo.eliminar(id, solicitante.id);
   }
-
-  // Aprobación mínima existente (la revisión completa llega en la parte 3).
-  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado): Promise<CertificadoDetalle> {
-    if (nuevoEstado !== CertificadoEstado.APROBADO && nuevoEstado !== CertificadoEstado.RECHAZADO) {
-      throw new Error('ESTADO_INVALIDO');
-    }
-    const certificado = await this.repo.findById(id);
-    if (!certificado) throw new Error('CERTIFICADO_NO_ENCONTRADO');
-    if (certificado.estado !== CertificadoEstado.PENDIENTE) throw new Error('ESTADO_NO_PENDIENTE');
-    return this.repo.actualizar(id, { estado: nuevoEstado }, {
-      condicion: { estados: [CertificadoEstado.PENDIENTE], error: 'ESTADO_NO_PENDIENTE' },
-    });
-  }
 }

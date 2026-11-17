@@ -89,6 +89,7 @@ model Persona {
 model Usuario {
   id            String              @id @default(cuid())
   nombreUsuario String              @unique
+  email         String?             @unique
   password      String
   rol           Rol                 @default(VOLUNTARIO)
   personaId     String              @unique
@@ -250,6 +251,7 @@ model CertificadosRelAtributos {
 model Emergencia {
   id          String              @id @default(cuid())
   descripcion String
+  observacionesCierre String?           @db.Text
   fecha       DateTime
   imagen      String?
   ubicacionId String

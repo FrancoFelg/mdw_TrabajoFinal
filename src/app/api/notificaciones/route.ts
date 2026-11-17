@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
 import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
 import { NotificacionService, revisarSinAtenderSiCorresponde } from '../../../../services/notificacion.service';
@@ -14,10 +15,10 @@ export async function GET(req: NextRequest) {
   try {
     if (esCoordinadorOAdmin(usuario)) await revisarSinAtenderSiCorresponde();
     const noLeidas = await service.contarNoLeidas(usuario.id);
-    if (req.nextUrl.searchParams.get('resumen')) return NextResponse.json({ noLeidas }, { headers: { 'Cache-Control': 'no-store' } });
-    return NextResponse.json({ noLeidas, avisos: await service.listar(usuario.id) }, { headers: { 'Cache-Control': 'no-store' } });
+    if (req.nextUrl.searchParams.get('resumen')) return jsonPublico({ noLeidas }, { headers: { 'Cache-Control': 'no-store' } });
+    return jsonPublico({ noLeidas, avisos: await service.listar(usuario.id) }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     console.error('Error en GET /api/notificaciones:', error);
-    return NextResponse.json({ error: 'No pudimos cargar los avisos.' }, { status: 500 });
+    return jsonPublico({ error: 'No pudimos cargar los avisos.' }, { status: 500 });
   }
 }

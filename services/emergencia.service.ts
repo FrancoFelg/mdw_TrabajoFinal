@@ -166,6 +166,8 @@ export class EmergenciaService {
 
   // Tomar la emergencia (con reglas de negocio y control de concurrencia)
   async tomarEmergencia(emergenciaId: string, usuarioId: string) {
+    const actor = await db.usuario.findUnique({ where: { id: usuarioId }, select: { rol: true } });
+    if (actor?.rol !== 'VOLUNTARIO') throw new Error('ROL_VOLUNTARIO_REQUERIDO');
     // 1. Validar existencia de la emergencia
     const emergencia = await this.emergenciaRepo.findById(emergenciaId);
     if (!emergencia) {
@@ -206,6 +208,8 @@ export class EmergenciaService {
 
   // Finalizar la emergencia
   async finalizarEmergencia(emergenciaId: string, usuarioId: string, observaciones?: string) {
+    const actor = await db.usuario.findUnique({ where: { id: usuarioId }, select: { rol: true } });
+    if (actor?.rol !== 'VOLUNTARIO') throw new Error('ROL_VOLUNTARIO_REQUERIDO');
     const emergencia = await this.emergenciaRepo.findById(emergenciaId);
     if (!emergencia) {
       throw new Error('EMERGENCIA_NO_ENCONTRADA');
@@ -224,6 +228,9 @@ export class EmergenciaService {
       throw new Error('NO_ES_EL_VOLUNTARIO_ASIGNADO');
     }
 
-    return await this.emergenciaRepo.finalizarEmergencia(emergenciaId);
+    if (typeof observaciones !== 'string' || observaciones.trim().length < 10 || observaciones.trim().length > 10000) {
+      throw new Error('INFORME_INVALIDO');
+    }
+    return await this.emergenciaRepo.finalizarEmergencia(emergenciaId, observaciones.trim());
   }
 }

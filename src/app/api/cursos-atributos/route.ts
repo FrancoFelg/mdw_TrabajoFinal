@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { CursoAtributoController } from '../../../../controllers/cursoAtributo.controller';
 import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
 import { leerBody, RESPUESTA_NO_AUTORIZADO, RESPUESTA_PROHIBIDO, responderErrorCurso } from '@/lib/cursoErrores';
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
   if (!getUserFromRequest(req)) return RESPUESTA_NO_AUTORIZADO();
   try {
     const atributos = await controller.listar();
-    return NextResponse.json(atributos);
+    return jsonPublico(atributos);
   } catch (error) {
     return responderErrorCurso(error, 'Error al listar los atributos de curso.');
   }
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await leerBody(req);
     const nuevo = await controller.crear(body, usuario.id);
-    return NextResponse.json(nuevo, { status: 201 });
+    return jsonPublico(nuevo, { status: 201 });
   } catch (error) {
     return responderErrorCurso(error, 'Error al crear el atributo de curso.');
   }

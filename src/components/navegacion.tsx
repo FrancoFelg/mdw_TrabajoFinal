@@ -40,7 +40,7 @@ export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | nul
     { href: '/reportar', label: 'Reportar', Icono: Megaphone },
     { href: '/casos', label: 'Casos', Icono: ClipboardList },
     { href: '/certificados', label: 'Formación', Icono: GraduationCap },
-    { href: '/ascensos', label: 'Mis ascensos', Icono: Users },
+    ...(usuario.rol === 'VOLUNTARIO' ? [{ href: '/ascensos', label: 'Mis ascensos', Icono: Users }] : []),
     ...(coordinador ? [{ href: '/usuarios', label: 'Usuarios', Icono: Users }] : []),
   ] : [];
   const activo = (href: string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);

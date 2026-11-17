@@ -12,7 +12,7 @@ La interfaz incluye inicio (`/`), login (`/login`), directorio con búsqueda (`/
 | :--- | :--- |
 | Franco Lamberti | [FrancoFelg](https://github.com/FrancoFelg) |
 | Guillermo Natali Ulla | [guille-nat](https://github.com/guille-nat) |
-| Federico Gonzalvez Rolon | — |
+| Federico Gonzalvez Rolon | [FedeGonzalvezR](https://github.com/FedeGonzalvezR) |
 | Lucas Ciolfi | [CiolfiLucas](https://github.com/CiolfiLucas) |
 
 ## Entornos
@@ -325,7 +325,7 @@ Comprobantes de capacitación de un usuario (historia 5). Estados: `PENDIENTE` (
 | `GET /api/certificados/:id` | Dueño o coordinación | Detalle (`404` si es de otra persona) |
 | `POST /api/certificados` | Autenticado | Cargar uno propio (`multipart/form-data`, con archivo) |
 | `PUT /api/certificados/:id` | Dueño | Editar mientras está `PENDIENTE` o `RECHAZADO`; editar un rechazado lo vuelve a `PENDIENTE` |
-| `PATCH /api/certificados/:id` | Coordinador | Aprobar o rechazar un certificado pendiente |
+| `PATCH /api/certificados/:id` | Coordinador | Aprobar o rechazar un certificado pendiente (rechazo con motivo) |
 | `DELETE /api/certificados/:id` | Dueño o coordinación | Baja lógica |
 | `GET /api/certificados/:id/archivo` | Dueño o coordinación | Descarga el archivo (`inline`) |
 
@@ -365,6 +365,7 @@ Errores: la respuesta es `{ "error", "codigo", "campo"? }`. `401` · `400` `CAMP
 | Campo | Tipo | Obligatorio |
 | :--- | :--- | :--- |
 | `estado` | `APROBADO` \| `RECHAZADO` | Sí |
+| `motivo` | texto (hasta 2000 caracteres) | Solo al rechazar |
 
 ```bash
 curl -X PATCH https://mdw.guillermonatali.com/api/certificados/<id> \
@@ -372,7 +373,7 @@ curl -X PATCH https://mdw.guillermonatali.com/api/certificados/<id> \
   -d '{ "estado": "APROBADO" }'
 ```
 
-Errores: `401` · `403` · `400` `ESTADO_INVALIDO` · `404` · `422` `ESTADO_NO_PENDIENTE`.
+Errores: `401` · `403` · `400` `ESTADO_INVALIDO` / `MOTIVO_REQUERIDO` · `404` · `409` `ESTADO_NO_PENDIENTE` (ya fue revisado). Al resolver se guardan quién revisó y cuándo, y se avisa a la persona. `PATCH /api/solicitudes-certificados/:id` hace lo mismo; la pantalla de coordinación es `/certificados/revisar`.
 
 ---
 

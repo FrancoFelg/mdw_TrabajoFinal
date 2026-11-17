@@ -32,7 +32,7 @@ test('tipoArchivo reconoce pdf, jpeg, png y webp por contenido', () => {
 });
 
 test('guardar y leer devuelve los mismos bytes; borrar es idempotente', async () => {
-  process.env.CERTIFICADO_UPLOAD_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'cert-'));
+  process.env.CERTIFICATE_UPLOAD_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'cert-'));
   const a = cargarArchivos();
   await a.guardarArchivo('c1', PDF);
   assert.deepEqual(await a.leerArchivo('c1'), PDF);
@@ -42,7 +42,7 @@ test('guardar y leer devuelve los mismos bytes; borrar es idempotente', async ()
 });
 
 test('guardarArchivo rechaza más de 5 MB y tipos inválidos', async () => {
-  process.env.CERTIFICADO_UPLOAD_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'cert-'));
+  process.env.CERTIFICATE_UPLOAD_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'cert-'));
   const a = cargarArchivos();
   const grande = Buffer.concat([PDF, Buffer.alloc(5 * 1024 * 1024)]);
   await assert.rejects(a.guardarArchivo('c2', grande), /ARCHIVO_INVALIDO/);
@@ -65,7 +65,7 @@ const mananaAR = () => { const d = new Date(`${hoyAR()}T12:00:00Z`); d.setUTCDat
 const coincide = (fila, where = {}) => Object.entries(where).every(([k, v]) => v === undefined || (v && Array.isArray(v.in) ? v.in.includes(fila[k]) : fila[k] === v));
 
 function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tipo: 'NUMERO', fechaEliminacion: null }, { id: 'nivel', nombre: 'Nivel', tipo: 'TEXTO', fechaEliminacion: null }] } = {}) {
-  let datos = { certificados: [], rels: [], escritos: [], borrados: [] };
+  let datos = { certificados: [], rels: [], escritos: [], borrados: [], avisos: [] };
   let n = 0;
   let fallarEscritura = false;
   const hidratar = c => c && ({ ...c, certificadosRelAtributos: datos.rels.filter(r => r.certificadoId === c.id && r.fechaEliminacion === null).map(r => ({ ...r, campos: catalogo.find(a => a.id === r.campoId) })) });
@@ -91,7 +91,7 @@ function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tip
       if (fila) Object.assign(fila, update); else datos.rels.push({ ...create, id: `r${datos.rels.length}`, fechaEliminacion: null });
     },
   };
-  const db = { certificado, certificadosRelAtributos, certificadoAtributo: { async findMany({ where }) { return catalogo.filter(a => coincide(a, where)); }, async findFirst({ where }) { return catalogo.find(a => coincide(a, where)) ?? null; } } };
+  const db = { certificado, certificadosRelAtributos, notificacion: { async create({ data }) { datos.avisos.push(data); return data; } }, certificadoAtributo: { async findMany({ where }) { return catalogo.filter(a => coincide(a, where)); }, async findFirst({ where }) { return catalogo.find(a => coincide(a, where)) ?? null; } } };
   db.$transaction = async fn => { const copia = structuredClone(datos); try { return await fn(db); } catch (e) { datos = copia; throw e; } };
   const archivos = {
     ...cargarArchivos(),
@@ -110,7 +110,7 @@ function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tip
     const original = certificado.findFirst;
     certificado.findFirst = async args => { const r = await original(args); certificado.findFirst = original; if (r) Object.assign(datos.certificados.find(c => c.id === r.id), cambio); return r; };
   };
-  return { servicio: new servicio.CertificadoService(), modulo: servicio, datos: () => datos, fallarEscritura: () => { fallarEscritura = true; }, despuesDeLeer };
+  return { servicio: new servicio.CertificadoService(), modulo: servicio, db, datos: () => datos, fallarEscritura: () => { fallarEscritura = true; }, despuesDeLeer };
 }
 
 const VOL = { id: 'v', rol: 'VOLUNTARIO' };
@@ -190,7 +190,7 @@ test('voluntario no ve ajenos; coordinación sí y filtra por estado', async () 
   const e = escenarioCertificados();
   const mio = await e.servicio.crear(entrada(), pdf(), VOL);
   const ajeno = await e.servicio.crear(entrada(), pdf(), OTRO);
-  await e.servicio.cambiarEstado(ajeno.id, 'APROBADO');
+  e.datos().certificados.find(x => x.id === ajeno.id).estado = 'APROBADO';
   assert.deepEqual((await e.servicio.listar({ usuarioId: 'w' }, VOL)).map(c => c.id), [mio.id]);
   await assert.rejects(e.servicio.obtener(ajeno.id, VOL), /CERTIFICADO_NO_ENCONTRADO/);
   assert.equal((await e.servicio.obtener(mio.id, VOL)).id, mio.id);
@@ -204,7 +204,7 @@ test('voluntario no ve ajenos; coordinación sí y filtra por estado', async () 
 test('editar APROBADO falla con NO_EDITABLE', async () => {
   const e = escenarioCertificados();
   const c = await e.servicio.crear(entrada(), pdf(), VOL);
-  await e.servicio.cambiarEstado(c.id, 'APROBADO');
+  e.datos().certificados[0].estado = 'APROBADO';
   await assert.rejects(e.servicio.actualizar(c.id, { nombre: 'Otro' }, null, VOL), /NO_EDITABLE/);
 });
 
@@ -289,12 +289,37 @@ test('una aprobación entre la lectura y la escritura impide la edición', async
   assert.deepEqual(e.datos().escritos, [c.id]);
 });
 
+// ---------- Revisión (resolverCertificado) ----------
+
+const cargarRevision = e => cargar('src/lib/certificados.ts', {
+  '../../config/database': { db: e.db },
+  './respuesta-publica': cargar('src/lib/respuesta-publica.ts', {}),
+});
+
+test('revisar guarda quién y cuándo, exige motivo al rechazar y avisa al dueño', async () => {
+  const e = escenarioCertificados();
+  const { resolverCertificado } = cargarRevision(e);
+  const c = await e.servicio.crear(entrada(), pdf(), VOL);
+  await assert.rejects(resolverCertificado(c.id, 'RECHAZADO', '  ', 'c'), /MOTIVO_REQUERIDO/);
+  await resolverCertificado(c.id, 'RECHAZADO', 'Ilegible', 'c');
+  const fila = e.datos().certificados[0];
+  assert.equal(fila.estado, 'RECHAZADO');
+  assert.equal(fila.motivoRechazo, 'Ilegible');
+  assert.equal(fila.usuarioRevisionId, 'c');
+  assert.ok(fila.fechaRevision instanceof Date);
+  assert.deepEqual(e.datos().avisos.map(a => [a.usuarioId, a.enlace]), [['v', '/certificados']]);
+});
+
 test('dos revisiones simultáneas: la segunda no pisa a la primera', async () => {
   const e = escenarioCertificados();
+  const { resolverCertificado } = cargarRevision(e);
   const c = await e.servicio.crear(entrada(), pdf(), VOL);
   e.despuesDeLeer({ estado: 'APROBADO' });
-  await assert.rejects(e.servicio.cambiarEstado(c.id, 'RECHAZADO'), /ESTADO_NO_PENDIENTE/);
-  assert.equal(e.datos().certificados[0].estado, 'APROBADO');
+  await assert.rejects(resolverCertificado(c.id, 'RECHAZADO', 'No', 'c'), /ESTADO_NO_PENDIENTE/);
+  // El doble revierte toda la transacción (también el cambio simulado); lo que importa: el rechazo no se escribió.
+  assert.notEqual(e.datos().certificados[0].estado, 'RECHAZADO');
+  assert.equal(e.datos().certificados[0].motivoRechazo, null);
+  assert.equal(e.datos().avisos.length, 0);
 });
 
 // ---------- Regla del caso rojo ----------
@@ -323,7 +348,8 @@ function escenarioApi() {
   let token = VOL;
   const enDisco = new Map();
   const archivos = { ...cargarArchivos(), async leerArchivo(id) { if (!enDisco.has(id)) throw new Error('ENOENT'); return enDisco.get(id); } };
-  const auth = { getUserFromRequest: () => token, esCoordinadorOAdmin: u => u?.rol === 'COORDINADOR' || u?.rol === 'ADMIN' };
+  const auth = { esCoordinadorOAdmin: u => u?.rol === 'COORDINADOR' || u?.rol === 'ADMIN' };
+  const avisados = [];
   const atributos = [];
   const { CertificadoAtributoService } = cargar('services/certificadoAtributo.service.ts', {
     '../repositories/certificadoAtributo.repository': { CertificadoAtributoRepository: class { async crear(d) { atributos.push(d); return { id: 'a1', ...d }; } async findAll() { return atributos; } } },
@@ -334,10 +360,14 @@ function escenarioApi() {
     '../../services/certificado.service': { CertificadoService: e.modulo.CertificadoService },
     '../../services/certificadoAtributo.service': { CertificadoAtributoService },
     './auth': auth,
+    './actor-actual': { actorActual: async () => token },
+    './avisos': { avisarCertificadoNuevo: (id, usuarioId) => avisados.push([id, usuarioId]) },
+    './certificados': cargarRevision(e),
+    './respuesta-publica': cargar('src/lib/respuesta-publica.ts', {}),
     './archivos-certificado': archivos,
     './certificadoErrores': errores,
   });
-  return { ...e, api, enDisco, atributos, token: t => { token = t; } };
+  return { ...e, api, enDisco, atributos, avisados, token: t => { token = t; } };
 }
 
 function formulario(campos = {}, archivo = new File([PDF], 'mi certificado.pdf', { type: 'application/pdf' })) {
@@ -361,6 +391,7 @@ test('sin sesión 401; alta multipart 201 con estado PENDIENTE', async () => {
   assert.equal(c.usuarioId, 'v');
   assert.equal(c.certificadosRelAtributos.length, 1);
   assert.equal((await (await e.api.listarCertificados(pedido(''))).json()).length, 1);
+  assert.deepEqual(e.avisados, [[c.id, 'v']]);
 });
 
 test('errores de negocio indican código y campo', async () => {
@@ -431,8 +462,12 @@ test('PATCH de voluntario responde 403', async () => {
   const patch = () => pedido(`/${c.id}`, { method: 'PATCH', body: JSON.stringify({ estado: 'APROBADO' }) });
   assert.equal((await e.api.cambiarEstadoCertificado(patch(), c.id)).status, 403);
   e.token(COORD);
+  const sinMotivo = await e.api.cambiarEstadoCertificado(pedido(`/${c.id}`, { method: 'PATCH', body: JSON.stringify({ estado: 'RECHAZADO' }) }), c.id);
+  assert.equal(sinMotivo.status, 400);
+  assert.equal((await sinMotivo.json()).codigo, 'MOTIVO_REQUERIDO');
   assert.equal((await e.api.cambiarEstadoCertificado(patch(), c.id)).status, 200);
-  assert.equal((await e.api.cambiarEstadoCertificado(patch(), c.id)).status, 422);
+  assert.equal(e.datos().certificados[0].usuarioRevisionId, 'c');
+  assert.equal((await e.api.cambiarEstadoCertificado(patch(), c.id)).status, 409);
 });
 
 test('?estado=VENCIDO responde 400', async () => {

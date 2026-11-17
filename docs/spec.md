@@ -150,8 +150,9 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
 | Sistema visual | `/sistema` | Público; ejemplos sin datos personales | Implementada |
 | Reportar emergencia | `/reportar` | Público | Implementada; descripción, GPS o dirección manual y foto opcional con reintento |
-| Mis certificados | `/certificados`, `/certificados/nuevo`, `/certificados/[id]/editar` | Con sesión (editar: solo el dueño) | Implementada (parte 1: sin curso). Ver `docs/certificados.md` |
-| Cursos y revisión de certificados | Por definir | Según rol y operación | Pendientes (partes 2 y 3); API de cursos existente |
+| Mis certificados | `/certificados`, `/certificados/nuevo`, `/certificados/[id]/editar` | Con sesión (editar: solo el dueño) | Implementada (parte 1: sin curso). `/formacion` redirige según rol. Ver `docs/certificados.md` |
+| Revisión de certificados | `/certificados/revisar` | Coordinador y administrador | Implementada; pendientes e historial, aprobación o rechazo con motivo y aviso a la persona |
+| Cursos | Por definir | Coordinación | Pendiente (parte 2); API de cursos existente |
 | Solicitudes de ascenso | `/ascensos` y `/usuarios/:id/solicitudes` | Según rol y operación | Implementada; historial, evaluación y avisos. Ver `docs/ascensos.md` |
 
 El acceso anónimo a `/usuarios` redirige a `/login?next=/usuarios`. Al iniciar sesión se recupera ese destino.

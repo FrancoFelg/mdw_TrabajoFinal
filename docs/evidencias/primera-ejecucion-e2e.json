@@ -1,0 +1,804 @@
+{
+  "fecha": "2026-11-16T04:11:17.640Z",
+  "base": "mdw_e2e (localhost:3306)",
+  "navegador": "Chrome instalado",
+  "stats": {
+    "startTime": "2026-11-16T04:11:17.640Z",
+    "duration": 83895.461,
+    "expected": 87,
+    "skipped": 0,
+    "unexpected": 20,
+    "flaky": 0
+  },
+  "casos": [
+    {
+      "titulo": "concurrencia.spec.ts / H10: diez voluntarios toman el mismo caso; exactamente uno gana",
+      "archivo": "concurrencia.spec.ts",
+      "linea": 5,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "concurrencia.spec.ts / H10: un voluntario no puede tomar diez casos simultáneos",
+      "archivo": "concurrencia.spec.ts",
+      "linea": 19,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H2/H7-H11: reporte público, login, tomar y finalizar desde navegador",
+      "archivo": "flujos.spec.ts",
+      "linea": 6,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H1/H2: perfil propio, login por nombre/email, duplicidad y privacidad",
+      "archivo": "flujos.spec.ts",
+      "linea": 47,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H3: solicitud, duplicado, rechazo, historial y aprobación con avisos",
+      "archivo": "flujos.spec.ts",
+      "linea": 60,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H10: rojo exige certificado aprobado",
+      "archivo": "flujos.spec.ts",
+      "linea": 82,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H8/H9: mapa con marcadores por prioridad y filtro de casos libres",
+      "archivo": "flujos.spec.ts",
+      "linea": 90,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H7: reporte anónimo con GPS, prioridades, idempotencia y foto",
+      "archivo": "flujos.spec.ts",
+      "linea": 108,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H1/H3: coordinador consulta perfil, cambia rol y no ve Mis ascensos",
+      "archivo": "flujos.spec.ts",
+      "linea": 126,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "flujos.spec.ts / H11: finalizar exige voluntario asignado; documenta POST declarado",
+      "archivo": "flujos.spec.ts",
+      "linea": 140,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 200\nReceived: 405\n\n  146 |     await account(other);\n  147 |     expect(await other.put(`/api/emergencias/${caso.id}/finalizar`).then(r => r.status())).toBe(403);\n> 148 |     expect(await request.post(`/api/emergencias/${caso.id}/finalizar`, { data: { observaciones: 'Asistencia finalizada correctamente.' } }).then(r => r.status())).toBe(200);\n      |                                                                                                                                                                    ^\n  149 |   } finally { await other.dispose(); }\n  150 | });\n  151 |\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\flujos.spec.ts:148:164"
+      ]
+    },
+    {
+      "titulo": "flujos.spec.ts / H5/H6: acceso a formación desde el bloqueo de un caso rojo",
+      "archivo": "flujos.spec.ts",
+      "linea": 152,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 200\nReceived: 404\n\n  157 |   await expect(link).toHaveAttribute('href', '/formacion');\n  158 |   const response = await page.goto('/formacion');\n> 159 |   expect(response?.status()).toBe(200);\n      |                              ^\n  160 |   await expect(page.getByRole('heading', { name: /certificados|formación/i })).toBeVisible();\n  161 | });\n  162 |\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\flujos.spec.ts:159:30"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/usuarios exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/usuarios exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/auth/login exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/auth/logout exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 401\nReceived: 200\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/solicitudes-ascenso exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/cursos exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/cursos exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / DELETE /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/solicitudes-certificados exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 401\nReceived: 404\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 401\nReceived: 404\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/emergencias exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/emergencias/:id exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias/:id/tomar exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 401\nReceived: 405\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ANONIMO / GET /api/notificaciones exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/usuarios exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/usuarios exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/auth/login exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/auth/logout exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/solicitudes-ascenso exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/cursos exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/cursos exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / DELETE /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/solicitudes-certificados exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 403\nReceived: 404\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 403\nReceived: 404\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/emergencias exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/emergencias/:id exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: 500\nReceived array: [200, 201, 400, 404, 409, 422]\n\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n> 24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n     |                                                ^\n  25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:24:48"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias/:id/tomar exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: 405\nReceived array: [200, 201, 400, 404, 409, 422]\n\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n> 24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n     |                                                ^\n  25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:24:48"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/notificaciones exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/usuarios exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/usuarios exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/auth/login exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/auth/logout exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/solicitudes-ascenso exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/cursos exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/cursos exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / DELETE /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/solicitudes-certificados exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).not.toBe(expected) // Object.is equality\n\nExpected: not 404\n\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n> 25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n     |                                                                                                                              ^\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n  28 |     });\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:25:126"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).not.toBe(expected) // Object.is equality\n\nExpected: not 404\n\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n> 25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n     |                                                                                                                              ^\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n  28 |     });\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:25:126"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/emergencias exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/emergencias/:id exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: 500\nReceived array: [200, 201, 400, 404, 409, 422]\n\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n> 24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n     |                                                ^\n  25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:24:48"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias/:id/tomar exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 403\nReceived: 404\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 403\nReceived: 405\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/notificaciones exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/usuarios exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/usuarios exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/usuarios/me exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/auth/login exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/auth/logout exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/solicitudes-ascenso exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/cursos exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/cursos exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / DELETE /api/cursos/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/certificados exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/solicitudes-certificados exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).not.toBe(expected) // Object.is equality\n\nExpected: not 404\n\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n> 25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n     |                                                                                                                              ^\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n  28 |     });\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:25:126"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/solicitudes-certificados/:id exige Coordinador",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).not.toBe(expected) // Object.is equality\n\nExpected: not 404\n\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n> 25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n     |                                                                                                                              ^\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n  28 |     });\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:25:126"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias exige Público",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/emergencias exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/emergencias/:id exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toContain(expected) // indexOf\n\nExpected value: 500\nReceived array: [200, 201, 400, 404, 409, 422]\n\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n> 24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n     |                                                ^\n  25 |         if (!row.path.includes(':id') || row.path.startsWith('/api/solicitudes-certificados')) expect(response.status()).not.toBe(404);\n  26 |       }\n  27 |       expect(await response.text()).not.toMatch(/\"(?:password|passwordHash|password_hash)\"|\\$2[aby]\\$/i);\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:24:48"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias/:id/tomar exige Voluntario",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 403\nReceived: 404\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "failed",
+      "errores": [
+        "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 403\nReceived: 405\n\n  19 |         method: row.method, ...(row.method === 'GET' ? {} : { data: {} }),\n  20 |       });\n> 21 |       if (!allowed) expect(response.status()).toBe(actor === 'ANONIMO' ? 401 : 403);\n     |                                               ^\n  22 |       else {\n  23 |         // Payload vacío: el permiso debe pasar antes de validación o recurso inexistente.\n  24 |         expect([200, 201, 400, 404, 409, 422]).toContain(response.status());\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\permisos.spec.ts:21:47"
+      ]
+    },
+    {
+      "titulo": "permisos.spec.ts / ADMIN / GET /api/notificaciones exige Autenticado",
+      "archivo": "permisos.spec.ts",
+      "linea": 10,
+      "estado": "passed",
+      "errores": []
+    }
+  ]
+}

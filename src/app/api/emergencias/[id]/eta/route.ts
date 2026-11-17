@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { EmergenciaController } from '../../../../../../controllers/emergencia.controller';
 import { MODOS_VIAJE } from '../../../../../../services/rutas.service';
@@ -24,12 +25,12 @@ const QuerySchema = z.object({
 // voluntario (autenticado)
 export async function GET(req: NextRequest, { params }: Contexto) {
   if (!getUserFromRequest(req)) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    return jsonPublico({ error: 'No autorizado' }, { status: 401 });
   }
 
   const validacion = QuerySchema.safeParse(Object.fromEntries(req.nextUrl.searchParams));
   if (!validacion.success) {
-    return NextResponse.json(
+    return jsonPublico(
       { error: `Parámetros inválidos: coordenada_x y coordenada_y son obligatorias; modo puede ser ${MODOS_VIAJE.join(', ')}.` },
       { status: 400 },
     );
@@ -39,26 +40,26 @@ export async function GET(req: NextRequest, { params }: Contexto) {
     const { id } = await params;
     const { coordenada_x, coordenada_y, modo } = validacion.data;
     const eta = await controller.calcularEta(id, { lat: coordenada_y, lng: coordenada_x }, modo);
-    return NextResponse.json(eta, { headers: { 'Cache-Control': 'no-store' } });
+    return jsonPublico(eta, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     const mensaje = error instanceof Error ? error.message : '';
 
     switch (mensaje) {
       case 'EMERGENCIA_NO_ENCONTRADA':
-        return NextResponse.json({ error: 'La emergencia no existe.' }, { status: 404 });
+        return jsonPublico({ error: 'La emergencia no existe.' }, { status: 404 });
       case 'EMERGENCIA_SIN_COORDENADAS':
-        return NextResponse.json({ error: 'La emergencia no tiene coordenadas cargadas.' }, { status: 409 });
+        return jsonPublico({ error: 'La emergencia no tiene coordenadas cargadas.' }, { status: 409 });
       case 'RUTA_NO_ENCONTRADA':
-        return NextResponse.json(
+        return jsonPublico(
           { error: 'No hay una ruta posible entre tu ubicación y la emergencia con ese modo de viaje.' },
           { status: 422 },
         );
       case 'GOOGLE_MAPS_NO_CONFIGURADO':
       case 'GOOGLE_MAPS_NO_DISPONIBLE':
-        return NextResponse.json({ error: 'No se pudo calcular la ruta en este momento.' }, { status: 503 });
+        return jsonPublico({ error: 'No se pudo calcular la ruta en este momento.' }, { status: 503 });
       default:
         console.error('Error en GET /api/emergencias/:id/eta:', error);
-        return NextResponse.json({ error: 'Error al calcular el tiempo de llegada.' }, { status: 500 });
+        return jsonPublico({ error: 'Error al calcular el tiempo de llegada.' }, { status: 500 });
     }
   }
 }

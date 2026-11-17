@@ -96,7 +96,7 @@ export function Habilitacion({ estado, enlace = true }: { estado: EstadoHabilita
     <span className="habilitacion-texto">
       <strong>{h.titulo}</strong>
       <span>{h.texto}</span>
-      {enlace && h.accion && <Link className="text-link" href="/formacion#cargar">{h.accion}</Link>}
+      {enlace && h.accion && <Link className="text-link" href="/certificados/nuevo">{h.accion}</Link>}
     </span>
   </div>;
 }

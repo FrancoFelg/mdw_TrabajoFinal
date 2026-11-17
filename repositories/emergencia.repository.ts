@@ -123,7 +123,14 @@ export class EmergenciaRepository {
 
   // Tomar/Asignar emergencia utilizando una transacción
   async tomarEmergencia(emergenciaId: string, usuarioId: string): Promise<boolean> {
-    return await db.$transaction(async (tx: any) => {
+    return await db.$transaction(async (tx) => {
+      // Serializa asignaciones del mismo usuario incluso cuando compite por casos distintos.
+      // La lectura de la activa sucede después de adquirir el bloqueo de fila en MySQL.
+      await tx.$queryRaw`SELECT id FROM Usuario WHERE id = ${usuarioId} FOR UPDATE`;
+      const activa = await tx.emergencia.findFirst({
+        where: { estado: EmergenciaEstado.EN_CAMINO, usuarios: { some: { usuarioId } } },
+      });
+      if (activa) throw new Error('VOLUNTARIO_CON_EMERGENCIA_ACTIVA');
       // 1. Verificar si la emergencia sigue estando SIN_GESTIONAR
       const emergencia = await tx.emergencia.findUnique({
         where: { id: emergenciaId },
@@ -134,12 +141,13 @@ export class EmergenciaRepository {
       }
 
       // 2. Cambiar estado a EN_CAMINO
-      await tx.emergencia.update({
-        where: { id: emergenciaId },
+      const cambio = await tx.emergencia.updateMany({
+        where: { id: emergenciaId, estado: EmergenciaEstado.SIN_GESTIONAR },
         data: {
           estado: EmergenciaEstado.EN_CAMINO,
         },
       });
+      if (cambio.count !== 1) return false;
 
       // 3. Crear el registro en UsuarioEmergencia
       await tx.usuarioEmergencia.create({
@@ -154,16 +162,14 @@ export class EmergenciaRepository {
   }
 
   // Finalizar la emergencia
-  async finalizarEmergencia(emergenciaId: string) {
-    return await db.emergencia.update({
-      where: { id: emergenciaId },
-      data: {
-        estado: EmergenciaEstado.GESTIONADA,
-      },
-      include: {
-        ubicacion: true,
-        usuarios: true,
-      },
+  async finalizarEmergencia(emergenciaId: string, observaciones: string) {
+    return await db.$transaction(async tx => {
+      const cambio = await tx.emergencia.updateMany({
+        where: { id: emergenciaId, estado: EmergenciaEstado.EN_CAMINO },
+        data: { estado: EmergenciaEstado.GESTIONADA, observacionesCierre: observaciones },
+      });
+      if (cambio.count !== 1) throw new Error('EMERGENCIA_NO_ESTA_EN_PROCESO');
+      return tx.emergencia.findUniqueOrThrow({ where: { id: emergenciaId }, include: { ubicacion: true, usuarios: true } });
     });
   }
 }

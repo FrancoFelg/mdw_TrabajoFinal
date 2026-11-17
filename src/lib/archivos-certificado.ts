@@ -24,8 +24,9 @@ export function nombreSeguro(nombre: string): string {
 
 function ruta(id: string) {
   if (!/^[a-zA-Z0-9_-]{1,80}$/.test(id)) throw new Error('ID_INVALIDO');
-  const carpeta = process.env.CERTIFICADO_UPLOAD_DIR || path.join(process.cwd(), '.data', 'certificados');
-  return path.join(carpeta, `${id}.archivo`);
+  // Misma carpeta y extensión que los comprobantes cargados antes de la parte 1: siguen sirviéndose.
+  const carpeta = process.env.CERTIFICATE_UPLOAD_DIR || path.join(process.cwd(), '.data', 'certificados');
+  return path.join(carpeta, `${id}.documento`);
 }
 
 export async function guardarArchivo(id: string, bytes: Uint8Array): Promise<void> {

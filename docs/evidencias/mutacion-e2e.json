@@ -1,0 +1,199 @@
+{
+  "config": {
+    "argv": [
+      "C:\\nvm4w\\nodejs\\node.exe",
+      "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "tests/e2e/concurrencia.spec.ts",
+      "--grep",
+      "diez voluntarios"
+    ],
+    "configFile": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\playwright.config.ts",
+    "rootDir": "C:/Users/franc/Desktop/AZeta/Espacio Academico/Ingeniería en Sistemas UAI/MDW/ProyectoFinal/mdw_TrabajoFinal/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/franc/Desktop/AZeta/Espacio Academico/Ingeniería en Sistemas UAI/MDW/ProyectoFinal/mdw_TrabajoFinal/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/franc/Desktop/AZeta/Espacio Academico/Ingeniería en Sistemas UAI/MDW/ProyectoFinal/mdw_TrabajoFinal/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e",
+        "snapshotDir": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 60000,
+        "use": {
+          "channel": "chrome",
+          "baseURL": "http://127.0.0.1:3100",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "concurrencia.spec.ts",
+      "file": "concurrencia.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "H10: diez voluntarios toman el mismo caso; exactamente uno gana",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 2760,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoHaveLength\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected length: \u001b[32m1\u001b[39m\nReceived length: \u001b[31m10\u001b[39m\nReceived array:  \u001b[31m[200, 200, 200, 200, 200, 200, 200, 200, 200, 200]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoHaveLength\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected length: \u001b[32m1\u001b[39m\nReceived length: \u001b[31m10\u001b[39m\nReceived array:  \u001b[31m[200, 200, 200, 200, 200, 200, 200, 200, 200, 200]\u001b[39m\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\concurrencia.spec.ts:13:55",
+                    "location": {
+                      "file": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\concurrencia.spec.ts",
+                      "column": 55,
+                      "line": 13
+                    },
+                    "snippet": " \u001b[90m 11 |\u001b[39m     \u001b[36mconst\u001b[39m statuses \u001b[33m=\u001b[39m responses\u001b[33m.\u001b[39mmap(response \u001b[33m=>\u001b[39m response\u001b[33m.\u001b[39mstatus())\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m'Diez solicitudes, HTTP:'\u001b[39m\u001b[33m,\u001b[39m statuses)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m     expect(statuses\u001b[33m.\u001b[39mfilter(status \u001b[33m=>\u001b[39m status \u001b[33m===\u001b[39m \u001b[35m200\u001b[39m))\u001b[33m.\u001b[39mtoHaveLength(\u001b[35m1\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m     expect(statuses\u001b[33m.\u001b[39mfilter(status \u001b[33m=>\u001b[39m status \u001b[33m===\u001b[39m \u001b[35m409\u001b[39m))\u001b[33m.\u001b[39mtoHaveLength(\u001b[35m9\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m     expect(\u001b[36mawait\u001b[39m db\u001b[33m.\u001b[39musuarioEmergencia\u001b[33m.\u001b[39mcount({ where\u001b[33m:\u001b[39m { emergenciaId\u001b[33m:\u001b[39m caso\u001b[33m.\u001b[39mid } }))\u001b[33m.\u001b[39mtoBe(\u001b[35m1\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m   } \u001b[36mfinally\u001b[39m { \u001b[36mawait\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mall(clients\u001b[33m.\u001b[39mmap(client \u001b[33m=>\u001b[39m client\u001b[33m.\u001b[39mdispose()))\u001b[33m;\u001b[39m }"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\concurrencia.spec.ts",
+                        "column": 55,
+                        "line": 13
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoHaveLength\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected length: \u001b[32m1\u001b[39m\nReceived length: \u001b[31m10\u001b[39m\nReceived array:  \u001b[31m[200, 200, 200, 200, 200, 200, 200, 200, 200, 200]\u001b[39m\n\n  11 |     const statuses = responses.map(response => response.status());\n  12 |     console.log('Diez solicitudes, HTTP:', statuses);\n> 13 |     expect(statuses.filter(status => status === 200)).toHaveLength(1);\n     |                                                       ^\n  14 |     expect(statuses.filter(status => status === 409)).toHaveLength(9);\n  15 |     expect(await db.usuarioEmergencia.count({ where: { emergenciaId: caso.id } })).toBe(1);\n  16 |   } finally { await Promise.all(clients.map(client => client.dispose())); }\n    at C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\concurrencia.spec.ts:13:55"
+                    }
+                  ],
+                  "stdout": [
+                    {
+                      "text": "Diez solicitudes, HTTP: [\n  \u001b[33m200\u001b[39m, \u001b[33m200\u001b[39m, \u001b[33m200\u001b[39m, \u001b[33m200\u001b[39m,\n  \u001b[33m200\u001b[39m, \u001b[33m200\u001b[39m, \u001b[33m200\u001b[39m, \u001b[33m200\u001b[39m,\n  \u001b[33m200\u001b[39m, \u001b[33m200\u001b[39m\n]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:41:16.992Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\test-results\\concurrencia-H10-diez-volu-11fa3-o-caso-exactamente-uno-gana\\error-context.md"
+                    },
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\test-results\\concurrencia-H10-diez-volu-11fa3-o-caso-exactamente-uno-gana\\error-context.md"
+                    },
+                    {
+                      "name": "trace",
+                      "contentType": "application/zip",
+                      "path": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\test-results\\concurrencia-H10-diez-volu-11fa3-o-caso-exactamente-uno-gana\\trace.zip"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e\\concurrencia.spec.ts",
+                    "column": 55,
+                    "line": 13
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "d42cb164446bcb7b5122-0819442bec557d07aa8a",
+          "file": "concurrencia.spec.ts",
+          "line": 5,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-17T01:41:16.235Z",
+    "duration": 3741.513,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

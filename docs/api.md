@@ -17,17 +17,23 @@
 | `PATCH /api/cursos/:id` | Editar información o atributos de un curso | Coordinador | H4 |
 | `DELETE /api/cursos/:id` | Desactivar o eliminar un curso del catálogo | Coordinador | H4 |
 | `GET /api/certificados` | Listar los certificados propios; coordinación ve todos y filtra con `?estado=` y `?usuarioId=` | Autenticado | H5 |
-| `POST /api/certificados` | Cargar un certificado propio sin curso (`multipart/form-data` con archivo y datos adicionales); nace `PENDIENTE` | Autenticado | H5 |
-| `GET /api/certificados/:id` | Detalle de un certificado | Dueño o coordinador | H5 |
-| `PUT /api/certificados/:id` | Editar un certificado `PENDIENTE` o `RECHAZADO` (un rechazado vuelve a `PENDIENTE`) | Dueño | H5 |
-| `DELETE /api/certificados/:id` | Baja lógica de un certificado | Dueño o coordinador | H5 |
-| `GET /api/certificados/:id/archivo` | Ver o descargar el archivo del certificado | Dueño o coordinador | H5 |
+| `POST /api/certificados` | Cargar un certificado propio sin curso (`multipart/form-data`: `nombre`, `entidadEmisora`, `fechaEmision`, `codigoVerificacion` opcional, `archivo` PDF/imagen hasta 5 MB y datos adicionales); propietario y estado `PENDIENTE` salen del servidor | Autenticado | H5 |
+| `GET /api/certificados/:id` | Detalle de un certificado; solo dueño o coordinación (terceros reciben 404) | Autenticado | H5 |
+| `PUT /api/certificados/:id` | El dueño edita un certificado `PENDIENTE` o `RECHAZADO` (un rechazado vuelve a `PENDIENTE`) | Autenticado | H5 |
+| `DELETE /api/certificados/:id` | Baja lógica; solo dueño o coordinación | Autenticado | H5 |
+| `GET /api/certificados/:id/archivo` | Ver o descargar el archivo; solo dueño o coordinación (terceros reciben 404) | Autenticado | H5 |
 | `GET /api/certificados-atributos` | Catálogo de datos adicionales de certificados | Autenticado | H5 |
 | `POST /api/certificados-atributos` | Crear un dato adicional (`nombre`, `tipo`) | Coordinador | H5 |
-| `PATCH /api/certificados/:id` | Aprobar o rechazar un certificado pendiente (la cola de revisión llega en la parte 3) | Coordinador | H6 |
+| `PATCH /api/certificados/:id` | Aprobar o rechazar un certificado pendiente con `estado` y `motivo` (obligatorio al rechazar); decisión repetida devuelve 409. Usado por `/certificados/revisar` | Coordinador | H6 |
+| `GET /api/solicitudes-certificados` | Obtener la tabla de solicitudes de validación de certificados | Coordinador | H6 |
+| `PATCH /api/solicitudes-certificados/:id` | Igual que `PATCH /api/certificados/:id`: resolver con `estado` APROBADO o RECHAZADO; rechazo exige `motivo`; decisión repetida devuelve 409 | Coordinador | H6 |
 | `POST /api/emergencias` | Reportar una nueva emergencia en la vía pública | **Público** | H7 |
 | `GET /api/emergencias` | Listar y filtrar emergencias activas para el mapa | Autenticado | H8 |
 | `GET /api/emergencias/:id` | Obtener detalle y ficha completa de una emergencia | Autenticado | H8 |
 | `POST /api/emergencias/:id/tomar` | Asignarse y marcar la emergencia como `EN CAMINO` | Voluntario | H10 |
-| `POST /api/emergencias/:id/finalizar` | Registrar informe de atención y marcar como `GESTIONADA` | Voluntario (asignado) | H11 |
+| `POST /api/emergencias/:id/finalizar` | Guardar `observaciones` (10 a 10000 caracteres) y marcar como GESTIONADA; PUT permanece por compatibilidad | Voluntario (asignado) | H11 |
 | `GET /api/notificaciones` | Avisos del usuario (historia 12) con `noLeidas`; `?resumen=1` devuelve solo el contador. Si consulta coordinación, revisa los casos sin atender (una vez por minuto como máximo) | Autenticado | H12 |
+
+`GET /api/certificados/:id/archivo` descarga el comprobante con sesión. Solo su propietario y coordinación pueden leerlo; terceros reciben 404. Las pruebas funcionales verifican este acceso además de la matriz de roles.
+
+La solicitud de validación utiliza el propio registro Certificado: nace PENDIENTE y conserva el resultado y motivo de rechazo. No hay una segunda tabla de solicitudes. Al resolver se guardan quién revisó y cuándo (`usuarioRevisionId`, `fechaRevision`) y una notificación al propietario dentro de la misma transacción. El detalle del módulo está en `docs/certificados.md`.
