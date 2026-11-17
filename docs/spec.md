@@ -145,7 +145,7 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Inicio | `/` | Público | Implementada; presentación de la red |
 | Iniciar sesión | `/login` | Público; con sesión vuelve al destino permitido | Implementada |
 | Crear cuenta | `/registro` | Público; con sesión vuelve al inicio | Implementada; alta como voluntario |
-| Casos: lista y mapa | `/casos` | Con sesión | Implementada; libres y en camino, filtro por prioridad |
+| Casos: lista y mapa | `/casos` | Con sesión | Implementada; libres y en camino, filtro por prioridad y por distancia (1, 5 o 10 km, con ubicación activa) |
 | Detalle de caso | `/casos/[id]` | Con sesión | Implementada; tomar y finalizar con informe |
 | Avisos | `/notificaciones` | Con sesión | Implementada; no leídos, marcar como leído y push opcional |
 | Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
