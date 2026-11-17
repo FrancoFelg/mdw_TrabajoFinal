@@ -40,6 +40,7 @@ export function CasosVista({ casos, mio }: { casos: CasoFila[]; mio: CasoFila | 
     : visibles;
   const libres = casos.filter(c => c.estado === 'SIN_GESTIONAR').length;
   const enCamino = casos.length - libres;
+  const sufijo = prioridad ? ` ${PRIORIDADES[prioridad].nombre.toLowerCase()}s` : '';
   const radioActivo = radio !== null && yoActiva ? radio : null;
   const enRadio = radioActivo !== null ? ` a menos de ${formatoDistancia(radioActivo)}` : '';
 
