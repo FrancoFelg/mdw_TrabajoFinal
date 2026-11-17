@@ -24,7 +24,8 @@ test('H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegad
     const row = coordinator.getByRole('article', { name: `Certificado ${nombre} de ${user.nombreUsuario}`, exact: true });
     await row.getByLabel('Resultado').selectOption('RECHAZADO');
     await row.getByRole('button', { name: 'Guardar validación' }).click();
-    await expect(coordinator.getByRole('status')).toHaveText('Para rechazar, escribí el motivo (hasta 2000 caracteres).');
+    await expect(row.getByRole('alert')).toHaveText('Para rechazar, escribí el motivo (hasta 2000 caracteres).');
+    await expect(row.getByLabel('Motivo del rechazo')).toBeFocused();
     await row.getByLabel('Motivo del rechazo').fill('El comprobante está incompleto.');
     await row.getByRole('button', { name: 'Guardar validación' }).click();
     await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');
@@ -96,7 +97,8 @@ test('H4/H5: coordinación crea un curso que otorga certificado y la persona sol
     await coordinator.getByLabel('Horas').fill('20');
     await coordinator.getByLabel('Al terminar, el curso otorga un certificado').check();
     await coordinator.getByRole('button', { name: 'Crear curso' }).click();
-    await expect(coordinator.getByText('Completá el nombre del certificado y la entidad emisora, o desmarcá la opción.')).toBeVisible();
+    await expect(coordinator.locator('#curso-curso-cert-nombre-error')).toHaveText('Para que el curso otorgue un certificado, completá su nombre y la entidad emisora.');
+    await expect(coordinator.getByLabel('Nombre del certificado')).toBeFocused();
     await coordinator.getByLabel('Nombre del certificado').fill('Certificado de Primeros Auxilios');
     await coordinator.getByLabel('Entidad emisora del certificado').fill('Cruz Roja Argentina');
     await coordinator.getByRole('button', { name: 'Crear curso' }).click();
@@ -110,7 +112,8 @@ test('H4/H5: coordinación crea un curso que otorga certificado y la persona sol
     await expect(tarjeta.getByRole('link', { name: /Editar/ })).toHaveCount(0);
     await expect(tarjeta.getByRole('button', { name: /Dar de baja/ })).toHaveCount(0);
     await tarjeta.getByRole('link', { name: `Cargar mi certificado de ${titulo}` }).click();
-    await expect(page.getByText('Certificado de Primeros Auxilios')).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/certificados/nuevo\\?cursoId=${curso.id}$`));
+    await expect(page.getByText('Certificado de Primeros Auxilios', { exact: true })).toBeVisible();
     await expect(page.getByLabel('Nombre del certificado')).toHaveCount(0);
     await page.getByLabel('Archivo', { exact: true }).setInputFiles({ name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf });
     await page.getByRole('button', { name: 'Cargar certificado' }).click();

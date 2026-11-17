@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText } from 'lucide-react';
 import { Button, Card } from './ui';
+import { Formulario } from './formulario';
 import { MarcaRevision } from './marcas';
+import { revisarCertificadoAction } from '@/app/actions/formacion';
 import { fechaLegible } from '@/lib/certificados-vista';
 
 export type CertificadoRevision = {
@@ -15,27 +17,7 @@ export type CertificadoRevision = {
 // Cola de validación (historia 6): pendientes primero, luego el historial resuelto.
 export function RevisionCertificados({ certificados }: { certificados: CertificadoRevision[] }) {
   const router = useRouter();
-  const [ocupado, setOcupado] = useState(false);
-  const [mensaje, setMensaje] = useState<{ error: boolean; texto: string } | null>(null);
-
-  async function resolver(event: FormEvent<HTMLFormElement>, id: string) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    setOcupado(true); setMensaje(null);
-    try {
-      const response = await fetch(`/api/certificados/${id}`, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estado: data.get('estado'), motivo: data.get('motivo') }),
-        signal: AbortSignal.timeout(20000),
-      });
-      const body = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(body?.error || 'No se pudo guardar la validación.');
-      setMensaje({ error: false, texto: 'Validación guardada.' });
-      router.refresh();
-    } catch (error) {
-      setMensaje({ error: true, texto: error instanceof Error && error.name !== 'TimeoutError' && error.name !== 'TypeError' ? error.message : 'No se pudo confirmar la validación. Actualizá la página antes de reintentar.' });
-    } finally { setOcupado(false); }
-  }
+  const [mensaje, setMensaje] = useState('');
 
   const pendientes = certificados.filter(c => c.estado === 'PENDIENTE');
   const resueltos = certificados.filter(c => c.estado !== 'PENDIENTE');
@@ -50,17 +32,19 @@ export function RevisionCertificados({ certificados }: { certificados: Certifica
     </dl>
     {c.motivoRechazo && <p className="aviso">Motivo: {c.motivoRechazo}</p>}
     <div className="actions"><a className="button button-chico button-secondary" href={`/api/certificados/${c.id}/archivo`} target="_blank" rel="noopener"><FileText aria-hidden="true" size={18} />Ver archivo<span className="sr-only"> (se abre en otra pestaña)</span></a></div>
-    {c.estado === 'PENDIENTE' && <form className="stack-chico" onSubmit={event => resolver(event, c.id)}>
+    {c.estado === 'PENDIENTE' && <Formulario id={`revisar-${c.id}`} className="stack-chico"
+      action={datos => { setMensaje(''); return revisarCertificadoAction(c.id, datos); }}
+      onSuccess={() => { setMensaje('Validación guardada.'); router.refresh(); }}>
       <div className="field"><label htmlFor={`resultado-${c.id}`}>Resultado</label>
         <select id={`resultado-${c.id}`} name="estado" className="input"><option value="APROBADO">Aprobar</option><option value="RECHAZADO">Rechazar</option></select></div>
       <div className="field"><label htmlFor={`motivo-${c.id}`}>Motivo del rechazo</label>
         <textarea id={`motivo-${c.id}`} name="motivo" className="input textarea" maxLength={2000} /></div>
-      <div><Button disabled={ocupado} type="submit">Guardar validación</Button></div>
-    </form>}
+      <div><Button type="submit">Guardar validación</Button></div>
+    </Formulario>}
   </Card>;
 
-  return <div className="stack" aria-busy={ocupado}>
-    <p role="status" className={mensaje?.error ? 'alert' : undefined}>{mensaje?.texto}</p>
+  return <div className="stack">
+    <p role="status">{mensaje}</p>
     <h2>Pendientes ({pendientes.length})</h2>
     {pendientes.length ? pendientes.map(tarjeta) : <p className="muted">No hay certificados para revisar.</p>}
     <h2>Historial</h2>

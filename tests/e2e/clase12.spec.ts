@@ -105,7 +105,8 @@ test('certificado conserva archivo y datos ante validación', async ({ page }) =
   await page.getByLabel('Número de certificado').fill(codigo);
   await page.getByLabel('Archivo', { exact: true }).setInputFiles({ name: 'invalido.svg', mimeType: 'image/svg+xml', buffer: Buffer.from('<svg/>') });
   await page.getByRole('button', { name: 'Cargar certificado' }).click();
-  await expect(page.locator('#error-archivo')).toHaveText('Elegí un PDF o una imagen JPG, PNG o WebP de hasta 5 MB.');
+  await expect(page.locator('#certificado-cert-archivo-error')).toHaveText('Elegí un PDF o una imagen JPG, PNG o WebP de hasta 5 MB.');
+  await expect(page.getByLabel('Archivo', { exact: true })).toBeFocused();
   await expect(page.getByLabel('Número de certificado')).toHaveValue(codigo);
   await expect(page.getByLabel('Nombre del certificado')).toHaveValue('Primeros auxilios');
   expect(await page.getByLabel('Archivo', { exact: true }).evaluate((input: HTMLInputElement) => input.files?.[0]?.name)).toBe('invalido.svg');

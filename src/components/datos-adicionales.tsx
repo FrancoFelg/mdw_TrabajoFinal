@@ -1,10 +1,11 @@
 'use client';
 
-import { useRef, useState, type ReactNode } from 'react';
+import { useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { Button, Input } from './ui';
 
 // Datos adicionales (EAV) de cursos y certificados: filas «dato del catálogo + valor» con un control según el tipo.
+// El formulario los envía como JSON en el campo oculto `atributos`; los errores van al fieldset `datosAdicionales`.
 
 export type AtributoCatalogo = { id: string; nombre: string; tipo: string };
 type Fila = { clave: number; campoId: string; dato: string };
@@ -19,18 +20,16 @@ export function useDatosAdicionales(catalogo: AtributoCatalogo[], iniciales: { c
     setFilas,
     agregar: () => setFilas(fs => [...fs, { clave: siguiente.current++, campoId: '', dato: '' }]),
     tipoDe,
-    incompletas: () => filas.some(f => !f.campoId || (tipoDe(f.campoId) !== 'BOOLEANO' && !f.dato.trim())),
-    valores: () => filas.map(f => ({ campoId: f.campoId, dato: tipoDe(f.campoId) === 'BOOLEANO' ? (f.dato === 'true' ? 'true' : 'false') : f.dato })),
+    // Una fila sin dato elegido no se envía; una con dato y sin valor sí, para que el servidor la rechace.
+    valores: () => filas.filter(f => f.campoId).map(f => ({ campoId: f.campoId, dato: tipoDe(f.campoId) === 'BOOLEANO' ? (f.dato === 'true' ? 'true' : 'false') : f.dato })),
   };
 }
 
-export function DatosAdicionales({ catalogo, estado, error }: { catalogo: AtributoCatalogo[]; estado: ReturnType<typeof useDatosAdicionales>; error?: ReactNode }) {
+export function DatosAdicionales({ catalogo, estado }: { catalogo: AtributoCatalogo[]; estado: ReturnType<typeof useDatosAdicionales> }) {
   const { filas, setFilas, agregar, tipoDe } = estado;
-  if (!catalogo.length) return null;
   const cambiar = (clave: number, cambio: Partial<Fila>) => setFilas(fs => fs.map(f => f.clave === clave ? { ...f, ...cambio } : f));
 
-  return <fieldset className="reporte-paso" aria-describedby={error ? 'error-atributos' : undefined}>
-    <legend>Datos adicionales <span className="opcional">Opcional</span></legend>
+  return <>
     {filas.map((f, i) => {
       const tipo = tipoDe(f.campoId);
       const usados = new Set(filas.filter(o => o.clave !== f.clave).map(o => o.campoId));
@@ -54,6 +53,5 @@ export function DatosAdicionales({ catalogo, estado, error }: { catalogo: Atribu
       </div>;
     })}
     {filas.length < catalogo.length && <div><Button type="button" className="button-chico button-secondary" onClick={agregar}><Plus aria-hidden="true" size={18} />Agregar dato</Button></div>}
-    {error}
-  </fieldset>;
+  </>;
 }

@@ -30,6 +30,11 @@ const ERRORES: Record<string, { status: number; mensaje: string; campo?: string 
   TIPO_INVALIDO: { status: 400, mensaje: 'El tipo debe ser TEXTO, NUMERO, FECHA o BOOLEANO.' },
 };
 
+// Para Server Actions: mensaje y campo de un código de negocio de certificados, o null si no es conocido.
+export function errorCertificado(codigo: string): { mensaje: string; campo?: string } | null {
+  return ERRORES[codigo] ?? null;
+}
+
 export function responderErrorCertificado(error: unknown, mensajeDefault: string): NextResponse {
   const codigo = error instanceof Error ? error.message : '';
   const conocido = ERRORES[codigo];

@@ -52,6 +52,11 @@ const ERRORES_NEGOCIO: Record<string, { status: number; mensaje: string }> = {
   },
 };
 
+// Para Server Actions: mensaje de un código de negocio de cursos, o null si no es conocido.
+export function mensajeErrorCurso(codigo: string): string | null {
+  return ERRORES_NEGOCIO[codigo]?.mensaje ?? null;
+}
+
 // ---------------------------------------------------------------------------
 // Errores de Prisma: se traducen por código para no filtrar detalles internos.
 // https://www.prisma.io/docs/orm/reference/error-reference

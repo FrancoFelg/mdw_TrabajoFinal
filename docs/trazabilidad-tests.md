@@ -22,6 +22,9 @@ El registro público siempre crea voluntarios. La autoridad del coordinador inic
 | Otros escenarios de `flujos.spec.ts` | H1/H2: duplicidad, credenciales y privacidad; H3: historial y decisiones; H7: GPS, foto y recuperación documentada; H8/H9: mapa y filtros; H10: certificado para rojo; H11: cierre por asignado e informe |
 | `usuarios.test.cjs` | H1/H2/H3, edición y privacidad de `docs/usuarios.md`, sesión y destinos permitidos de `docs/ui.md` |
 | `ascensos.test.cjs` | H3/H12 y transacciones, avisos, permisos e historial de `docs/ascensos.md` |
+| `certificados.test.cjs` | H5/H6 y regla 2: archivos, alta con y sin curso, único activo por curso, edición, baja, privacidad, API y revisión de `docs/certificados.md` |
+| `cursos.test.cjs` | H4: horas, certificado que otorga y rol vigente en las rutas de cursos |
+| `formacion-actions.test.cjs` | H4/H5/H6 en pantallas: permisos de las Server Actions y errores por campo |
 | `reportes.test.cjs` | H7/H8, recuperación de dirección, GPS, fotos, reintentos y persistencia de `docs/ui.md` |
 
 ## Exigencias eliminadas

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { FileText, Pencil, Trash2 } from 'lucide-react';
 import { Button, Card } from './ui';
 import { MarcaRevision } from './marcas';
+import { darDeBajaCertificadoAction } from '@/app/actions/formacion';
 import { editable, fechaLegible, valorAtributo, type CertificadoVista } from '@/lib/certificados-vista';
 
 export function CertificadosListado({ certificados }: { certificados: CertificadoVista[] }) {
@@ -18,11 +19,11 @@ export function CertificadosListado({ certificados }: { certificados: Certificad
     setOcupado(c.id);
     setError('');
     try {
-      const respuesta = await fetch(`/api/certificados/${c.id}`, { method: 'DELETE', signal: AbortSignal.timeout(20000) });
-      if (!respuesta.ok) throw new Error((await respuesta.json().catch(() => null))?.error || 'No pudimos dar de baja el certificado.');
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error && e.name !== 'TimeoutError' && e.name !== 'TypeError' ? e.message : 'No pudimos confirmar la baja. Actualizá la página antes de reintentar.');
+      const resultado = await darDeBajaCertificadoAction(c.id);
+      if (resultado.ok) router.refresh();
+      else setError(resultado.error || 'No pudimos dar de baja el certificado.');
+    } catch {
+      setError('No pudimos confirmar la baja. Actualizá la página antes de reintentar.');
     } finally {
       setOcupado(null);
     }

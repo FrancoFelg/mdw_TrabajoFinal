@@ -1,6 +1,6 @@
 'use client';
 
-import { Children, cloneElement, isValidElement, Fragment, useRef, useState, type ReactNode, type ReactElement, type FormEvent } from 'react';
+import { Children, cloneElement, isValidElement, Fragment, useEffect, useRef, useState, type ReactNode, type ReactElement, type FormEvent } from 'react';
 import { type ResultadoFormulario, formularioInicial } from '@/lib/formulario';
 
 // Se envía sin reset automático: también se conservan contraseñas y archivos ante un error.
@@ -12,6 +12,18 @@ export function Formulario({ children, action, onSuccess, className = 'stack', i
   const [ocupado, setOcupado] = useState(false);
   const bloqueo = useRef(false);
   const formulario = useRef<HTMLFormElement>(null);
+  const enfocarError = useRef(false);
+  // El foco se mueve después de que React pintó el error y rehabilitó los campos:
+  // antes, el mensaje todavía no existe o el campo sigue deshabilitado y el foco se pierde.
+  useEffect(() => {
+    if (!enfocarError.current || ocupado) return;
+    enfocarError.current = false;
+    const form = formulario.current;
+    const nombre = Object.keys(resultado.campos)[0];
+    const campo = nombre ? form?.elements.namedItem(nombre) : null;
+    if (campo instanceof HTMLElement) campo.focus();
+    else form?.querySelector<HTMLElement>('.form-error')?.focus();
+  }, [resultado, ocupado]);
   function decorar(nodos: ReactNode, dentroLabel = false): ReactNode {
     return Children.map(nodos, nodo => {
       if (!isValidElement(nodo)) return nodo;
@@ -64,12 +76,11 @@ export function Formulario({ children, action, onSuccess, className = 'stack', i
       if (!respuesta) return; // Una acción de login puede navegar antes de devolver estado.
       setResultado(respuesta);
       if (respuesta.ok) onSuccess?.();
-      else requestAnimationFrame(() => {
-        const nombre = Object.keys(respuesta.campos)[0];
-        if (nombre) (form.elements.namedItem(nombre) as HTMLElement)?.focus?.();
-        else formulario.current?.querySelector<HTMLElement>('.form-error')?.focus();
-      });
-    } catch { setResultado({ ok: false, campos: {}, error: 'No se pudo confirmar el cambio. Revisá tu conexión y reintentá.' }); }
+      else enfocarError.current = true;
+    } catch {
+      setResultado({ ok: false, campos: {}, error: 'No se pudo confirmar el cambio. Revisá tu conexión y reintentá.' });
+      enfocarError.current = true;
+    }
     finally { bloqueo.current = false; setOcupado(false); }
   }
   return <form ref={formulario} id={id} className={className} onSubmit={enviar} noValidate aria-busy={ocupado}>

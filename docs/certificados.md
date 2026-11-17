@@ -23,6 +23,8 @@ La historia 5 de `docs/spec.md` pide que cada persona cargue y administre sus ce
 - **`/formacion`:** la ruta anterior redirige: coordinación a `/certificados/revisar`, el resto a `/certificados`.
 - **Catálogo de datos adicionales:** coordinación lo administra por API (`POST /api/certificados-atributos` con `nombre` y `tipo`). Si está vacío, el formulario no muestra la sección.
 
+Pantallas: los formularios usan Server Actions (`src/app/actions/formacion.ts`) con el componente `Formulario`, como el resto de la app: errores debajo de cada campo, errores de negocio arriba, datos y archivo conservados ante un error. Las acciones llaman a los mismos servicios que la API.
+
 API: ver la tabla de `docs/api.md` y los ejemplos de `README.md`.
 - Las cargas usan `multipart/form-data`; `atributos` va como JSON.
 - Los errores responden `{ error, codigo, campo? }`. `campo` indica en qué parte del formulario mostrarlos.

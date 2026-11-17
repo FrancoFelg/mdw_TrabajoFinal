@@ -7,6 +7,7 @@ import { Pencil, Trash2, Upload } from 'lucide-react';
 import type { CertificadoEstado } from '@prisma/client';
 import { Button, Card } from './ui';
 import { MarcaRevision } from './marcas';
+import { darDeBajaCursoAction } from '@/app/actions/formacion';
 import { valorAtributo } from '@/lib/certificados-vista';
 import { fechaCurso, otorgaCertificado, terminado, type CursoVista } from '@/lib/cursos-vista';
 
@@ -21,11 +22,11 @@ export function CursosListado({ cursos, coordinacion, mios }: { cursos: CursoVis
     setOcupado(c.id);
     setError('');
     try {
-      const respuesta = await fetch(`/api/cursos/${c.id}`, { method: 'DELETE', signal: AbortSignal.timeout(20000) });
-      if (!respuesta.ok) throw new Error((await respuesta.json().catch(() => null))?.error || 'No pudimos dar de baja el curso.');
-      router.refresh();
-    } catch (e) {
-      setError(e instanceof Error && e.name !== 'TimeoutError' && e.name !== 'TypeError' ? e.message : 'No pudimos confirmar la baja. Actualizá la página antes de reintentar.');
+      const resultado = await darDeBajaCursoAction(c.id);
+      if (resultado.ok) router.refresh();
+      else setError(resultado.error || 'No pudimos dar de baja el curso.');
+    } catch {
+      setError('No pudimos confirmar la baja. Actualizá la página antes de reintentar.');
     } finally {
       setOcupado(null);
     }
