@@ -1,4 +1,5 @@
 import { Alert, Badge, Button, Input, Skeleton } from '@/components/ui';
+import { requireSession } from '@/lib/session';
 import { Apariencia, TemaBoton } from '@/components/tema';
 import { Asignado, CodigoCaso, EtapasCaso, IconoPrioridad, MarcaEstado, MarcaPrioridad, MarcaRevision } from '@/components/marcas';
 
@@ -7,7 +8,8 @@ export const metadata = { title: 'Sistema visual | Red de Apoyo' };
 // Galería de piezas del pizarrón. Los datos son de ejemplo y no corresponden a personas reales.
 const EJEMPLO = 'cmh0ejemplo0000000000k7q2';
 
-export default function Sistema() {
+export default async function Sistema() {
+  await requireSession('/sistema');
   return <section className="formacion">
     <header className="pagina-cabecera"><h1>Sistema visual</h1><p className="muted">Piezas de la interfaz con datos de ejemplo.</p></header>
     <div className="galeria">

@@ -46,6 +46,10 @@ El push es opcional por dispositivo: `public/sw.js` muestra el aviso y abre el e
 
 ## Sesión y permisos
 
+Las rutas públicas (`/`, `/login`, `/registro`, `/reportar`) comparten el layout `(publico)`. Las privadas, incluida `/sistema`, comparten `(privado)`. El layout raíz conserva HTML, tipografía y tema; ambos grupos reutilizan el marco de navegación y contenido. Cada página privada valida sesión con su destino exacto para conservar `next` al iniciar sesión. Los controles de páginas, acciones y API siguen siendo independientes del layout.
+
+El encabezado muestra nombre de usuario y rol vigente junto al avatar. Las rutas públicas conservan la navegación de la cuenta cuando hay sesión.
+
 El formulario usa una Server Action y el AuthService existente. El JWT se almacena en una cookie HttpOnly, SameSite=Lax, Secure en producción, con duración de ocho horas. `JWT_SECRET` debe estar definido para emitir y verificar tokens. No se guarda el token en localStorage.
 
 La API de login también establece esa cookie y conserva el token en su respuesta para clientes que usan Bearer. Las APIs aceptan Bearer y, para el navegador, la cookie. El directorio requiere coordinador o administrador tanto en la página como en GET `/api/usuarios`. La pantalla consulta UsuarioService en el servidor y envía al cliente solamente identificador, nombre de usuario, nombre, apellido y rol.

@@ -146,7 +146,7 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Detalle de caso | `/casos/[id]` | Con sesión | Implementada; tomar y finalizar con informe |
 | Avisos | `/notificaciones` | Con sesión | Implementada; no leídos, marcar como leído y push opcional |
 | Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
-| Sistema visual | `/sistema` | Público; ejemplos sin datos personales | Implementada |
+| Sistema visual | `/sistema` | Con sesión; ejemplos sin datos personales | Implementada |
 | Reportar emergencia | `/reportar` | Público | Implementada; descripción, GPS o dirección manual y foto opcional con reintento |
 | Formación y certificados | `/formacion` | Con sesión; validación solo coordinación | Carga de comprobantes, catálogo opcional e historial; aprobación o rechazo con motivo |
 | Solicitudes de ascenso | `/ascensos` y `/usuarios/:id/solicitudes` | Según rol y operación | Implementada; historial, evaluación y avisos. Ver `docs/ascensos.md` |
