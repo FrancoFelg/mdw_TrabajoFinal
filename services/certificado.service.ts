@@ -1,4 +1,5 @@
 import { CertificadoEstado } from '@prisma/client';
+import { resolverCertificado } from '../src/lib/certificados';
 import {
     ActualizarCertificadoData,
   CertificadoRepository,
@@ -43,7 +44,8 @@ export class CertificadoService {
     // 4. Inyección de valores por defecto y usuario de creación
     const payloadCompleto: CrearCertificadoConAtributosData = {
       ...data,
-      estado: data.estado || CertificadoEstado.PENDIENTE,
+      estado: CertificadoEstado.PENDIENTE,
+      usuarioId: usuarioCreacionId,
       usuarioCreacionId,
     };
 
@@ -64,10 +66,13 @@ export class CertificadoService {
 
   async actualizar(id: string, data: ActualizarCertificadoData) {
     await this.obtenerPorId(id);
-    return await this.repo.actualizar(id, data);
+    if (data.estado !== undefined || typeof data.codigoVerificacion !== 'string' || !data.codigoVerificacion.trim()) {
+      throw new Error('ESTADO_INVALIDO');
+    }
+    return await this.repo.actualizar(id, { codigoVerificacion: data.codigoVerificacion.trim() });
   }
 
-  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado) {
+  async cambiarEstado(id: string, nuevoEstado: CertificadoEstado, motivo?: string) {
     if (nuevoEstado !== CertificadoEstado.APROBADO && nuevoEstado !== CertificadoEstado.RECHAZADO) {
       throw new Error('ESTADO_INVALIDO');
     }
@@ -78,7 +83,7 @@ export class CertificadoService {
       throw new Error('ESTADO_NO_PENDIENTE');
     }
 
-    return await this.repo.actualizar(id, { estado: nuevoEstado });
+    return await resolverCertificado(id, nuevoEstado, motivo);
   }
 
 

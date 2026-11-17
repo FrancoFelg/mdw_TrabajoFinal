@@ -1,5 +1,6 @@
 import { Rol, SolicitudAscensoEstado } from '@prisma/client';
 import { SolicitudAscensoRepository } from '../repositories/solicitudAscenso.repository';
+import { db } from '../config/database';
 
 export class SolicitudAscensoService {
   private repo: SolicitudAscensoRepository;
@@ -12,6 +13,9 @@ export class SolicitudAscensoService {
     if (!usuarioId) {
       throw new Error('USUARIO_REQUERIDO');
     }
+
+    const actual = await db.usuario.findUnique({ where: { id: usuarioId }, select: { rol: true } });
+    if (actual?.rol !== Rol.VOLUNTARIO) throw new Error('SOLO_VOLUNTARIOS');
 
     const solicitudPendiente =
       await this.repo.findPendienteByUsuarioId(usuarioId);

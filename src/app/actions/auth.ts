@@ -8,7 +8,7 @@ import { safeDestination, sessionCookie } from '@/lib/session';
 export async function loginAction(_state: { error: string }, data: FormData) {
   const nombreUsuario = String(data.get('nombreUsuario') ?? '').trim();
   const password = String(data.get('password') ?? '');
-  if (!nombreUsuario || !password) return { error: 'Ingresá tu usuario y contraseña.' };
+  if (!nombreUsuario || !password) return { error: 'Ingresá tu usuario o email y contraseña.' };
   try {
     const result = await new AuthService().login(nombreUsuario, password);
     (await cookies()).set('token', result.token, sessionCookie);

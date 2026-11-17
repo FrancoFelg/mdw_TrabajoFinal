@@ -1,0 +1,24 @@
+{
+  "fecha": "2026-11-16",
+  "baseCodigo": "1cf46fd",
+  "baseDatos": "mdw_e2e (localhost:3306)",
+  "origen": "Salida de la primera ejecución real de tests/e2e/concurrencia.spec.ts, antes de modificar el repositorio y la ruta de toma.",
+  "escenarios": [
+    {
+      "nombre": "Diez voluntarios toman el mismo caso",
+      "solicitudesSimultaneas": 10,
+      "httpObservados": [200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+      "exitosEsperados": 1,
+      "exitosObservados": 10,
+      "resultado": "failed"
+    },
+    {
+      "nombre": "Un voluntario toma diez casos distintos",
+      "solicitudesSimultaneas": 10,
+      "httpObservados": [200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+      "exitosEsperados": 1,
+      "exitosObservados": 10,
+      "resultado": "failed"
+    }
+  ]
+}

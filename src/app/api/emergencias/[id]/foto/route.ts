@@ -1,3 +1,4 @@
+import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '../../../../../../config/database';
 import { getUserFromRequest } from '@/lib/auth';
@@ -11,14 +12,14 @@ export async function POST(req: NextRequest, { params }: Contexto) {
   const { id } = await params;
   try {
     if (!verificarPermisoFoto(id, req.headers.get('x-permiso-foto') ?? '')) {
-      return NextResponse.json({ error: 'El permiso para adjuntar la foto venció o no es válido.' }, { status: 403 });
+      return jsonPublico({ error: 'El permiso para adjuntar la foto venció o no es válido.' }, { status: 403 });
     }
     if (!await db.emergencia.findUnique({ where: { id }, select: { id: true } })) {
-      return NextResponse.json({ error: 'El reporte no existe.' }, { status: 404 });
+      return jsonPublico({ error: 'El reporte no existe.' }, { status: 404 });
     }
     // El cuerpo es binario: se limita mientras llega, antes de reservar más memoria.
     const lector = req.body?.getReader();
-    if (!lector) return NextResponse.json({ error: 'Elegí una foto.' }, { status: 400 });
+    if (!lector) return jsonPublico({ error: 'Elegí una foto.' }, { status: 400 });
     const partes: Uint8Array[] = [];
     let total = 0;
     for (;;) {
@@ -27,18 +28,18 @@ export async function POST(req: NextRequest, { params }: Contexto) {
       total += value.length;
       if (total > MAX_FOTO) {
         await lector.cancel();
-        return NextResponse.json({ error: 'La foto debe pesar hasta 5 MB.' }, { status: 413 });
+        return jsonPublico({ error: 'La foto debe pesar hasta 5 MB.' }, { status: 413 });
       }
       partes.push(value);
     }
     const bytes = Buffer.concat(partes);
-    if (!tipoFoto(bytes)) return NextResponse.json({ error: 'Elegí una foto JPG, PNG o WebP válida.' }, { status: 400 });
+    if (!tipoFoto(bytes)) return jsonPublico({ error: 'Elegí una foto JPG, PNG o WebP válida.' }, { status: 400 });
     await guardarFoto(id, bytes);
     await db.emergencia.update({ where: { id }, data: { imagen: `/api/emergencias/${id}/foto` } });
-    return NextResponse.json({ ok: true });
+    return jsonPublico({ ok: true });
   } catch (error) {
     console.error('Error guardando foto:', error);
-    return NextResponse.json({ error: 'El reporte está guardado. No pudimos adjuntar la foto; podés reintentar.' }, { status: 503 });
+    return jsonPublico({ error: 'El reporte está guardado. No pudimos adjuntar la foto; podés reintentar.' }, { status: 503 });
   }
 }
 

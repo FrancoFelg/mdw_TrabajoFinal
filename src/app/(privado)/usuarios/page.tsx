@@ -3,12 +3,13 @@ import { requireSession } from '@/lib/session';
 import { SinDatos } from '@/components/sin-datos';
 import { UsuariosListado } from '@/components/usuarios-listado';
 import { db } from '../../../../config/database';
+import { puedeGestionarUsuarios } from '@/lib/usuarios-admin';
 
 export const metadata = { title: 'Usuarios | Red de Apoyo' };
 
 export default async function Usuarios() {
   const usuario = await requireSession('/usuarios');
-  if (usuario.rol !== 'ADMIN' && usuario.rol !== 'COORDINADOR') return <SinDatos titulo="Acceso restringido"><p>El directorio está disponible para coordinadores y administradores.</p></SinDatos>;
+  if (!await puedeGestionarUsuarios(usuario.id)) return <SinDatos titulo="Acceso restringido"><p>El directorio está disponible para coordinadores y administradores.</p></SinDatos>;
   const usuarios = await new UsuarioService().listarUsuarios();
   const pendientes = await db.solicitudAscenso.findMany({ where: { estado: 'PENDIENTE' }, select: { usuarioId: true }, distinct: ['usuarioId'] });
   return <section className="stack"><header className="pagina-cabecera"><h1>Usuarios</h1><p className="muted">Personas que forman parte de la red y su rol.</p></header>{usuarios.length ? <UsuariosListado pendientesIniciales={pendientes.map(s => s.usuarioId)} usuarios={usuarios.map(({ id, nombreUsuario, rol, persona }) => ({ id, nombreUsuario, rol, nombre: persona.nombre, apellido: persona.apellido }))} /> : <SinDatos titulo="Todavía no hay usuarios"><p>Las cuentas registradas aparecerán en este directorio.</p></SinDatos>}</section>;

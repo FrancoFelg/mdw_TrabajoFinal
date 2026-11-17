@@ -14,6 +14,7 @@ export function RegistroForm() {
 
   return (
     <form action={action} className="stack" aria-busy={pending}>
+      <div className="field"><label htmlFor="email-registro">Email</label><Input id="email-registro" name="email" type="email" autoComplete="email" required maxLength={191} /></div>
       <div className="field"><label htmlFor="nombre">Nombre</label><Input id="nombre" name="nombre" autoComplete="given-name" required maxLength={100} /></div>
       <div className="field"><label htmlFor="apellido">Apellido</label><Input id="apellido" name="apellido" autoComplete="family-name" required maxLength={100} /></div>
       <div className="field"><label htmlFor="fechaNac">Fecha de nacimiento</label><Input id="fechaNac" name="fechaNac" type="date" autoComplete="bday" required /></div>

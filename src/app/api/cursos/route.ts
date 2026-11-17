@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { CursoController } from '../../../../controllers/curso.controller';
 import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
 import { leerBody, RESPUESTA_NO_AUTORIZADO, RESPUESTA_PROHIBIDO, responderErrorCurso } from '@/lib/cursoErrores';
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
   if (!getUserFromRequest(req)) return RESPUESTA_NO_AUTORIZADO();
   try {
     const cursos = await controller.listar();
-    return NextResponse.json(cursos);
+    return jsonPublico(cursos);
   } catch (error) {
     return responderErrorCurso(error, 'Error al obtener los cursos.');
   }
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await leerBody(req);
     const nuevoCurso = await controller.crear(body, usuario.id);
-    return NextResponse.json(nuevoCurso, { status: 201 });
+    return jsonPublico(nuevoCurso, { status: 201 });
   } catch (error) {
     return responderErrorCurso(error, 'Error al crear el curso.');
   }

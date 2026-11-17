@@ -8,7 +8,11 @@ const { NextRequest } = require('next/server');
 function cargar(archivo, dobles) {
   const fuente = ts.transpileModule(fs.readFileSync(path.resolve(archivo), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText;
   const modulo = { exports: {} };
-  new Function('require', 'module', 'exports', fuente)(nombre => nombre in dobles ? dobles[nombre] : require(nombre), modulo, modulo.exports);
+  new Function('require', 'module', 'exports', fuente)(nombre => {
+    if (nombre in dobles) return dobles[nombre];
+    if (nombre.startsWith('.')) return cargar(path.resolve(path.dirname(archivo), `${nombre}.ts`), dobles);
+    return require(nombre);
+  }, modulo, modulo.exports);
   return modulo.exports;
 }
 
@@ -35,7 +39,7 @@ function escenario() {
   const db = { usuario, solicitudAscenso, notificacion: { async create({ data }) { if (fallarAviso) throw Error('Sin DB'); datos.avisos.push(data); return data; } } };
   db.$transaction = async fn => { const copia = structuredClone(datos); try { return await fn(db); } catch (e) { datos = copia; throw e; } };
   const { SolicitudAscensoRepository } = cargar('repositories/solicitudAscenso.repository.ts', { '../config/database': { db } });
-  const { SolicitudAscensoService } = cargar('services/solicitudAscenso.service.ts', { '../repositories/solicitudAscenso.repository': { SolicitudAscensoRepository } });
+  const { SolicitudAscensoService } = cargar('services/solicitudAscenso.service.ts', { '../config/database': { db }, '../repositories/solicitudAscenso.repository': { SolicitudAscensoRepository } });
   let token = { id: 'v', rol: 'VOLUNTARIO' };
   const api = cargar('src/lib/ascensos-api.ts', { '../../config/database': { db }, '../../services/solicitudAscenso.service': { SolicitudAscensoService }, './auth': { getUserFromRequest: () => token } });
   return { repo: new SolicitudAscensoRepository(), servicio: new SolicitudAscensoService(), api, datos: () => datos, token: t => { token = t; }, fallarAviso: () => { fallarAviso = true; } };
@@ -52,7 +56,31 @@ test('crear avisa al voluntario y a toda coordinación; no duplica pendientes', 
 });
 test('coordinadores y administradores no pueden pedir ascenso', async () => {
   const e = escenario();
-  for (const id of ['c', 'a']) await assert.rejects(e.servicio.crear(id), /USUARIO_YA_ES_COORDINADOR/);
+  for (const id of ['c', 'a']) await assert.rejects(e.servicio.crear(id), /SOLO_VOLUNTARIOS/);
+});
+
+test('API conserva el rechazo a no voluntarios y notifica el fallo', async () => {
+  const e = escenario();
+  for (const rol of ['COORDINADOR', 'ADMIN']) {
+    const id = rol === 'ADMIN' ? 'a' : 'c';
+    e.token({ id, rol });
+    const respuesta = await e.api.operarAscenso(peticion(), 'crear');
+    assert.equal(respuesta.status, 403);
+    assert.match((await respuesta.json()).error, /Solo los voluntarios/);
+    assert.equal(e.datos().avisos.at(-1).usuarioId, id);
+  }
+  assert.equal(e.datos().solicitudes.length, 0);
+});
+
+test('historial de ascensos filtra credenciales incluso en relaciones anidadas', async () => {
+  const e = escenario();
+  e.token({ id: 'c', rol: 'COORDINADOR' });
+  e.datos().solicitudes.push({ id: 's0', usuarioId: 'v', estado: 'PENDIENTE', usuario: { password: 'hash', nombreUsuario: 'ana' } });
+  const respuesta = await e.api.listarAscensos(peticion());
+  assert.equal(respuesta.status, 200);
+  const datos = await respuesta.json();
+  assert.equal(datos[0].usuario.password, undefined);
+  assert.equal(datos[0].usuario.nombreUsuario, 'ana');
 });
 test('aprobar cambia rol y notifica a solicitante y revisor', async () => {
   const e = escenario(); const s = await e.servicio.crear('v');

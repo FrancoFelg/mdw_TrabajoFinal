@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { createHash } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 import { db } from '../../../../config/database';
@@ -19,10 +20,10 @@ export async function GET(req: NextRequest) {
 
     try {
         const emergencias = await service.listarEmergencias();
-        return NextResponse.json(emergencias, { status: 200 });
+        return jsonPublico(emergencias, { status: 200 });
     } catch (error: any) {
         console.error('Error en GET /api/emergencias:', error);
-        return NextResponse.json(
+        return jsonPublico(
             { error: 'Error interno al consultar las emergencias.' },
             { status: 500 }
         );
@@ -37,24 +38,24 @@ export async function POST(req: NextRequest) {
     // Reintentar la misma clave recupera el caso si su respuesta se perdió.
     const clave = req.headers.get('Idempotency-Key');
     if (clave && !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(clave)) {
-        return NextResponse.json({ error: 'La clave de envío no es válida.' }, { status: 400 });
+        return jsonPublico({ error: 'La clave de envío no es válida.' }, { status: 400 });
     }
     const id = clave ? createHash('sha256').update(clave).digest('hex') : undefined;
     const respuesta = (emergencia: { id: string; descripcion: string; prioridad: string; estado: string }, status: number) => {
         let permiso: string | null = null;
         try { permiso = permisoFoto(emergencia.id); } catch { /* El reporte sigue disponible sin foto. */ }
-        return NextResponse.json({ ...emergencia, permisoFoto: permiso }, { status });
+        return jsonPublico({ ...emergencia, permisoFoto: permiso }, { status });
     };
     let body: unknown;
     try {
         body = await req.json();
     } catch {
-        return NextResponse.json({ error: 'El body debe ser un JSON válido.' }, { status: 400 });
+        return jsonPublico({ error: 'El body debe ser un JSON válido.' }, { status: 400 });
     }
 
     const validacion = CrearEmergenciaSchema.safeParse(body);
     if (!validacion.success) {
-        return NextResponse.json(
+        return jsonPublico(
             { error: validacion.error.issues.map((i) => i.message).join(' ') },
             { status: 400 },
         );
@@ -78,24 +79,24 @@ export async function POST(req: NextRequest) {
 
         switch (mensaje) {
             case 'DIRECCION_NO_ENCONTRADA':
-                return NextResponse.json(
+                return jsonPublico(
                     { error: 'No se encontró la dirección indicada. Revisá calle, altura y localidad.' },
                     { status: 422 },
                 );
             case 'PROVINCIA_NO_RECONOCIDA':
-                return NextResponse.json(
+                return jsonPublico(
                     { error: 'No se pudo determinar la provincia de la dirección indicada.' },
                     { status: 422 },
                 );
             case 'GOOGLE_MAPS_NO_CONFIGURADO':
             case 'GOOGLE_MAPS_NO_DISPONIBLE':
-                return NextResponse.json(
+                return jsonPublico(
                     { error: 'No se pudo ubicar la dirección en este momento. Intentá enviando tu ubicación GPS.', reporteGuardado: false },
                     { status: 503 },
                 );
             default:
                 console.error('Error en POST /api/emergencias:', error);
-                return NextResponse.json({ error: 'Error al registrar la emergencia.' }, { status: 500 });
+                return jsonPublico({ error: 'Error al registrar la emergencia.' }, { status: 500 });
         }
     }
 }

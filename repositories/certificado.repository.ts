@@ -1,5 +1,6 @@
 import { db } from '../config/database';
 import { Certificado, CertificadoEstado } from '@prisma/client';
+import { usuarioPublicoSelect } from '../src/lib/usuario-publico';
 
 export interface AtributoValorInput {
   campoId: string;
@@ -8,8 +9,8 @@ export interface AtributoValorInput {
 }
 
 export interface CrearCertificadoConAtributosData {
-  cursoId: string;
-  estadoId: string;
+  cursoId?: string;
+  archivo?: string;
   estado: CertificadoEstado;
   usuarioId: string;
   codigoVerificacion: string;
@@ -18,7 +19,6 @@ export interface CrearCertificadoConAtributosData {
 }
 
 export interface ActualizarCertificadoData {
-  estadoId?: string;
   estado?: CertificadoEstado;
   codigoVerificacion?: string;
 }
@@ -28,7 +28,7 @@ export class CertificadoRepository {
     return await db.certificado.create({
       data: {
         cursoId: data.cursoId,
-        estadoId: data.estadoId,
+        archivo: data.archivo,
         estado: data.estado,
         usuarioId: data.usuarioId,
         codigoVerificacion: data.codigoVerificacion,
@@ -63,7 +63,7 @@ export class CertificadoRepository {
       include: {
         curso: true,
         usuario: {
-          include: { persona: true },
+          select: { ...usuarioPublicoSelect, persona: true },
         },
         certificadosRelAtributos: {
           where: { fechaEliminacion: null },
@@ -84,7 +84,7 @@ export class CertificadoRepository {
       include: {
         curso: true,
         usuario: {
-          include: { persona: true },
+          select: { ...usuarioPublicoSelect, persona: true },
         },
         certificadosRelAtributos: {
           where: { fechaEliminacion: null },

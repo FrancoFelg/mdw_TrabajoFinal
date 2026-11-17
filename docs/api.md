@@ -17,12 +17,16 @@
 | `PATCH /api/cursos/:id` | Editar información o atributos de un curso | Coordinador | H4 |
 | `DELETE /api/cursos/:id` | Desactivar o eliminar un curso del catálogo | Coordinador | H4 |
 | `GET /api/certificados` | Listar los certificados subidos por el usuario activo | Autenticado | H5 |
-| `POST /api/certificados` | Cargar un nuevo certificado (asociando curso de forma opcional) | Autenticado | H5 |
+| `POST /api/certificados` | Cargar multipart con `archivo` PDF/imagen (hasta 5 MB), `codigoVerificacion` y `cursoId` opcional; propietario y estado pendiente salen del servidor | Autenticado | H5 |
 | `GET /api/solicitudes-certificados` | Obtener la tabla de solicitudes de validación de certificados | Coordinador | H6 |
-| `PATCH /api/solicitudes-certificados/:id` | Aprobar o rechazar la validación de un certificado | Coordinador | H6 |
+| `PATCH /api/solicitudes-certificados/:id` | Resolver un certificado pendiente con `estado`: APROBADO o RECHAZADO; rechazo exige `motivo`; decisión repetida devuelve 409 | Coordinador | H6 |
 | `POST /api/emergencias` | Reportar una nueva emergencia en la vía pública | **Público** | H7 |
 | `GET /api/emergencias` | Listar y filtrar emergencias activas para el mapa | Autenticado | H8 |
 | `GET /api/emergencias/:id` | Obtener detalle y ficha completa de una emergencia | Autenticado | H8 |
 | `POST /api/emergencias/:id/tomar` | Asignarse y marcar la emergencia como `EN CAMINO` | Voluntario | H10 |
-| `POST /api/emergencias/:id/finalizar` | Registrar informe de atención y marcar como `GESTIONADA` | Voluntario (asignado) | H11 |
+| `POST /api/emergencias/:id/finalizar` | Guardar `observaciones` (10 a 10000 caracteres) y marcar como GESTIONADA; PUT permanece por compatibilidad | Voluntario (asignado) | H11 |
 | `GET /api/notificaciones` | Avisos del usuario (historia 12) con `noLeidas`; `?resumen=1` devuelve solo el contador. Si consulta coordinación, revisa los casos sin atender (una vez por minuto como máximo) | Autenticado | H12 |
+
+`GET /api/certificados/:id/archivo` descarga el comprobante con sesión. Solo su propietario y coordinación pueden leerlo; terceros reciben 404. Las pruebas funcionales verifican este acceso además de la matriz de roles.
+
+La solicitud de validación utiliza el propio registro Certificado: nace PENDIENTE y conserva el resultado y motivo de rechazo. No hay una segunda tabla de solicitudes. Al resolver se guarda una notificación al propietario dentro de la misma transacción.

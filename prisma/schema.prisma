@@ -90,6 +90,7 @@ model Persona {
 model Usuario {
   id            String              @id @default(cuid())
   nombreUsuario String              @unique
+  email         String?             @unique
   password      String
   rol           Rol                 @default(VOLUNTARIO)
   personaId     String              @unique
@@ -178,6 +179,8 @@ model Certificado {
   cursoId            String?
   usuarioId          String
   codigoVerificacion String            @unique
+  archivo            String?
+  motivoRechazo      String?           @db.Text
   curso              Cursos?            @relation(fields: [cursoId], references: [id])
   estado             CertificadoEstado @default(PENDIENTE)
   usuario            Usuario           @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
@@ -239,6 +242,7 @@ model CertificadosRelAtributos {
 model Emergencia {
   id          String              @id @default(cuid())
   descripcion String
+  observacionesCierre String?           @db.Text
   fecha       DateTime
   imagen      String?
   ubicacionId String

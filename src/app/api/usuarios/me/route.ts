@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonPublico } from '@/lib/respuesta-publica';
+import { NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { RESPUESTA_NO_AUTORIZADO, leerBody } from '@/lib/cursoErrores'; // O la librería genérica de errores de tu app
-import { UsuarioController } from '../../../../../controllers/usuario.controller';
 import { UsuarioService } from '../../../../../services/usuario.service';
+import { editarUsuario } from '@/lib/usuarios-admin';
+import { ZodError } from 'zod';
 
-const controller = new UsuarioController();
 const service = new UsuarioService();
 
 // GET /api/usuarios/me — Obtener perfil del usuario autenticado
@@ -14,10 +15,10 @@ export async function GET(req: NextRequest) {
 
   try {
     const perfil = await service.obtenerPerfil(usuario.id);
-    return NextResponse.json(perfil);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Error al obtener el perfil del usuario.' },
+    return jsonPublico(perfil);
+  } catch (error: unknown) {
+    return jsonPublico(
+      { error: error instanceof Error ? error.message : 'Error al obtener el perfil del usuario.' },
       { status: 500 }
     );
   }
@@ -30,13 +31,13 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await leerBody(req);
-    const perfilActualizado = await service.actualizarPerfil(usuario.id, body);
+    const perfilActualizado = await editarUsuario(usuario.id, body, true);
     
-    return NextResponse.json(perfilActualizado);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Error al actualizar el perfil del usuario.' },
-      { status: 400 }
+    return jsonPublico(perfilActualizado);
+  } catch (error: unknown) {
+    return jsonPublico(
+      { error: error instanceof ZodError ? 'Datos inválidos.' : (error as { code?: string })?.code === 'P2002' ? 'Ese nombre de usuario o email ya existe.' : 'No se pudo actualizar el perfil.' },
+      { status: (error as { code?: string })?.code === 'P2002' ? 409 : 400 }
     );
   }
 }

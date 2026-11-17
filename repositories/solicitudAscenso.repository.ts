@@ -1,8 +1,9 @@
 import { db } from '../config/database';
 import { Prisma, SolicitudAscensoEstado } from '@prisma/client';
+import { usuarioPublicoSelect } from '../src/lib/usuario-publico';
 
 // Nunca devolver contraseñas dentro del historial de solicitudes.
-const usuarioPublico = { select: { id: true, nombreUsuario: true, rol: true, persona: { select: { nombre: true, apellido: true } } } };
+const usuarioPublico = { select: { ...usuarioPublicoSelect, persona: { select: { nombre: true, apellido: true } } } };
 
 async function aviso(tx: Prisma.TransactionClient, usuarioId: string, clave: string, titulo: string, cuerpo: string, enlace = '/ascensos') {
   await tx.notificacion.create({ data: { usuarioId, clave, titulo, cuerpo, enlace, tipo: 'VALIDACION_PENDIENTE' } });
@@ -48,7 +49,7 @@ export class SolicitudAscensoRepository {
         if (!cambioRol.count) throw new Error('USUARIO_YA_ES_COORDINADOR');
       }
       const resultado = estado === 'APROBADO' ? 'aprobada' : 'rechazada';
-      await aviso(tx, solicitud.usuarioId, `ascenso:resultado:${id}`, `Solicitud de ascenso ${resultado}`, estado === 'APROBADO' ? 'Tu rol cambió a Coordinador. Volvé a iniciar sesión para actualizar tus permisos.' : 'Tu solicitud fue rechazada. Podés presentar una nueva solicitud.');
+      await aviso(tx, solicitud.usuarioId, `ascenso:resultado:${id}`, `Solicitud de ascenso ${resultado}`, estado === 'APROBADO' ? 'Tu rol cambió a Coordinador.' : 'Tu solicitud fue rechazada. Podés presentar una nueva solicitud.', estado === 'APROBADO' ? '/cuenta' : '/ascensos');
       if (actorId) await aviso(tx, actorId, `ascenso:gestion:${id}`, `Solicitud ${resultado}`, 'La decisión se guardó correctamente.', `/usuarios/${solicitud.usuarioId}/solicitudes`);
       return { ...solicitud, estado };
     });
