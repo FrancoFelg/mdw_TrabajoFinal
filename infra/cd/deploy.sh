@@ -69,8 +69,8 @@ die() { log "ERROR: $*"; exit 1; }
 #      compose lee igual, esquiva el grep), y sin `extends`, `include` ni
 #      `env_file`. Compose los resuelve al renderizar (leen archivos del host
 #      como root) y la clave desaparece del resultado, así que hay que
-#      frenarlos antes. Sin `\` para que no se puedan escribir esas claves con
-#      escapes de YAML.
+#      frenarlos antes. Sin `\` ni `!` para que no se puedan escribir esas
+#      claves con escapes ni con tags de YAML (`!!binary` en base64).
 #   2. Modelo renderizado (`config --format json`): claves permitidas, nombres
 #      propios del proyecto para volúmenes, redes, containers e imágenes, y
 #      `proxy-network` como única red externa, solo para EXTERNAL_SERVICES y
@@ -93,8 +93,8 @@ check_compose() {
     die "compose rechazado, tiene que estar en UTF-8 sin bytes NUL"
   fi
   local hit
-  if hit="$(grep -niE 'extends|include|env_file|\\' "$COMPOSE_FILE")"; then
-    die "compose rechazado, usa extends/include/env_file o barras invertidas:"$'\n'"$hit"
+  if hit="$(grep -niE 'extends|include|env_file|[\\!]' "$COMPOSE_FILE")"; then
+    die "compose rechazado, usa extends/include/env_file, barras invertidas o tags (!):"$'\n'"$hit"
   fi
 
   # --- 2. Modelo renderizado. --no-env-resolution deja `env_file` a la vista
@@ -107,6 +107,7 @@ check_compose() {
   violations="$(jq -r --arg p "$PROJECT_NAME" --argjson ext "$EXTERNAL_NETWORKS" \
     --argjson extsvc "$EXTERNAL_SERVICES" '
     def extra($allowed): (keys - $allowed)[];
+    . as $top |
     ( select(.name != $p) | "nombre de proyecto \(.name), se espera \($p)" ),
     ( keys - ["name", "services", "volumes", "networks"]
       | map(select(startswith("x-") | not))[]
@@ -138,7 +139,8 @@ check_compose() {
           | "\($s): logging.driver \(.driver) no permitido" ),
         ( .networks // {} | to_entries[] | select(.value != null and .value != {})
           | "\($s): red \(.key) con opciones (aliases, IP fija...) no permitidas" ),
-        ( select($s | IN($extsvc[]) | not) | .networks // {} | keys[] | select(IN($ext[]))
+        ( select($s | IN($extsvc[]) | not) | .networks // {} | keys[]
+          | select($top.networks[.].external == true)
           | "\($s): solo \($extsvc | join(", ")) puede conectarse a la red externa \(.)" ),
         ( .volumes // [] | .[] | select(.type != "volume" and .type != "bind")
           | "\($s): volumen de tipo \(.type) no permitido" ) ),

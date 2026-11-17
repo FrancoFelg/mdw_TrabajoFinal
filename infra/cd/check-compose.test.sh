@@ -122,6 +122,8 @@ case_yaml network-alias REJECT "${svc}"$'    networks:\n      proxy-network:\n  
 case_yaml network-fixed-ip REJECT "${svc}"$'    networks:\n      proxy-network:\n        ipv4_address: 172.18.0.50\nnetworks:\n  proxy-network:\n    external: true\n'
 case_yaml container-name-other REJECT "${svc}"$'    container_name: otherapp-app\n'
 case_yaml image-overwrite REJECT "${build}"$'    image: otherapp-app:latest\n'
+case_yaml network-key-rename REJECT $'name: mdw\nservices:\n  otherapp-app:\n    image: alpine\n    networks: [pn]\nnetworks:\n  pn:\n    name: proxy-network\n    external: true\n'
+case_yaml binary-key-include REJECT $'? !!binary aW5jbHVkZQ==\n: [./extra.yaml]\n'"${svc}"
 case_yaml service-name-alias REJECT $'name: mdw\nservices:\n  otherapp-app:\n    image: alpine\n    networks: [proxy-network]\nnetworks:\n  proxy-network:\n    external: true\n'
 
 # Codificación: un compose en UTF-16 que compose lee igual y esquiva el grep
