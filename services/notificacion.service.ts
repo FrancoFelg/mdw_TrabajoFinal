@@ -63,14 +63,17 @@ export class NotificacionService {
   }
 
   // Certificado o pedido de ascenso nuevo → coordinación (nunca a quien lo cargó).
-  async validacionPendiente(tipo: 'certificado' | 'ascenso', id: string, persona: string, autorId: string) {
+  // `reenvio`: un certificado rechazado que se corrigió; su clave incluye la fecha para volver a avisar.
+  async validacionPendiente(tipo: 'certificado' | 'ascenso', id: string, persona: string, autorId: string, reenvio?: Date) {
     const coordinacion = (await repo.coordinacion()).filter(u => u !== autorId);
     return notificar(coordinacion, {
       tipo: 'VALIDACION_PENDIENTE',
-      titulo: tipo === 'certificado' ? 'Certificado para validar' : 'Pedido de ascenso',
-      cuerpo: tipo === 'certificado' ? `${persona} cargó un certificado.` : `${persona} pidió ascenso a coordinador.`,
+      titulo: tipo === 'certificado' ? (reenvio ? 'Certificado corregido para validar' : 'Certificado para validar') : 'Pedido de ascenso',
+      cuerpo: tipo === 'certificado'
+        ? (reenvio ? `${persona} corrigió un certificado rechazado.` : `${persona} cargó un certificado.`)
+        : `${persona} pidió ascenso a coordinador.`,
       enlace: tipo === 'certificado' ? '/certificados/revisar' : '/usuarios',
-      clave: `${tipo}:${id}`,
+      clave: reenvio ? `${tipo}:${id}:reenvio:${reenvio.getTime()}` : `${tipo}:${id}`,
     });
   }
 

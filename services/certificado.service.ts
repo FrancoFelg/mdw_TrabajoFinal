@@ -168,8 +168,15 @@ export class CertificadoService {
     return certificado;
   }
 
-  // Solo el dueño, y solo mientras está PENDIENTE o RECHAZADO. Editar un rechazado lo reenvía a revisión.
-  async actualizar(id: string, entrada: CertificadoEntrada, archivo: ArchivoEntrada | null, solicitante: Solicitante): Promise<CertificadoDetalle> {
+  // Solo el dueño, y solo mientras está PENDIENTE o RECHAZADO. Editar un rechazado lo reenvía a revisión:
+  // `alReenviar` se llama entonces con el certificado ya guardado (para avisar a coordinación).
+  async actualizar(
+    id: string,
+    entrada: CertificadoEntrada,
+    archivo: ArchivoEntrada | null,
+    solicitante: Solicitante,
+    alReenviar?: (certificado: CertificadoDetalle) => void
+  ): Promise<CertificadoDetalle> {
     const actual = await this.repo.findById(id);
     if (!actual || actual.usuarioId !== solicitante.id) throw new Error('CERTIFICADO_NO_ENCONTRADO');
     if (actual.estado !== CertificadoEstado.PENDIENTE && actual.estado !== CertificadoEstado.RECHAZADO) {
@@ -203,13 +210,15 @@ export class CertificadoService {
       Object.assign(cambios, { estado: CertificadoEstado.PENDIENTE, motivoRechazo: null, fechaRevision: null, usuarioRevisionId: null });
     }
 
-    return this.repo.actualizar(id, cambios, {
+    const actualizado = await this.repo.actualizar(id, cambios, {
       atributos,
       usuarioId: solicitante.id,
       escribir: archivoNuevo ? () => guardarArchivo(id, archivoNuevo.bytes) : undefined,
       condicion: { estados: [CertificadoEstado.PENDIENTE, CertificadoEstado.RECHAZADO], error: 'NO_EDITABLE' },
       unicoDelCurso: reenvia && actual.cursoId ? { cursoId: actual.cursoId, usuarioId: solicitante.id } : undefined,
     });
+    if (reenvia) alReenviar?.(actualizado);
+    return actualizado;
   }
 
   // El dueño en cualquier estado, o coordinación.

@@ -376,7 +376,7 @@ curl -X PATCH https://mdw.guillermonatali.com/api/certificados/<id> \
   -d '{ "estado": "APROBADO" }'
 ```
 
-Errores: `401` · `403` · `400` `ESTADO_INVALIDO` / `MOTIVO_REQUERIDO` · `404` · `409` `ESTADO_NO_PENDIENTE` (ya fue revisado). Al resolver se guardan quién revisó y cuándo, y se avisa a la persona. `PATCH /api/solicitudes-certificados/:id` hace lo mismo; la pantalla de coordinación es `/certificados/revisar`.
+Errores: `401` · `403` · `400` `ESTADO_INVALIDO` / `MOTIVO_REQUERIDO` · `403` `CERTIFICADO_PROPIO` (nadie revisa su propio certificado) · `404` · `409` `ESTADO_NO_PENDIENTE` (ya fue revisado). Al resolver se guardan quién revisó y cuándo, y se avisa a la persona. `PATCH /api/solicitudes-certificados/:id` hace lo mismo; la pantalla de coordinación es `/certificados/revisar`.
 
 ---
 

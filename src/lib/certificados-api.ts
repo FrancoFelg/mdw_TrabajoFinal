@@ -4,7 +4,7 @@ import { ArchivoEntrada, CertificadoEntrada, CertificadoService } from '../../se
 import { CertificadoAtributoService } from '../../services/certificadoAtributo.service';
 import { esCoordinadorOAdmin } from './auth';
 import { actorActual } from './actor-actual';
-import { avisarCertificadoNuevo } from './avisos';
+import { avisarCertificadoNuevo, avisarCertificadoReenviado } from './avisos';
 import { leerArchivo, tipoArchivo } from './archivos-certificado';
 import { responderErrorCertificado } from './certificadoErrores';
 import { resolverCertificado } from './certificados';
@@ -103,7 +103,9 @@ export async function actualizarCertificado(req: NextRequest, id: string) {
   if (!quien) return NO_AUTORIZADO();
   try {
     const { entrada, archivo } = await leerFormulario(req);
-    return jsonPublico(await new CertificadoService().actualizar(id, entrada, archivo, quien));
+    const actualizado = await new CertificadoService().actualizar(id, entrada, archivo, quien,
+      c => avisarCertificadoReenviado(c.id, quien.id, c.fechaActualizacion));
+    return jsonPublico(actualizado);
   } catch (error) {
     return responderErrorCertificado(error, 'No pudimos guardar los cambios. Intentá de nuevo.');
   }

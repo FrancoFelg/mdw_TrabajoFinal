@@ -24,7 +24,7 @@
 | `GET /api/certificados/:id/archivo` | Ver o descargar el archivo; solo dueño o coordinación (terceros reciben 404) | Autenticado | H5 |
 | `GET /api/certificados-atributos` | Catálogo de datos adicionales de certificados | Autenticado | H5 |
 | `POST /api/certificados-atributos` | Crear un dato adicional (`nombre`, `tipo`) | Coordinador | H5 |
-| `PATCH /api/certificados/:id` | Aprobar o rechazar un certificado pendiente con `estado` y `motivo` (obligatorio al rechazar); decisión repetida devuelve 409. Usado por `/certificados/revisar` | Coordinador | H6 |
+| `PATCH /api/certificados/:id` | Aprobar o rechazar un certificado pendiente con `estado` y `motivo` (obligatorio al rechazar); decisión repetida devuelve 409 y el certificado propio 403. Usado por `/certificados/revisar` | Coordinador | H6 |
 | `GET /api/solicitudes-certificados` | Obtener la tabla de solicitudes de validación de certificados | Coordinador | H6 |
 | `PATCH /api/solicitudes-certificados/:id` | Igual que `PATCH /api/certificados/:id`: resolver con `estado` APROBADO o RECHAZADO; rechazo exige `motivo`; decisión repetida devuelve 409 | Coordinador | H6 |
 | `POST /api/emergencias` | Reportar una nueva emergencia en la vía pública | **Público** | H7 |

@@ -25,6 +25,10 @@ export function avisarCertificadoNuevo(certificadoId: string, usuarioId: string)
   enSegundoPlano('certificado', async () => new NotificacionService().validacionPendiente('certificado', certificadoId, await nombreDe(usuarioId), usuarioId));
 }
 
+export function avisarCertificadoReenviado(certificadoId: string, usuarioId: string, cuando: Date) {
+  enSegundoPlano('certificado reenviado', async () => new NotificacionService().validacionPendiente('certificado', certificadoId, await nombreDe(usuarioId), usuarioId, cuando));
+}
+
 export function avisarAscensoNuevo(solicitudId: string, usuarioId: string) {
   enSegundoPlano('ascenso', async () => new NotificacionService().validacionPendiente('ascenso', solicitudId, await nombreDe(usuarioId), usuarioId));
 }
