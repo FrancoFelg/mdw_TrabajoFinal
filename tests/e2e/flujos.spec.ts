@@ -46,6 +46,41 @@ test('H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega perso
   await expect(page.getByRole('heading', { name: 'Perfil de Nombre actualizado Apellido actualizado' })).toBeVisible();
   await logoutInBrowser(page, coordinator.nombreUsuario);
 });
+test('H7: la prioridad del reporte sale de las preguntas de estado', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const reportar = async (responde: string | null, respira: string | null) => {
+    await page.goto('/reportar');
+    // No hay un selector de prioridad con un valor elegido de antemano.
+    await expect(page.getByLabel('Prioridad de la emergencia')).toHaveCount(0);
+    await expect(page.getByRole('status').filter({ hasText: 'Prioridad' })).toContainText('Verde');
+    if (responde) await page.getByRole('group', { name: '¿Responde si le hablás?' }).getByLabel(responde, { exact: true }).check();
+    if (respira) await page.getByRole('group', { name: '¿Respira con normalidad?' }).getByLabel(respira, { exact: true }).check();
+    await page.getByLabel('¿Qué está pasando?').fill(`Prioridad derivada ${randomUUID()}`);
+    await page.getByLabel('Dirección del incidente').fill('Mariano Moreno 1810, Rosario, Santa Fe');
+    return page;
+  };
+  const enviar = async () => {
+    await page.getByRole('button', { name: 'Reportar emergencia', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Emergencia reportada' })).toBeVisible();
+    const id = (await page.locator('.reporte-codigo').innerText()).replace('Código: ', '').trim();
+    return (await db.emergencia.findUniqueOrThrow({ where: { id } })).prioridad;
+  };
+
+  await reportar('No', 'Sí');
+  await expect(page.getByRole('status').filter({ hasText: 'Prioridad' })).toContainText('Rojo');
+  // Con Rojo se repite cómo llamar a emergencias junto a la prioridad.
+  await expect(page.getByRole('link', { name: 'Llamar al 107' })).toHaveCount(2);
+  expect(await enviar()).toBe('ROJO');
+
+  await reportar('Sí', 'No sé');
+  await expect(page.getByRole('status').filter({ hasText: 'Prioridad' })).toContainText('Amarillo');
+  await expect(page.getByRole('link', { name: 'Llamar al 107' })).toHaveCount(1);
+  expect(await enviar()).toBe('AMARILLO');
+
+  await reportar('Sí', 'Sí');
+  expect(await enviar()).toBe('VERDE');
+});
+
 test('H1/H2/H3/H5/H7-H11: persona sin cuenta reporta; voluntario se registra, atiende, carga certificado, solicita ascenso y sale', async ({ page }) => {
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 375, height: 812 });

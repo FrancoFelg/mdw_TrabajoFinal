@@ -275,6 +275,8 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .ubicar-buscando { cursor: progress; }
 /* Preguntas de estado: selector segmentado Sí / No / No sé. La elección se marca desde el estado de React. */
 .pregunta { display: flex; flex-direction: column; gap: 8px; }
+fieldset.pregunta { border: 0; margin: 0; padding: 0; min-width: 0; }
+.pregunta legend { padding: 0; margin-bottom: 8px; }
 .pregunta-texto { font-weight: 600; }
 .pregunta-opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: var(--r); background: var(--bg-2); }
 .pregunta-op { position: relative; display: grid; place-items: center; min-height: 44px; border-radius: var(--r-s); font-weight: 600; color: var(--text-2); cursor: pointer; transition: background-color .15s, color .15s; }
