@@ -4,9 +4,11 @@ Fecha: 16 de noviembre de 2026. Pruebas reales contra Next.js, Chrome y MySQL lo
 
 ## Resultado
 
-La ejecución final tiene **109 escenarios aprobados, cero fallidos, cero omitidos**: 96 controles de permisos y 13 escenarios funcionales/concurrentes. La primera revisión había dado 87 aprobados y 20 fallidos sobre 107 escenarios. Se conserva esa evidencia en `evidencias/primera-ejecucion-e2e.json`; el resultado actual está en `evidencias/ultima-ejecucion-e2e.json`.
+La ejecución final tiene **110 escenarios aprobados, cero fallidos, cero omitidos**: 96 controles de permisos y 14 escenarios funcionales/concurrentes. Incluye los recorridos completos de persona sin cuenta, voluntario y coordinador solicitados. La primera revisión había dado 87 aprobados y 20 fallidos sobre 107 escenarios. Se conserva esa evidencia en `evidencias/primera-ejecucion-e2e.json`; el resultado actual está en `evidencias/ultima-ejecucion-e2e.json`.
 
-Las 35 unitarias, ESLint, TypeScript y el build de producción pasan. La ejecución E2E final comenzó a las 04:56:11 UTC y duró 82,15 segundos, sin casos inestables.
+Las 34 unitarias, ESLint, TypeScript y el build de producción pasan. La ejecución E2E final comenzó el 17 de noviembre de 2026 a las 01:39:06 UTC (16 de noviembre, 22:39:06 en Argentina) y duró 94,47 segundos, sin casos inestables. La mutación detectó diez tomas exitosas del mismo caso al retirar la condición de estado y restauró el archivo original. Ver `evidencias/mutacion-e2e.json`.
+
+La correspondencia con historias, especificaciones y exigencias eliminadas se documenta en [trazabilidad-tests.md](trazabilidad-tests.md). El lanzador regenera Prisma Client después de las migraciones para evitar errores por clientes de otra rama. Las páginas privadas conservan el destino de login al exigir sesión, sin una redirección genérica previa en el layout.
 
 ## Ejecución
 

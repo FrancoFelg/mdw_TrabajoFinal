@@ -1,1213 +1,3923 @@
 {
-  "base": "mdw_e2e (localhost:3306)",
-  "navegador": "Google Chrome",
-  "stats": {
-    "startTime": "2026-11-16T04:56:11.127Z",
-    "duration": 82153.86700000001,
-    "expected": 109,
-    "skipped": 0,
-    "unexpected": 0,
-    "flaky": 0
+  "config": {
+    "argv": [
+      "C:\\nvm4w\\nodejs\\node.exe",
+      "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\node_modules\\@playwright\\test\\cli.js",
+      "test"
+    ],
+    "configFile": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\playwright.config.ts",
+    "rootDir": "C:/Users/franc/Desktop/AZeta/Espacio Academico/Ingeniería en Sistemas UAI/MDW/ProyectoFinal/mdw_TrabajoFinal/tests/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/franc/Desktop/AZeta/Espacio Academico/Ingeniería en Sistemas UAI/MDW/ProyectoFinal/mdw_TrabajoFinal/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/franc/Desktop/AZeta/Espacio Academico/Ingeniería en Sistemas UAI/MDW/ProyectoFinal/mdw_TrabajoFinal/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e",
+        "snapshotDir": "C:\\Users\\franc\\Desktop\\AZeta\\Espacio Academico\\Ingeniería en Sistemas UAI\\MDW\\ProyectoFinal\\mdw_TrabajoFinal\\tests\\e2e",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 60000,
+        "use": {
+          "channel": "chrome",
+          "baseURL": "http://127.0.0.1:3100",
+          "trace": "retain-on-failure",
+          "screenshot": "only-on-failure"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.65.1",
+    "workers": 1,
+    "webServer": null
   },
-  "casos": [
-    {
-      "titulo": "certificados.spec.ts / H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 12275,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "certificados.spec.ts / H5/H6: archivos privados, rechazo de archivos inválidos y permisos vigentes",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 3454,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "concurrencia.spec.ts / H10: diez voluntarios toman el mismo caso; exactamente uno gana",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 3297,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "concurrencia.spec.ts / H10: un voluntario no puede tomar diez casos simultáneos",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 1120,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H2/H7-H11: reporte público, login, tomar y finalizar desde navegador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 10008,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H1/H2: perfil propio, login por nombre/email, duplicidad y privacidad",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 809,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H3: solicitud, duplicado, rechazo, historial y aprobación con avisos",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 6168,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H10: rojo exige certificado aprobado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 288,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H8/H9: mapa con marcadores por prioridad y filtro de casos libres",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 3617,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H7: reporte anónimo con GPS, prioridades, idempotencia y foto",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 1490,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H1/H3: coordinador consulta perfil, cambia rol y no ve Mis ascensos",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 9334,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H11: finalizar exige asignado; POST y PUT guardan el informe",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 3818,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "flujos.spec.ts / H5/H6: acceso a formación desde el bloqueo de un caso rojo",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 2212,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/usuarios exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 35,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/usuarios exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 37,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 29,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 30,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/auth/login exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 30,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/auth/logout exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 87,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 24,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/solicitudes-ascenso exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 24,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 41,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 41,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/cursos exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 25,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/cursos exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 21,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 1490,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / DELETE /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 43,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 23,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 22,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/solicitudes-certificados exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 21,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / PATCH /api/solicitudes-certificados/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 41,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 26,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/emergencias exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 25,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/emergencias/:id exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 53,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias/:id/tomar exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 63,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 58,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ANONIMO / GET /api/notificaciones exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 32,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/usuarios exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 227,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/usuarios exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 214,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 202,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 191,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/auth/login exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 318,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/auth/logout exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 276,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 1401,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/solicitudes-ascenso exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 193,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 195,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 205,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/cursos exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 212,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/cursos exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 279,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 222,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / DELETE /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 207,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 214,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 237,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/solicitudes-certificados exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 271,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / PATCH /api/solicitudes-certificados/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 232,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 209,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/emergencias exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 240,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/emergencias/:id exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 194,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias/:id/tomar exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 253,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 273,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / VOLUNTARIO / GET /api/notificaciones exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 213,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/usuarios exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 199,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/usuarios exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 252,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 223,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 270,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/auth/login exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 213,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/auth/logout exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 194,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 218,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/solicitudes-ascenso exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 255,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 282,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 226,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/cursos exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 194,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/cursos exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 220,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 224,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / DELETE /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 229,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 246,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 214,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/solicitudes-certificados exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 196,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / PATCH /api/solicitudes-certificados/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 259,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 232,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/emergencias exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 275,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/emergencias/:id exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 240,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias/:id/tomar exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 229,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 261,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / COORDINADOR / GET /api/notificaciones exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 679,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/usuarios exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 196,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/usuarios exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 270,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 203,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/usuarios/me exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 197,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/auth/login exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 185,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/auth/logout exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 213,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 205,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/solicitudes-ascenso exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 217,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 288,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 229,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/cursos exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 256,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/cursos exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 344,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 262,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / DELETE /api/cursos/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 227,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 196,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/certificados exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 222,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/solicitudes-certificados exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 194,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / PATCH /api/solicitudes-certificados/:id exige Coordinador",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 194,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias exige Público",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 195,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/emergencias exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 223,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/emergencias/:id exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 224,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias/:id/tomar exige Voluntario",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 239,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 246,
-          "errores": []
-        }
-      ]
-    },
-    {
-      "titulo": "permisos.spec.ts / ADMIN / GET /api/notificaciones exige Autenticado",
-      "estado": "expected",
-      "resultados": [
-        {
-          "estado": "passed",
-          "duracionMs": 267,
-          "errores": []
+  "suites": [
+    {
+      "title": "certificados.spec.ts",
+      "file": "certificados.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegador",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10615,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:39:08.089Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fef796d2f22ce4c30a45-b8969c4aaca606824538",
+          "file": "certificados.spec.ts",
+          "line": 8,
+          "column": 1
+        },
+        {
+          "title": "H5/H6: archivos privados, rechazo de archivos inválidos y permisos vigentes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2085,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:39:19.150Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "fef796d2f22ce4c30a45-e3486ac5380a9cd0c2a4",
+          "file": "certificados.spec.ts",
+          "line": 61,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "concurrencia.spec.ts",
+      "file": "concurrencia.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "H10: diez voluntarios toman el mismo caso; exactamente uno gana",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 842,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Diez solicitudes, HTTP: [\n  \u001b[33m200\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m,\n  \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m,\n  \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m\n]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:39:21.299Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d42cb164446bcb7b5122-0819442bec557d07aa8a",
+          "file": "concurrencia.spec.ts",
+          "line": 5,
+          "column": 1
+        },
+        {
+          "title": "H10: un voluntario no puede tomar diez casos simultáneos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 679,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Un voluntario, diez casos, HTTP: [\n  \u001b[33m200\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m,\n  \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m,\n  \u001b[33m409\u001b[39m, \u001b[33m409\u001b[39m\n]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:39:22.161Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d42cb164446bcb7b5122-add2eded1a9125054947",
+          "file": "concurrencia.spec.ts",
+          "line": 19,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "flujos.spec.ts",
+      "file": "flujos.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega personas distintas, edita voluntario y sale",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 24900,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:39:22.897Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-4e355db4b3961f3ff3b5",
+          "file": "flujos.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "H1/H2/H3/H5/H7-H11: persona sin cuenta reporta; voluntario se registra, atiende, carga certificado, solicita ascenso y sale",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11953,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:39:47.818Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-22efc6e825fd81b0e7f9",
+          "file": "flujos.spec.ts",
+          "line": 46,
+          "column": 1
+        },
+        {
+          "title": "H1/H2: perfil propio, login por nombre/email, duplicidad y privacidad",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 563,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:39:59.801Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-53b42a27bc1f854aa2c6",
+          "file": "flujos.spec.ts",
+          "line": 100,
+          "column": 1
+        },
+        {
+          "title": "H3: solicitud, duplicado, rechazo, historial y aprobación con avisos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2946,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:40:00.380Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-36e610aa9c1a814e043c",
+          "file": "flujos.spec.ts",
+          "line": 113,
+          "column": 1
+        },
+        {
+          "title": "H10: rojo exige certificado aprobado",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 264,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:40:03.337Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-41f6cf1f52231b6fa8da",
+          "file": "flujos.spec.ts",
+          "line": 134,
+          "column": 1
+        },
+        {
+          "title": "H8/H9: mapa con marcadores por prioridad y filtro de casos libres",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3535,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:40:03.615Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-9bdf3c676810b1c54177",
+          "file": "flujos.spec.ts",
+          "line": 142,
+          "column": 1
+        },
+        {
+          "title": "H7: reporte anónimo con GPS, prioridades, idempotencia y foto",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1501,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:40:07.165Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-f428041443d23a9969aa",
+          "file": "flujos.spec.ts",
+          "line": 160,
+          "column": 1
+        },
+        {
+          "title": "H1/H3: coordinador consulta perfil, cambia rol y no ve Mis ascensos",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3565,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:40:08.679Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-070b0f4871b648c61a29",
+          "file": "flujos.spec.ts",
+          "line": 178,
+          "column": 1
+        },
+        {
+          "title": "H11: finalizar exige asignado; POST y PUT guardan el informe",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3048,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:40:12.259Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-30218fea65fafe437452",
+          "file": "flujos.spec.ts",
+          "line": 192,
+          "column": 1
+        },
+        {
+          "title": "H5/H6: acceso a formación desde el bloqueo de un caso rojo",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1842,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-17T01:40:15.319Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c49b3f3f695e951cff1f-c7955e27cc1556212bed",
+          "file": "flujos.spec.ts",
+          "line": 213,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "permisos.spec.ts",
+      "file": "permisos.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "ANONIMO",
+          "file": "permisos.spec.ts",
+          "line": 9,
+          "column": 8,
+          "specs": [
+            {
+              "title": "POST /api/usuarios exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 25,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.215Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-b13e8bf19b1cef4b19e6",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.252Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-5288a934b939f7dbc8e2",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 19,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.287Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-393a514baece7d62a712",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.319Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-46c22a85fa187055e0c0",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/login exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.353Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-9787e8e2f6f021ae3f44",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/logout exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 290,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.387Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-64408d209b277b2bd82e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 31,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.696Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-406acc00cd88c6ea543c",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-ascenso exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 22,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.745Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-ae16d900450dd3525ff7",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 40,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.783Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-1892fc44c8fbb4a0eff3",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 45,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.836Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-99f80ff0bc9227eef86a",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/cursos exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 22,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.893Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-89adbd49d0440cc726a0",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/cursos exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 24,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.930Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-0b89dacbe97ad18fc7c7",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1368,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:17.972Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-55d8606de3d0d6003892",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "DELETE /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 31,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.352Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-1e0d87014de250f2036c",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.392Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-d3422b6ded14035a8a8a",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.421Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-c7e02cd0506cfb060fa4",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-certificados exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.448Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-18d56544b2d606d84587",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/solicitudes-certificados/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 40,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.476Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-0673d8a42b28b4f62e29",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 20,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.529Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-9387982ced3a789b650e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 26,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.561Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-c30e962b510322733f57",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias/:id exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 29,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.600Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-f1388c222b0949099396",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/tomar exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 35,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.640Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-4d1f3ceeeff62a42dca7",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 36,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.688Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-6ca879254326994008b2",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/notificaciones exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 25,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.740Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-ae1e7446a470ea112e39",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            }
+          ]
+        },
+        {
+          "title": "VOLUNTARIO",
+          "file": "permisos.spec.ts",
+          "line": 9,
+          "column": 8,
+          "specs": [
+            {
+              "title": "POST /api/usuarios exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 214,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:19.781Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-897f21bb41a98036b45e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 222,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:20.012Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-bb46a3c02d45d656b9eb",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 241,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:20.252Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-be28dae8983329365ee7",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 217,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:20.514Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-b58710d151413a329017",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/login exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 199,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:20.746Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-9a6f1ac55150d81814f7",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/logout exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 228,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:20.961Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-d7dbe36faed73895a0db",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1358,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:21.208Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-2f485f8fad1a4282147e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-ascenso exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 166,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:22.579Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-02629ed0f6d8a1cb6658",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 187,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:22.756Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-149722669495c43a6627",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 186,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:22.955Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-5bf7fb587fd0552b5e04",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/cursos exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 197,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:23.154Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-a149fedfef0649fedf25",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/cursos exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 186,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:23.365Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-8d5d20b830f75eb5a94e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 207,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:23.565Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-324482bb5182c73849b0",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "DELETE /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 240,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:23.790Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-7a55f91a1b53c13445a8",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 202,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:24.050Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-9f8acbb96b9347f51ab7",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 192,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:24.268Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-8a4ce9237bf04bc5e2c4",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-certificados exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 178,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:24.478Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-7b421e5476f9ed93b29e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/solicitudes-certificados/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 182,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:24.670Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-1c00300f341c3ef1f1fc",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 169,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:24.863Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-02712100ed274571b01e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 231,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:25.042Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-a9057b2bc699bec0b674",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias/:id exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 193,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:25.285Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-f54cd20f7ab0071b7562",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/tomar exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 188,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:25.489Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-cd64963ad45ec636817f",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 192,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:25.690Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-392fb7e267583ba57803",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/notificaciones exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 178,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:25.895Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-37d1956dc02d4a6fc861",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            }
+          ]
+        },
+        {
+          "title": "COORDINADOR",
+          "file": "permisos.spec.ts",
+          "line": 9,
+          "column": 8,
+          "specs": [
+            {
+              "title": "POST /api/usuarios exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 168,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:26.085Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-268f64420634ca7e72c8",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 243,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:26.263Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-af16cfe37a0ce73db0f1",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 172,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:26.518Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-9ad0683a34577100969d",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 165,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:26.701Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-aec853b0813ebe41c032",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/login exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 182,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:26.877Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-fb9ba38172b6af7fa5e4",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/logout exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 185,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:27.073Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-5f2d77f6560404625f1b",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 218,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:27.271Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-18966884e5ca9f369fcd",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-ascenso exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 185,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:27.505Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-6b3bdb5e277cb6e6c7a7",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 238,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:27.707Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-4c536bdb3629d2f43d8c",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 203,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:27.957Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-fc0c8f166de15ad39c8e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/cursos exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 173,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:28.171Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-e5efaeffe39fd67eaac0",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/cursos exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 174,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:28.355Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-5839f60b26e984c9c048",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 258,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:28.543Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-d9cb95fd79d028a689bd",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "DELETE /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 171,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:28.814Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-a852a304637418c4b95a",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 202,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:28.995Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-fd337dd543e3c7f7d1ce",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 163,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:29.207Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-8af3b0c59bd65617dd5c",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-certificados exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 161,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:29.381Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-9b44f4d03a17865c1134",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/solicitudes-certificados/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 182,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:29.553Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-eb5a97dc492687c2ef1d",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 171,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:29.745Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-5dfdad5fb8b1285f6aa4",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 185,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:29.925Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-57a1002620200bb91a2f",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias/:id exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 189,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:30.121Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-79410e10774888f990f9",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/tomar exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 203,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:30.319Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-5e2fa73efdfdc50172e0",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 233,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:30.535Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-e1def3c43e6cf995caa6",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/notificaciones exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4841,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:30.787Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-d079b23b64ddbb00fedc",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            }
+          ]
+        },
+        {
+          "title": "ADMIN",
+          "file": "permisos.spec.ts",
+          "line": 9,
+          "column": 8,
+          "specs": [
+            {
+              "title": "POST /api/usuarios exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 171,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:35.645Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-ca3c9cfb0c09e373ed44",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 216,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:35.825Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-bf1bb727c6772b1ff07c",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 168,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:36.053Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-97d8977b216664f80d1e",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/usuarios/me exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 187,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:36.229Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-f56bba50b651801f5fee",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/login exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 156,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:36.432Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-0dc3b7e2b59a05d30662",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/auth/logout exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 158,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:36.596Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-fd63c52ebca9a75e1355",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 165,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:36.764Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-0168715efe457a8ffcec",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-ascenso exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 177,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:36.939Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-6f1af2baaa6d66db9508",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/aprobar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 223,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:37.125Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-90eb82434dc8248976d9",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/solicitudes-ascenso/:id/rechazar exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 217,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:37.362Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-a53b27e9365251ea6485",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/cursos exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 180,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:37.595Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-2a06b2547ec6906bd820",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/cursos exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 189,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:37.789Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-2cf1237d450742d923f6",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 236,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:37.989Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-5cf2f6d95134e95cf27d",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "DELETE /api/cursos/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 218,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:38.242Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-a0137b75d06f33ec7ce2",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 213,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:38.474Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-c743fd97b8d99db0b365",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/certificados exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 175,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:38.702Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-37c7831760d47cdb06c2",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/solicitudes-certificados exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 171,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:38.888Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-635b4c91079d12352d11",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "PATCH /api/solicitudes-certificados/:id exige Coordinador",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 179,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:39.070Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-309486f4c3b8470a0c2b",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias exige Público",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 186,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:39.260Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-4f637b84e2951e60aa36",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 222,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:39.460Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-964061edcf4e11f2c781",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/emergencias/:id exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 207,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:39.696Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-021e1bf9d1bc7a49e61d",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/tomar exige Voluntario",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 213,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:39.918Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-51cdfcdcc4af54535ff9",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "POST /api/emergencias/:id/finalizar exige Voluntario (asignado)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 238,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:40.149Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-165b3d5107e16eb16ee2",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            },
+            {
+              "title": "GET /api/notificaciones exige Autenticado",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 236,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-17T01:40:40.401Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ab28736153b093a86134-1693289f289abea4cb4c",
+              "file": "permisos.spec.ts",
+              "line": 10,
+              "column": 29
+            }
+          ]
         }
       ]
     }
-  ]
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-17T01:39:06.839Z",
+    "duration": 94465.687,
+    "expected": 110,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
 }

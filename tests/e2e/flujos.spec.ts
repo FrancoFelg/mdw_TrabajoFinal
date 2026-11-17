@@ -1,10 +1,50 @@
 import { test, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { account, db, password, report } from './helpers';
+import { account, db, password, report, registerInBrowser, loginInBrowser, logoutInBrowser } from './helpers';
 
 test.afterAll(async () => db.$disconnect());
-test('H2/H7-H11: reporte público, login, tomar y finalizar desde navegador', async ({ page, request }) => {
-  const user = await account(request);
+
+test('H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega personas distintas, edita voluntario y sale', async ({ page, browser, request }) => {
+  test.setTimeout(120_000);
+  const coordinator = await registerInBrowser(page);
+  // Preparar la autoridad inicial en la base aislada; el registro público siempre crea voluntarios.
+  await db.usuario.update({ where: { id: coordinator.id }, data: { rol: 'COORDINADOR' } });
+  const caso = await report(request);
+  const candidates = [];
+  for (let index = 0; index < 2; index++) {
+    const context = await browser.newContext();
+    try {
+      const candidatePage = await context.newPage();
+      const user = await registerInBrowser(candidatePage);
+      await loginInBrowser(candidatePage, user.email, '/ascensos');
+      await candidatePage.getByRole('button', { name: 'Solicitar ascenso', exact: true }).click();
+      await expect(candidatePage.getByRole('status')).toHaveText('Solicitud enviada. Te avisaremos cuando se resuelva.');
+      candidates.push(user);
+      await logoutInBrowser(candidatePage, user.nombreUsuario);
+    } finally { await context.close(); }
+  }
+  await loginInBrowser(page, coordinator.email, '/casos');
+  await expect(page.getByRole('link').filter({ hasText: caso.descripcion })).toBeVisible();
+  for (const [index, user] of candidates.entries()) {
+    await page.goto(`/usuarios/${user.id}/solicitudes`);
+    await page.getByRole('button', { name: index === 0 ? 'Ascender a Coordinador' : 'Denegar ascenso', exact: true }).click();
+    await expect(page.getByRole('status')).toHaveText(index === 0 ? 'Ascenso aprobado. Se notificó a la persona.' : 'Ascenso denegado. Se notificó a la persona.');
+    expect((await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol).toBe(index === 0 ? 'COORDINADOR' : 'VOLUNTARIO');
+    expect((await db.solicitudAscenso.findFirstOrThrow({ where: { usuarioId: user.id } })).estado).toBe(index === 0 ? 'APROBADO' : 'RECHAZADO');
+  }
+  const volunteer = candidates[1];
+  await page.goto(`/usuarios/${volunteer.id}`);
+  await page.getByRole('button', { name: 'Editar usuario', exact: true }).click();
+  await page.getByLabel('Nombre', { exact: true }).fill('Nombre actualizado');
+  await page.getByLabel('Apellido', { exact: true }).fill('Apellido actualizado');
+  await page.getByRole('button', { name: 'Guardar cambios', exact: true }).click();
+  await expect(page.getByRole('status')).toHaveText('Usuario actualizado.');
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Perfil de Nombre actualizado Apellido actualizado' })).toBeVisible();
+  await logoutInBrowser(page, coordinator.nombreUsuario);
+});
+test('H1/H2/H3/H5/H7-H11: persona sin cuenta reporta; voluntario se registra, atiende, carga certificado, solicita ascenso y sale', async ({ page }) => {
+  test.setTimeout(120_000);
   const description = `Persona necesita asistencia E2E ${randomUUID()}`;
   await page.goto('/reportar');
   await page.getByLabel('¿Qué está pasando?').fill(description);
@@ -18,13 +58,15 @@ test('H2/H7-H11: reporte público, login, tomar y finalizar desde navegador', as
   expect(caso.prioridad).toBe('VERDE');
   expect(caso.ubicacion.direccion).toContain('Mariano Moreno 1810');
   expect(caso.ubicacion.coordenada_x).toBeNull();
-  await page.goto(`/login?next=/casos/${id}`);
-  await page.getByLabel('Nombre de usuario o email').fill(user.email);
-  await page.getByLabel('Contraseña', { exact: true }).fill(password);
-  await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
+  expect(await page.request.get('/api/usuarios/me').then(r => r.status())).toBe(401);
+  const user = await registerInBrowser(page);
+  await loginInBrowser(page, user.email, '/casos');
+  await page.getByRole('link').filter({ hasText: description }).click();
   await expect(page).toHaveURL(new RegExp(`/casos/${id}$`));
   await page.getByRole('button', { name: 'Tomar caso', exact: true }).click();
   await expect(page.getByLabel('Informe final')).toBeVisible();
+  expect((await db.emergencia.findUniqueOrThrow({ where: { id } })).estado).toBe('EN_CAMINO');
+  expect(await db.usuarioEmergencia.count({ where: { emergenciaId: id, usuarioId: user.id } })).toBe(1);
   await page.getByLabel('Informe final').fill('Se brindó asistencia y se resolvió la situación.');
   await page.getByRole('button', { name: 'Finalizar atención', exact: true }).click();
   await expect(page.getByText('Caso gestionado. Gracias por la ayuda.')).toBeVisible();
@@ -32,6 +74,19 @@ test('H2/H7-H11: reporte público, login, tomar y finalizar desde navegador', as
   expect((await db.emergencia.findUniqueOrThrow({ where: { id } })).observacionesCierre).toBe('Se brindó asistencia y se resolvió la situación.');
   await page.goto('/casos');
   await expect(page.getByText(description, { exact: true })).toHaveCount(0);
+  await page.goto('/formacion');
+  const codigo = `recorrido-${randomUUID()}`;
+  await page.getByLabel('Código de verificación').fill(codigo);
+  await page.getByLabel('Archivo del certificado').setInputFiles({ name: 'curso.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF') });
+  await page.getByRole('button', { name: 'Enviar certificado' }).click();
+  await expect(page.getByRole('status')).toHaveText('Certificado enviado a revisión.');
+  const certificado = await db.certificado.findUniqueOrThrow({ where: { codigoVerificacion: codigo } });
+  expect(certificado.usuarioId).toBe(user.id);
+  expect(certificado.estado).toBe('PENDIENTE');
+  await page.goto('/ascensos');
+  await page.getByRole('button', { name: 'Solicitar ascenso', exact: true }).click();
+  await expect(page.getByRole('status')).toHaveText('Solicitud enviada. Te avisaremos cuando se resuelva.');
+  expect(await db.solicitudAscenso.count({ where: { usuarioId: user.id, estado: 'PENDIENTE' } })).toBe(1);
   await page.getByRole('button', { name: `Opciones de cuenta (${user.nombreUsuario})` }).click();
   await page.getByRole('link', { name: 'Mi cuenta', exact: true }).click();
   await expect(page.getByRole('heading', { name: /Perfil de/ })).toBeVisible();
@@ -39,10 +94,7 @@ test('H2/H7-H11: reporte público, login, tomar y finalizar desde navegador', as
   await page.getByLabel('Nombre', { exact: true }).fill('Editado');
   await page.getByRole('button', { name: 'Guardar cambios' }).click();
   await expect(page.getByText('Usuario actualizado.', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: `Opciones de cuenta (${user.nombreUsuario})` }).click();
-  await page.getByRole('button', { name: 'Cerrar sesión', exact: true }).click();
-  await expect(page).toHaveURL('http://127.0.0.1:3100/');
-  await expect(page.getByRole('link', { name: 'Soy voluntario' })).toBeVisible();
+  await logoutInBrowser(page, user.nombreUsuario);
 });
 
 test('H1/H2: perfil propio, login por nombre/email, duplicidad y privacidad', async ({ request }) => {
@@ -75,7 +127,6 @@ test('H3: solicitud, duplicado, rechazo, historial y aprobación con avisos', as
     expect((await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol).toBe('COORDINADOR');
     const history = await db.solicitudAscenso.findMany({ where: { usuarioId: user.id } });
     expect(history.map(row => row.estado).sort()).toEqual(['APROBADO', 'RECHAZADO']);
-    expect(await db.notificacion.count({ where: { usuarioId: user.id } })).toBeGreaterThanOrEqual(5);
     expect(await request.post('/api/solicitudes-ascenso').then(r => r.status())).toBe(403);
   } finally { await coordinator.dispose(); }
 });

@@ -1,6 +1,4 @@
-import { requireSession } from '@/lib/session';
-
-export default async function PrivateLayout({ children }: { children: React.ReactNode }) {
-  await requireSession();
+export default function PrivateLayout({ children }: { children: React.ReactNode }) {
+  // Cada página exige sesión con su destino. Un redirect aquí pierde el parámetro next.
   return children;
 }

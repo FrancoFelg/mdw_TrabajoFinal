@@ -29,6 +29,8 @@ function run(file, args) {
   if (result.status) process.exit(result.status);
 }
 run('node_modules/prisma/build/index.js', ['migrate', 'deploy']);
+// El cliente debe corresponder al schema de esta rama, incluso tras cambiar de rama.
+run('node_modules/prisma/build/index.js', ['generate']);
 async function main() {
   try {
     await fetch('http://127.0.0.1:3100', { signal: AbortSignal.timeout(1000) });

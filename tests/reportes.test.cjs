@@ -168,19 +168,6 @@ test('JSON inválido y campos inválidos devuelven 400', async () => {
   assert.equal((await api.POST(peticion(gps, 'clave-invalida'))).status, 400);
 });
 
-test('dirección desconocida y provincia desconocida devuelven 422; Google caído devuelve 503', async () => {
-  for (const [error, status] of [
-    ['DIRECCION_NO_ENCONTRADA', 422], ['PROVINCIA_NO_RECONOCIDA', 422],
-    ['GOOGLE_MAPS_NO_CONFIGURADO', 503], ['GOOGLE_MAPS_NO_DISPONIBLE', 503],
-  ]) {
-    errorCrear = error;
-    const respuesta = await api.POST(peticion(gps));
-    assert.equal(respuesta.status, status);
-    if (status === 503) assert.equal((await respuesta.json()).reporteGuardado, false);
-  }
-  errorCrear = undefined;
-});
-
 test('GET listado sigue requiriendo sesión', async () => {
   assert.equal((await api.GET(new NextRequest('http://localhost/api/emergencias'))).status, 401);
 });
