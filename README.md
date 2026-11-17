@@ -114,7 +114,7 @@ Público. Devuelve el token JWT y los datos básicos del usuario.
 
 Respuesta `200`: `{ "token": "...", "usuario": { "id", "nombreUsuario", "rol" } }` (ver ejemplo en Uso rápido).
 
-Errores: `400` falta `nombreUsuario` o `password` · `401` usuario o contraseña incorrectos.
+Errores: `400` falta `nombreUsuario` o `password` · `401` usuario o contraseña incorrectos · `429` tras 10 intentos fallidos seguidos sobre la misma cuenta (hasta 15 minutos de espera) o al superar el límite por IP.
 
 #### `POST /api/auth/logout`
 
@@ -135,7 +135,7 @@ Público.
 | Campo | Tipo | Obligatorio |
 | :--- | :--- | :--- |
 | `nombreUsuario` | string (único) | Sí |
-| `password` | string | Sí |
+| `password` | string, de 8 caracteres a 72 bytes | Sí |
 | `persona.nombre` | string | Sí |
 | `persona.apellido` | string | Sí |
 | `persona.fechaNac` | fecha ISO | Sí |
@@ -424,7 +424,6 @@ Estados: `SIN_GESTIONAR` → `EN_CAMINO` → `GESTIONADA` (también existe `CANC
 | `provincia` | enum de provincias en mayúsculas con `_` (`BUENOS_AIRES`, `CABA`, `CORDOBA`, `SANTA_FE`, `TIERRA_DEL_FUEGO`, ...). Lista completa en [`prisma/schema.prisma`](prisma/schema.prisma) | Sí |
 | `coordenada_x` | number | No |
 | `coordenada_y` | number | No |
-| `imagen` | string | No |
 
 ```bash
 curl -X POST https://mdw.guillermonatali.com/api/emergencias \
@@ -442,7 +441,7 @@ curl -X POST https://mdw.guillermonatali.com/api/emergencias \
 ```json
 {
   "id": "cm...", "descripcion": "Persona inconsciente en la vereda", "fecha": "2026-10-06T15:30:00.000Z",
-  "prioridad": "ROJO", "estado": "SIN_GESTIONAR", "imagen": null,
+  "prioridad": "ROJO", "estado": "SIN_GESTIONAR", "imagen": null, "permisoFoto": "...",
   "ubicacion": { "id": "cm...", "coordenada_x": -34.6037, "coordenada_y": -58.3816, "provincia": "CABA" }
 }
 ```

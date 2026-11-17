@@ -4,7 +4,7 @@ import { UsuarioService } from '../../../../services/usuario.service';
 import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
 import { getUserFromRequest } from '@/lib/auth';
 import { puedeGestionarUsuarios } from '@/lib/usuarios-admin';
-import { z } from 'zod';
+import { RegistroApiSchema } from '@/lib/registro';
 
 const usuarioService = new UsuarioService();
 
@@ -29,31 +29,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { nombreUsuario, password, persona } = body;
-    const email = body.email === undefined ? undefined : z.string().trim().toLowerCase().email().max(191).parse(body.email);
-
-    if (!nombreUsuario || !password || !persona?.nombre || !persona?.apellido || !persona?.fechaNac) {
-      return jsonPublico(
-        { error: 'Faltan campos obligatorios para el registro.' },
-        { status: 400 }
-      );
+    let body: unknown;
+    try { body = await req.json(); } catch { return jsonPublico({ error: 'El body debe ser un JSON válido.' }, { status: 400 }); }
+    const validacion = RegistroApiSchema.safeParse(body);
+    if (!validacion.success) {
+      return jsonPublico({ error: validacion.error.issues[0].message }, { status: 400 });
     }
 
-    const nuevoUsuario = await usuarioService.registrarUsuario({
-      nombreUsuario,
-      email,
-      password,
-      persona: {
-        ...persona,
-        fechaNac: new Date(persona.fechaNac),
-      },
-    });
+    const nuevoUsuario = await usuarioService.registrarUsuario(validacion.data);
 
     return jsonPublico(nuevoUsuario, { status: 201 });
   } catch (error: any) {
 
-    if (error instanceof z.ZodError) return jsonPublico({ error: 'Email inválido.' }, { status: 400 });
     if (error.message === 'NOMBRE_USUARIO_EXISTENTE' || error.code === 'P2002') {
       return jsonPublico(
         { error: 'El nombre de usuario o email ya está registrado.' },

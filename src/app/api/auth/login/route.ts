@@ -31,6 +31,12 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
+    if (error.message === 'DEMASIADOS_INTENTOS') {
+      return jsonPublico(
+        { error: 'Demasiados intentos fallidos. Esperá unos minutos antes de volver a intentar.' },
+        { status: 429 }
+      );
+    }
     return jsonPublico(
       { error: 'Error interno en el servidor.' },
       { status: 500 }
