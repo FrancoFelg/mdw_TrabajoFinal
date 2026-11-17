@@ -25,8 +25,8 @@ export async function guardarPerfilAction(id: string | null, datos: FormData): P
   try {
     const usuario = await actor(id !== null);
     const entrada = {
-      nombreUsuario: datos.get('nombreUsuario'), email: datos.get('email'),
-      ...(id !== null ? { rol: datos.get('rol') } : {}),
+      nombreUsuario: datos.get('nombreUsuario'),
+      ...(id === null ? { email: datos.get('email') } : { rol: datos.get('rol') }),
       persona: { nombre: datos.get('nombre'), apellido: datos.get('apellido'), fechaNac: datos.get('fechaNac'),
         telefonos: Array.from(datos.keys()).filter(nombre => /^telefonos\.\d+\.tipo$/.test(nombre)).map(nombre => ({ tipo: datos.get(nombre), numero: datos.get(nombre.replace(/\.tipo$/, '.numero')) })) },
     };
