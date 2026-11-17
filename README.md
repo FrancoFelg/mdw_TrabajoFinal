@@ -12,7 +12,7 @@ La interfaz incluye inicio (`/`), login (`/login`), directorio con búsqueda (`/
 | :--- | :--- |
 | Franco Lamberti | [FrancoFelg](https://github.com/FrancoFelg) |
 | Guillermo Natali Ulla | [guille-nat](https://github.com/guille-nat) |
-| Federico Gonzalvez Rolon | — |
+| Federico Gonzalvez Rolon | [FedeGonzalvezR](https://github.com/FedeGonzalvezR) |
 | Lucas Ciolfi | [CiolfiLucas](https://github.com/CiolfiLucas) |
 
 ## Entornos
