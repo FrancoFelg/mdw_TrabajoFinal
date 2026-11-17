@@ -167,6 +167,14 @@ Un voluntario autenticado recibe un mensaje de acceso restringido sin consultar 
 
 ## 6. Reglas de negocio
 
+### Visibilidad de registros (clase 08)
+
+Las emergencias `SIN_GESTIONAR` y `EN_CAMINO` son compartidas entre usuarios autenticados para permitir la asistencia y evitar superposición de recursos. Los casos cerrados (`GESTIONADA` o `CANCELADA`) solo pueden consultarse por el voluntario asignado y por coordinación/administración. El filtro utiliza el ID de la sesión y se aplica en la consulta a la base, tanto para el listado como para el detalle y las fotos. Un caso cerrado ajeno y uno inexistente devuelven el mismo 404.
+
+Los detalles `/usuarios/[id]` y `/usuarios/[id]/solicitudes` requieren coordinación/administración. Un voluntario recibe la misma página 404 para cualquier ID; consulta sus datos propios en `/cuenta` y `/ascensos`.
+
+Listado y detalle se resuelven en Server Components mediante servicios/repositorios conectados a `src/lib/db.ts`, sin `fetch` a la API propia. `config/database.ts` reexporta esa única instancia para mantener compatibles los módulos existentes. Los componentes cliente se reservan para filtros, mapas, geolocalización y acciones interactivas.
+
 1. Un reporte de emergencia no requiere cuenta de usuario, pero la asignación para acudir a resolverla exige un **Usuario** autenticado.
 2. Para tomar una emergencia de prioridad `ROJO`, el voluntario debe poseer al menos un **Certificado** en estado `APROBADO` vinculado a su cuenta vía `UsuarioCertificado`.
 3. El campo `Curso` dentro de un `Certificado` es opcional; si no se selecciona un curso del catálogo, se registra como certificado general.

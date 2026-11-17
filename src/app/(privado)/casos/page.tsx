@@ -1,5 +1,6 @@
 import { EmergenciaService } from '../../../../services/emergencia.service';
 import { requireSession } from '@/lib/session';
+import { casosVisibles } from '@/lib/acceso-casos';
 import { ORDEN_PRIORIDAD, haceCuanto, NOMBRES_PROVINCIA } from '@/lib/casos';
 import { CasosVista, type CasoFila } from '@/components/casos-vista';
 import { Refrescar } from '@/components/refrescar';
@@ -8,7 +9,7 @@ export const metadata = { title: 'Casos | Red de Apoyo' };
 
 export default async function Casos() {
   const sesion = await requireSession('/casos');
-  const emergencias = await new EmergenciaService().listarEmergencias();
+  const emergencias = await new EmergenciaService().listarEmergencias(casosVisibles(sesion));
   const activos: CasoFila[] = emergencias
     .filter(e => e.estado === 'SIN_GESTIONAR' || e.estado === 'EN_CAMINO')
     .map(e => {

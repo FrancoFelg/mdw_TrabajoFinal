@@ -132,7 +132,7 @@ test('todas las respuestas JSON de API usan el filtro público', () => {
 
 test('destinos de login conservan cuenta y ascensos sin permitir redirecciones externas', () => {
   const { safeDestination } = cargar('src/lib/session.ts', {
-    '../../config/database': { db: {} },
+    './db': { db: {} },
     'next/headers': {}, 'next/navigation': {},
   });
   assert.equal(safeDestination('/cuenta'), '/cuenta');

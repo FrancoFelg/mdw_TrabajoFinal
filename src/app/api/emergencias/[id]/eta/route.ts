@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { EmergenciaController } from '../../../../../../controllers/emergencia.controller';
 import { MODOS_VIAJE } from '../../../../../../services/rutas.service';
 import { getUserFromRequest } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { casosVisibles } from '@/lib/acceso-casos';
 
 const controller = new EmergenciaController();
 
@@ -24,7 +26,8 @@ const QuerySchema = z.object({
 // distancia y tiempo estimado de llegada desde la posición actual del
 // voluntario (autenticado)
 export async function GET(req: NextRequest, { params }: Contexto) {
-  if (!getUserFromRequest(req)) {
+  const usuario = getUserFromRequest(req);
+  if (!usuario) {
     return jsonPublico({ error: 'No autorizado' }, { status: 401 });
   }
 
@@ -38,6 +41,11 @@ export async function GET(req: NextRequest, { params }: Contexto) {
 
   try {
     const { id } = await params;
+    const actor = await db.usuario.findUnique({ where: { id: usuario.id }, select: { id: true, rol: true } });
+    if (!actor) return jsonPublico({ error: 'No autorizado' }, { status: 401 });
+    if (!await db.emergencia.findFirst({ where: { AND: [{ id }, casosVisibles(actor)] }, select: { id: true } })) {
+      return jsonPublico({ error: 'La emergencia no existe.' }, { status: 404 });
+    }
     const { coordenada_x, coordenada_y, modo } = validacion.data;
     const eta = await controller.calcularEta(id, { lat: coordenada_y, lng: coordenada_x }, modo);
     return jsonPublico(eta, { headers: { 'Cache-Control': 'no-store' } });

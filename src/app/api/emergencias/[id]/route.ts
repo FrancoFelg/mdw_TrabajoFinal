@@ -1,6 +1,8 @@
 import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextRequest } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { casosVisibles } from '@/lib/acceso-casos';
 import { RESPUESTA_NO_AUTORIZADO, leerBody } from '@/lib/cursoErrores';
 import { EmergenciaService } from '../../../../../services/emergencia.service';
 
@@ -17,7 +19,9 @@ export async function GET(req: NextRequest, { params }: ContextoRoute) {
 
   try {
     const { id } = await params;
-    const emergencia = await service.obtenerPorId(id);
+    const actor = await db.usuario.findUnique({ where: { id: usuario.id }, select: { id: true, rol: true } });
+    if (!actor) return RESPUESTA_NO_AUTORIZADO();
+    const emergencia = await service.obtenerPorId(id, casosVisibles(actor));
 
     if (!emergencia) {
       return jsonPublico(

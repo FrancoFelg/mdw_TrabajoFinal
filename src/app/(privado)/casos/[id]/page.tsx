@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { EmergenciaService } from '../../../../../services/emergencia.service';
 import { EmergenciaRepository } from '../../../../../repositories/emergencia.repository';
 import { requireSession } from '@/lib/session';
+import { casosVisibles } from '@/lib/acceso-casos';
 import { haceCuanto, horaCorta, NOMBRES_PROVINCIA, codigoCaso } from '@/lib/casos';
 import { Asignado, CodigoCaso, EtapasCaso, MarcaEstado, MarcaPrioridad } from '@/components/marcas';
 import { CasoAcciones } from '@/components/caso-acciones';
@@ -16,7 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function Caso({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const sesion = await requireSession(`/casos/${id}`);
-  const emergencia = await new EmergenciaService().obtenerPorId(id).catch(() => null);
+  const emergencia = await new EmergenciaService().obtenerPorId(id, casosVisibles(sesion)).catch(error => {
+    if (error instanceof Error && error.message === 'EMERGENCIA_NO_ENCONTRADA') return null;
+    throw error;
+  });
   if (!emergencia) notFound();
 
   const repo = new EmergenciaRepository();
