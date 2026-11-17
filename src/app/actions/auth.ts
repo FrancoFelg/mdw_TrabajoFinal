@@ -16,7 +16,10 @@ export async function loginAction(_state: unknown, data: FormData): Promise<Resu
     const result = await new AuthService().login(nombreUsuario, password);
     (await cookies()).set('token', result.token, sessionCookie);
   } catch (error) {
-    return { ok: false, campos: {}, error: error instanceof Error && error.message === 'CREDANCIALES_INVALIDAS' ? 'Usuario o contraseña incorrectos.' : 'No pudimos iniciar sesión. Intentá nuevamente en unos momentos.' };
+    const codigo = error instanceof Error ? error.message : '';
+    return { ok: false, campos: {}, error: codigo === 'CREDANCIALES_INVALIDAS' ? 'Usuario o contraseña incorrectos.'
+      : codigo === 'DEMASIADOS_INTENTOS' ? 'Demasiados intentos fallidos. Esperá unos minutos antes de volver a intentar.'
+      : 'No pudimos iniciar sesión. Intentá nuevamente en unos momentos.' };
   }
   redirect(safeDestination(data.get('next')));
 }

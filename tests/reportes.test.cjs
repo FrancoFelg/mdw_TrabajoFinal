@@ -43,13 +43,13 @@ const servicio = cargar('services/emergencia.service.ts', {
 });
 const gps = { descripcion: 'Persona necesita ayuda', coordenada_x: -58.4, coordenada_y: -34.6, provincia: 'CABA' };
 
-test('valida descripción, GPS completo, rangos, provincia y foto URL', () => {
+test('valida descripción, GPS completo, rangos, provincia y rechaza imagen enviada por el cliente', () => {
   for (const datos of [
     { ...gps, descripcion: '    ' }, { ...gps, descripcion: 'x'.repeat(192) },
     { ...gps, coordenada_x: 181 }, { ...gps, coordenada_y: -91 },
     { ...gps, provincia: undefined }, { ...gps, provincia: 'OTRA' },
     { ...gps, prioridad: 'AZUL' }, { ...gps, prioridad: '' },
-    { ...gps, imagen: 'archivo-no-url' }, { descripcion: 'Sin ubicación' },
+    { ...gps, imagen: 'archivo-no-url' }, { ...gps, imagen: 'https://externo.example/foto.png' }, { descripcion: 'Sin ubicación' },
   ]) assert.equal(servicio.CrearEmergenciaSchema.safeParse(datos).success, false);
   assert.equal(servicio.CrearEmergenciaSchema.safeParse(gps).success, true);
   assert.equal(servicio.CrearEmergenciaSchema.safeParse({ descripcion: 'Persona necesita ayuda', direccion: 'Callao 100, CABA' }).success, true);
