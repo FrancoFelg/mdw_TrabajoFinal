@@ -23,6 +23,8 @@ pnpm exec playwright show-report
 
 Chrome debe estar instalado. Como alternativa, ejecutar `pnpm exec playwright install chromium` y omitir `E2E_BROWSER_CHANNEL`.
 
+En Linux, MySQL debe iniciarse con `--lower-case-table-names=1`, igual que producción. Las migraciones históricas mezclan mayúsculas y minúsculas en los nombres de tabla. CI crea un MySQL 8.4 nuevo con esa opción para E2E y para validar migraciones. La opción se configura al inicializar MySQL; no debe cambiarse sobre un directorio de datos existente.
+
 Sin `E2E_DATABASE_URL`, el lanzador toma las credenciales locales de `.env` y cambia el nombre de base a `mdw_e2e`. Una URL explícita debe apuntar a localhost/127.0.0.1 y una base `mdw_e2e` o `mdw_e2e_*`. Rechaza bases remotas y nombres ajenos antes de conectar. El usuario MySQL necesita crear la base o tenerla creada y poder migrarla.
 
 El comando aplica migraciones e inicia su servidor en `127.0.0.1:3100`; rechaza otro servidor existente. Conserva datos con identificadores aleatorios. Las cuentas se registran y autentican normalmente. Los roles de fixtures se preparan en la base aislada; no existen usuarios especiales, tokens fabricados ni modos de testing en la aplicación.

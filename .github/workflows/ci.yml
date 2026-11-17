@@ -34,16 +34,6 @@ jobs:
     name: E2E y permisos (MySQL local)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    services:
-      mysql:
-        image: mysql:8.4
-        env:
-          MYSQL_ROOT_PASSWORD: ci
-          MYSQL_DATABASE: mdw_e2e
-        ports: ['3306:3306']
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -pci"
-          --health-interval=5s --health-timeout=5s --health-retries=20
     env:
       E2E_DATABASE_URL: mysql://root:ci@127.0.0.1:3306/mdw_e2e
     steps:
@@ -57,6 +47,22 @@ jobs:
       - run: pnpm exec prisma generate
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
+      # Mismo tratamiento de nombres de tabla que producción y migraciones.
+      # services no permite pasar --lower-case-table-names a mysqld.
+      - name: Levantar MySQL E2E como en prod
+        run: |
+          docker run -d --name mysql-e2e \
+            -e MYSQL_ROOT_PASSWORD=ci \
+            -e MYSQL_DATABASE=mdw_e2e \
+            -p 3306:3306 \
+            mysql:8.4 --lower-case-table-names=1
+          for i in $(seq 1 30); do
+            if docker exec mysql-e2e mysqladmin ping -h 127.0.0.1 -uroot -pci --silent 2>/dev/null; then
+              echo "MySQL E2E listo"; exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL E2E no arrancó"; docker logs mysql-e2e; exit 1
       - run: pnpm test:e2e:mutation
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4
