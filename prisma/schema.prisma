@@ -19,7 +19,6 @@ enum CertificadoEstado {
   PENDIENTE
   APROBADO
   RECHAZADO
-  VENCIDO
 }
 
 enum Prioridad {
@@ -106,6 +105,7 @@ model Usuario {
   certificadosRecibidos              Certificado[]              @relation("CertificadoAlumno")
   certificadosCreados                Certificado[]              @relation("CertificadoCreador")
   certificadosEliminados             Certificado[]              @relation("CertificadoEliminador")
+  certificadosRevisados              Certificado[]              @relation("CertificadoRevisor")
   certificadosAtributosCreados       CertificadoAtributo[]      @relation("CertificadoAtributoCreador")
   certificadosAtributosEliminados    CertificadoAtributo[]      @relation("CertificadoAtributoEliminador")
   certificadosRelAtributosCreados    CertificadosRelAtributos[] @relation("CertificadosRelAtributosCreador")
@@ -177,14 +177,24 @@ model Certificado {
   id                 String            @id @default(cuid())
   cursoId            String?
   usuarioId          String
-  codigoVerificacion String            @unique
-  curso              Cursos?            @relation(fields: [cursoId], references: [id])
+  nombre             String
+  entidadEmisora     String
+  codigoVerificacion String?
+  curso              Cursos?           @relation(fields: [cursoId], references: [id])
   estado             CertificadoEstado @default(PENDIENTE)
   usuario            Usuario           @relation("CertificadoAlumno", fields: [usuarioId], references: [id])
-  fechaEmision       DateTime          @default(now())
+  fechaEmision       DateTime
+  archivoTipo        String
+  archivoNombre      String
   fechaCreacion      DateTime          @default(now())
+  fechaActualizacion DateTime          @updatedAt
   usuarioCreacionId  String
   usuarioCreacion    Usuario           @relation("CertificadoCreador", fields: [usuarioCreacionId], references: [id])
+
+  motivoRechazo     String?   @db.Text
+  fechaRevision     DateTime?
+  usuarioRevisionId String?
+  usuarioRevision   Usuario?  @relation("CertificadoRevisor", fields: [usuarioRevisionId], references: [id])
 
   fechaEliminacion     DateTime?
   usuarioEliminacionId String?
@@ -194,6 +204,7 @@ model Certificado {
 
   @@index([cursoId])
   @@index([usuarioId])
+  @@index([usuarioRevisionId])
 }
 
 // Parametrica: catalogo de atributos posibles para un certificado
@@ -282,15 +293,14 @@ model Telefono {
   @@index([personaId])
 }
 
-
 // solicitudesAscenso
 
 model SolicitudAscenso {
-  id        String                  @id @default(cuid())
+  id        String                 @id @default(cuid())
   usuarioId String
   usuario   Usuario                @relation(fields: [usuarioId], references: [id])
   estado    SolicitudAscensoEstado @default(PENDIENTE)
-  creadoEn  DateTime                @default(now())
+  creadoEn  DateTime               @default(now())
 }
 
 // Avisos de la historia 12. `clave` evita repetir el mismo aviso a la misma persona

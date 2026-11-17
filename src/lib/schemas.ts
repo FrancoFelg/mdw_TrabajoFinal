@@ -24,7 +24,6 @@ export const CertificadoEstadoEnum = z.enum([
   'PENDIENTE',
   'APROBADO',
   'RECHAZADO',
-  'VENCIDO',
 ]);
 export type CertificadoEstadoType = z.infer<typeof CertificadoEstadoEnum>;
 

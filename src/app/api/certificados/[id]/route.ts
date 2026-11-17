@@ -1,112 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { CertificadoController } from '../../../../../controllers/certificado.controller';
-import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
-import { ACCESO_NO_AUTORIZADO, RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
-import { CertificadoEstado } from '@prisma/client';
+import { NextRequest } from 'next/server';
+import {
+  actualizarCertificado,
+  cambiarEstadoCertificado,
+  eliminarCertificado,
+  obtenerCertificado,
+} from '@/lib/certificados-api';
 
-const controller = new CertificadoController();
+export const runtime = 'nodejs';
 
-// En Next 15+ `params` es una Promise: hay que hacerle await
+// En Next 15+ `params` es una Promise
 type Contexto = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, { params }: Contexto) {
-  const usuario = getUserFromRequest(req);
-  if (!usuario) return RESPUESTA_NO_AUTORIZADO();
-
-  try {
-    const { id } = await params;
-    const certificado = await controller.obtenerPorId(id);
-    // Un voluntario solo ve los suyos; respondemos 404 para no revelar que el certificado existe
-    if (!esCoordinadorOAdmin(usuario) && certificado.usuarioId !== usuario.id) {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
-    }
-    return NextResponse.json(certificado);
-  } catch (error: any) {
-    if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
-    }
-    return NextResponse.json({ error: 'Error al consultar el certificado.' }, { status: 500 });
-  }
+  return obtenerCertificado(req, (await params).id);
 }
 
+// Solo el dueño; multipart.
 export async function PUT(req: NextRequest, { params }: Contexto) {
-  const usuario = getUserFromRequest(req);
-  if (!usuario) return RESPUESTA_NO_AUTORIZADO();
-  if (!esCoordinadorOAdmin(usuario)) return ACCESO_NO_AUTORIZADO();
-
-  try {
-    const { id } = await params;
-    const body = await req.json();
-    const actualizado = await controller.actualizar(id, body);
-    return NextResponse.json(actualizado);
-  } catch (error: any) {
-    if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
-    }
-    return NextResponse.json({ error: 'Error al actualizar el certificado.' }, { status: 500 });
-  }
+  return actualizarCertificado(req, (await params).id);
 }
 
+// Coordinación: { estado: 'APROBADO' | 'RECHAZADO' }.
 export async function PATCH(req: NextRequest, { params }: Contexto) {
-  // 1. Autenticación y Autorización (Solo Coordinadores o Admins)
-  const usuario = getUserFromRequest(req);
-  if (!usuario) return RESPUESTA_NO_AUTORIZADO();
-  if (!esCoordinadorOAdmin(usuario)) return ACCESO_NO_AUTORIZADO();
-
-  try {
-    const { id } = await params;
-    const { estado } = await req.json();
-
-    if (!estado) {
-      return NextResponse.json(
-        { error: 'El campo "estado" es obligatorio.' },
-        { status: 400 }
-      );
-    }
-
-    const actualizado = await controller.cambiarEstado(id, estado as CertificadoEstado);
-    return NextResponse.json(actualizado, { status: 200 });
-
-  } catch (error: any) {
-    if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
-    }
-
-    if (error.message === 'ESTADO_INVALIDO') {
-      return NextResponse.json(
-        { error: 'Solo se permite cambiar el estado a APROBADO o RECHAZADO.' },
-        { status: 400 }
-      );
-    }
-
-    if (error.message === 'ESTADO_NO_PENDIENTE') {
-      return NextResponse.json(
-        { error: 'Solo se pueden aprobar o rechazar certificados en estado PENDIENTE.' },
-        { status: 422 } // Unprocessable Entity
-      );
-    }
-
-    return NextResponse.json(
-      { error: 'Error al actualizar el estado del certificado.' },
-      { status: 500 }
-    );
-  }
+  return cambiarEstadoCertificado(req, (await params).id);
 }
 
 export async function DELETE(req: NextRequest, { params }: Contexto) {
-  const usuario = getUserFromRequest(req);
-  if (!usuario) return RESPUESTA_NO_AUTORIZADO();
-  if (!esCoordinadorOAdmin(usuario)) return ACCESO_NO_AUTORIZADO();
-
-  try {
-    const { id } = await params;
-    // Quién elimina sale del token, nunca del body
-    await controller.eliminar(id, usuario.id);
-    return NextResponse.json({ mensaje: 'Certificado eliminado correctamente.' });
-  } catch (error: any) {
-    if (error.message === 'CERTIFICADO_NO_ENCONTRADO') {
-      return NextResponse.json({ error: 'Certificado no encontrado.' }, { status: 404 });
-    }
-    return NextResponse.json({ error: 'Error al eliminar el certificado.' }, { status: 500 });
-  }
+  return eliminarCertificado(req, (await params).id);
 }

@@ -114,6 +114,8 @@ export class EmergenciaRepository {
       where: {
         usuarioId,
         estado: CertificadoEstado.APROBADO,
+        // Un certificado dado de baja deja de habilitar casos rojos.
+        fechaEliminacion: null,
       },
     });
     return !!certificado;

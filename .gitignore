@@ -48,5 +48,8 @@ next-env.d.ts
 # agent teams lite - skill registry (artefacto local generado)
 .atl/
 
+# archivos subidos en dev (certificados, fotos de emergencias)
+.data/
+
 # datos de MySQL en prod (bind mount del compose)
 infra/docker/db_data/

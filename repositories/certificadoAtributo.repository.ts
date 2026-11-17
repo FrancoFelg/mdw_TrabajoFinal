@@ -1,7 +1,8 @@
 import { db } from '../config/database';
-import { CertificadoAtributo } from '@prisma/client';
+import { AtributoTipo, CertificadoAtributo } from '@prisma/client';
 export interface CrearAtributoParametriaData {
   nombre: string;
+  tipo?: AtributoTipo;
   usuarioCreacionId: string;
 }
 
@@ -10,6 +11,7 @@ export class CertificadoAtributoRepository {
     return await db.certificadoAtributo.create({
       data: {
         nombre: data.nombre,
+        tipo: data.tipo,
         usuarioCreacionId: data.usuarioCreacionId,
       },
     });

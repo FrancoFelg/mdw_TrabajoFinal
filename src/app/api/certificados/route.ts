@@ -1,48 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { CertificadoController } from '../../../../controllers/certificado.controller';
-import { esCoordinadorOAdmin, getUserFromRequest, getUserIdFromRequest } from '@/lib/auth';
-import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
+import { NextRequest } from 'next/server';
+import { crearCertificado, listarCertificados } from '@/lib/certificados-api';
 
-const controller = new CertificadoController();
+export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
-    const usuario = getUserFromRequest(req);
-    if (!usuario) return RESPUESTA_NO_AUTORIZADO();
-
-    try {
-        // Coordinadores y admins ven todos; un voluntario solo los suyos
-        const certificados = await controller.listar(esCoordinadorOAdmin(usuario) ? undefined : usuario.id);
-        return NextResponse.json(certificados);
-    } catch {
-        return NextResponse.json({ error: 'Error al obtener los certificados.' }, { status: 500 });
-    }
-}
-
-export async function POST(req: NextRequest) {
-    try {
-        const usuarioCreacionId = getUserIdFromRequest(req);
-
-        if (!usuarioCreacionId) {
-            return NextResponse.json({ error: 'No autorizado o token inválido.' }, { status: 401 });
-        }
-
-        const body = await req.json();
-        const nuevoCertificado = await controller.crear(body, usuarioCreacionId);
-
-        return NextResponse.json(nuevoCertificado, { status: 201 });
-    } catch (error: any) {
-        if (error.message === 'CAMPOS_OBLIGATORIOS_FALTANTES') {
-            return NextResponse.json(
-                { error: 'Faltan campos obligatorios: estadoId, usuarioId o codigoVerificacion.' },
-                { status: 400 }
-            );
-        }
-        if (error.message === 'ATRIBUTO_INCOMPLETO_CAMPO_Y_VALOR_REQUERIDOS') {
-            return NextResponse.json(
-                { error: 'Cada atributo debe incluir su campoId y valor.' },
-                { status: 400 }
-            );
-        }
-        return NextResponse.json({ error: 'Error al crear el certificado.' }, { status: 500 });
-    }
-}
+// GET: los propios (coordinación: todos, con ?estado= y ?usuarioId=). POST: multipart con el archivo.
+export const GET = (req: NextRequest) => listarCertificados(req);
+export const POST = (req: NextRequest) => crearCertificado(req);

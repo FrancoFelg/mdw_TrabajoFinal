@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useRef, useState } from 'react';
-import { ClipboardList, LogOut, Megaphone, UserRound, Users } from 'lucide-react';
+import { ClipboardList, GraduationCap, LogOut, Megaphone, UserRound, Users } from 'lucide-react';
 import { logoutAction } from '@/app/actions/auth';
 import type { UsuarioToken } from '@/lib/auth';
 import { Campana } from './campana';
@@ -39,6 +39,7 @@ export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | nul
   const links = usuario ? [
     { href: '/reportar', label: 'Reportar', Icono: Megaphone },
     { href: '/casos', label: 'Casos', Icono: ClipboardList },
+    { href: '/certificados', label: 'Formación', Icono: GraduationCap },
     { href: '/ascensos', label: 'Mis ascensos', Icono: Users },
     ...(coordinador ? [{ href: '/usuarios', label: 'Usuarios', Icono: Users }] : []),
   ] : [];

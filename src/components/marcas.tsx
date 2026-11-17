@@ -1,6 +1,6 @@
 import type { CertificadoEstado, EmergenciaEstado, Prioridad } from '@prisma/client';
 import Link from 'next/link';
-import { CalendarX, CircleCheck, CircleDashed, CircleX, Clock, Hourglass, Navigation, OctagonAlert, ShieldAlert, ShieldCheck, ShieldEllipsis, TriangleAlert } from 'lucide-react';
+import { CircleCheck, CircleDashed, CircleX, Clock, Hourglass, Navigation, OctagonAlert, ShieldAlert, ShieldCheck, ShieldEllipsis, TriangleAlert } from 'lucide-react';
 import { ESTADOS, PRIORIDADES, codigoCaso, type EstadoHabilitacion } from '@/lib/casos';
 
 // Marcas compartidas: prioridad, estado, código de caso, asignado y etapas.
@@ -37,7 +37,6 @@ const REVISION: Record<CertificadoEstado, { nombre: string; Icono: typeof Clock 
   PENDIENTE: { nombre: 'Pendiente', Icono: Clock },
   APROBADO: { nombre: 'Aprobado', Icono: ShieldCheck },
   RECHAZADO: { nombre: 'Rechazado', Icono: CircleX },
-  VENCIDO: { nombre: 'Vencido', Icono: CalendarX },
 };
 
 export function MarcaRevision({ estado }: { estado: CertificadoEstado }) {

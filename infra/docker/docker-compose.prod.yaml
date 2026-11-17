@@ -47,6 +47,9 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es obligatorio}
       # Opcional: sin key, geocoding, autocompletado y ETA responden 503
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+    # Archivos subidos (.data/certificados y .data/emergencias): sobreviven a los redeploys
+    volumes:
+      - mdw_uploads:/app/.data
     expose:
       - "3000"
     healthcheck:
@@ -128,6 +131,9 @@ services:
       start_period: 30s
     networks:
       - internal
+
+volumes:
+  mdw_uploads:
 
 networks:
   # Ya existe en el VPS; la comparten todas las apps con global-nginx

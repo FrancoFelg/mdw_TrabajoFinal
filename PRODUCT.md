@@ -38,7 +38,7 @@ Un solo circuito entre quien ve la emergencia en la calle y quien va a atenderla
 - Next.js (App Router) + Prisma + MySQL; API REST con JWT Bearer (8 h). Roles: `ADMIN`, `COORDINADOR`, `VOLUNTARIO`. Documentada en `README.md` y `docs/api.md`.
 - Producción en `https://mdw.guillermonatali.com`, deploy continuo desde `main`.
 - Estados de emergencia: `SIN GESTIONAR`, `EN CAMINO`, `GESTIONADA`, `CANCELADA`. Al pasar a `GESTIONADA` sale de la vista activa.
-- Estados de certificado: `PENDIENTE`, `APROBADO`, `RECHAZADO`, `VENCIDO`. Ascenso: `PENDIENTE`, `APROBADO`, `RECHAZADO`.
+- Estados de certificado: `PENDIENTE`, `APROBADO`, `RECHAZADO`. Ascenso: `PENDIENTE`, `APROBADO`, `RECHAZADO`.
 - Reporte de emergencia en 3 toques o menos. Si falla el GPS se destaca la entrada manual sin perder lo ya cargado.
 - "Tomar emergencia" debe ser una acción clara y accesible en móvil. Si otro voluntario la toma al mismo tiempo, se bloquea y se informa.
 - Web responsiva / PWA. Avisos dentro de la app y push del navegador (historia 12). Fuera de alcance: app nativa, chat interno, notificaciones por mail o SMS, inventario, donaciones, firma digital, atención médica oficial.

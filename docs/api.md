@@ -16,10 +16,15 @@
 | `POST /api/cursos` | Crear un nuevo curso en el catálogo | Coordinador | H4 |
 | `PATCH /api/cursos/:id` | Editar información o atributos de un curso | Coordinador | H4 |
 | `DELETE /api/cursos/:id` | Desactivar o eliminar un curso del catálogo | Coordinador | H4 |
-| `GET /api/certificados` | Listar los certificados subidos por el usuario activo | Autenticado | H5 |
-| `POST /api/certificados` | Cargar un nuevo certificado (asociando curso de forma opcional) | Autenticado | H5 |
-| `GET /api/solicitudes-certificados` | Obtener la tabla de solicitudes de validación de certificados | Coordinador | H6 |
-| `PATCH /api/solicitudes-certificados/:id` | Aprobar o rechazar la validación de un certificado | Coordinador | H6 |
+| `GET /api/certificados` | Listar los certificados propios; coordinación ve todos y filtra con `?estado=` y `?usuarioId=` | Autenticado | H5 |
+| `POST /api/certificados` | Cargar un certificado propio sin curso (`multipart/form-data` con archivo y datos adicionales); nace `PENDIENTE` | Autenticado | H5 |
+| `GET /api/certificados/:id` | Detalle de un certificado | Dueño o coordinador | H5 |
+| `PUT /api/certificados/:id` | Editar un certificado `PENDIENTE` o `RECHAZADO` (un rechazado vuelve a `PENDIENTE`) | Dueño | H5 |
+| `DELETE /api/certificados/:id` | Baja lógica de un certificado | Dueño o coordinador | H5 |
+| `GET /api/certificados/:id/archivo` | Ver o descargar el archivo del certificado | Dueño o coordinador | H5 |
+| `GET /api/certificados-atributos` | Catálogo de datos adicionales de certificados | Autenticado | H5 |
+| `POST /api/certificados-atributos` | Crear un dato adicional (`nombre`, `tipo`) | Coordinador | H5 |
+| `PATCH /api/certificados/:id` | Aprobar o rechazar un certificado pendiente (la cola de revisión llega en la parte 3) | Coordinador | H6 |
 | `POST /api/emergencias` | Reportar una nueva emergencia en la vía pública | **Público** | H7 |
 | `GET /api/emergencias` | Listar y filtrar emergencias activas para el mapa | Autenticado | H8 |
 | `GET /api/emergencias/:id` | Obtener detalle y ficha completa de una emergencia | Autenticado | H8 |

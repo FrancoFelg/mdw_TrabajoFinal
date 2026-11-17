@@ -18,7 +18,7 @@ export default function Sistema() {
 
     <section className="bloque" aria-labelledby="s-estado"><h2 id="s-estado">Estados</h2>
       <div className="actions"><MarcaEstado estado="SIN_GESTIONAR" /><MarcaEstado estado="EN_CAMINO" /><MarcaEstado estado="GESTIONADA" /><MarcaEstado estado="CANCELADA" /></div>
-      <div className="actions"><MarcaRevision estado="PENDIENTE" /><MarcaRevision estado="APROBADO" /><MarcaRevision estado="RECHAZADO" /><MarcaRevision estado="VENCIDO" /></div>
+      <div className="actions"><MarcaRevision estado="PENDIENTE" /><MarcaRevision estado="APROBADO" /><MarcaRevision estado="RECHAZADO" /></div>
     </section>
 
     <section className="bloque" aria-labelledby="s-cinta"><h2 id="s-cinta">Código y asignado</h2>

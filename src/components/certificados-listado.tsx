@@ -1,0 +1,61 @@
+'use client';
+
+import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { FileText, Pencil, Trash2 } from 'lucide-react';
+import { Button, Card } from './ui';
+import { MarcaRevision } from './marcas';
+import { editable, fechaLegible, type CertificadoVista } from '@/lib/certificados-vista';
+
+const valorLegible = (tipo: string, dato: string) =>
+  tipo === 'BOOLEANO' ? (dato === 'true' ? 'Sí' : 'No') : tipo === 'FECHA' ? fechaLegible(`${dato}T12:00:00.000Z`) : dato;
+
+export function CertificadosListado({ certificados }: { certificados: CertificadoVista[] }) {
+  const router = useRouter();
+  const [ocupado, setOcupado] = useState<string | null>(null);
+  const [error, setError] = useState('');
+
+  async function darDeBaja(c: CertificadoVista) {
+    if (ocupado || !window.confirm(`¿Dar de baja "${c.nombre}"? No se puede deshacer.`)) return;
+    setOcupado(c.id);
+    setError('');
+    try {
+      const respuesta = await fetch(`/api/certificados/${c.id}`, { method: 'DELETE', signal: AbortSignal.timeout(20000) });
+      if (!respuesta.ok) throw new Error((await respuesta.json().catch(() => null))?.error || 'No pudimos dar de baja el certificado.');
+      router.refresh();
+    } catch (e) {
+      setError(e instanceof Error && e.name !== 'TimeoutError' && e.name !== 'TypeError' ? e.message : 'No pudimos confirmar la baja. Actualizá la página antes de reintentar.');
+    } finally {
+      setOcupado(null);
+    }
+  }
+
+  return <div className="stack" aria-busy={ocupado !== null}>
+    {error && <p className="alert" role="alert">{error}</p>}
+    {certificados.map(c => <Card key={c.id}>
+      <div className="certificado-cabecera">
+        <h2>{c.nombre}</h2>
+        <MarcaRevision estado={c.estado} />
+      </div>
+      <dl className="datos">
+        <div><dt>Entidad emisora</dt><dd>{c.entidadEmisora}</dd></div>
+        <div><dt>Emitido</dt><dd>{fechaLegible(c.fechaEmision)}</dd></div>
+        {c.codigoVerificacion && <div><dt>Número</dt><dd>{c.codigoVerificacion}</dd></div>}
+        {c.atributos.map(a => <div key={a.campoId}><dt>{a.nombre}</dt><dd>{valorLegible(a.tipo, a.dato)}</dd></div>)}
+      </dl>
+      {c.estado === 'RECHAZADO' && c.motivoRechazo && <p className="aviso">Motivo del rechazo: {c.motivoRechazo}</p>}
+      <div className="actions">
+        <a className="button button-chico button-secondary" href={`/api/certificados/${c.id}/archivo`} target="_blank" rel="noopener">
+          <FileText aria-hidden="true" size={18} />Ver archivo<span className="sr-only"> de {c.nombre} (se abre en otra pestaña)</span>
+        </a>
+        {editable(c.estado) && <Link className="button button-chico button-secondary" href={`/certificados/${c.id}/editar`}>
+          <Pencil aria-hidden="true" size={18} />Editar<span className="sr-only"> {c.nombre}</span>
+        </Link>}
+        <Button className="button-chico button-peligro" disabled={ocupado !== null} onClick={() => darDeBaja(c)}>
+          <Trash2 aria-hidden="true" size={18} />{ocupado === c.id ? 'Dando de baja…' : 'Dar de baja'}<span className="sr-only"> {c.nombre}</span>
+        </Button>
+      </div>
+    </Card>)}
+  </div>;
+}
