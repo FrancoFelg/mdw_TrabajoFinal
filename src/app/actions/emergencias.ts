@@ -6,7 +6,7 @@ import { getSession } from '@/lib/session';
 
 // Acciones sobre un caso (historias 10 y 11). El reporte vive con su pantalla.
 
-export type ResultadoCaso = { ok: boolean; error: string };
+export type ResultadoCaso = { ok: boolean; error: string; campos?: Record<string, string> };
 
 const ERRORES_CASO: Record<string, string> = {
   ROL_VOLUNTARIO_REQUERIDO: 'Solo voluntarios pueden atender emergencias.',
@@ -29,6 +29,7 @@ function errorCaso(error: unknown) {
 export async function tomarCasoAction(id: string): Promise<ResultadoCaso> {
   const sesion = await getSession();
   if (!sesion) return { ok: false, error: 'Tu sesión venció. Volvé a ingresar.' };
+  if (sesion.rol !== 'VOLUNTARIO') return { ok: false, error: 'Solo voluntarios pueden atender emergencias.' };
   try {
     await new EmergenciaService().tomarEmergencia(id, sesion.id);
   } catch (error) {
@@ -43,8 +44,9 @@ export async function tomarCasoAction(id: string): Promise<ResultadoCaso> {
 export async function finalizarCasoAction(id: string, _estado: ResultadoCaso, datos: FormData): Promise<ResultadoCaso> {
   const sesion = await getSession();
   if (!sesion) return { ok: false, error: 'Tu sesión venció. Volvé a ingresar.' };
+  if (sesion.rol !== 'VOLUNTARIO') return { ok: false, error: 'Solo voluntarios pueden atender emergencias.' };
   const informe = String(datos.get('informe') ?? '').trim();
-  if (informe.length < 10) return { ok: false, error: 'Contá en al menos 10 caracteres cómo terminó la atención.' };
+  if (informe.length < 10 || informe.length > 10000) return { ok: false, error: '', campos: { informe: 'Contá cómo terminó la atención (10 a 10000 caracteres).' } };
   try {
     await new EmergenciaService().finalizarEmergencia(id, sesion.id, informe);
   } catch (error) {

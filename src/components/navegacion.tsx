@@ -8,6 +8,7 @@ import { logoutAction } from '@/app/actions/auth';
 import type { UsuarioToken } from '@/lib/auth';
 import { Campana } from './campana';
 import { TemaBoton } from './tema';
+import { BotonEnviar } from './boton-enviar';
 
 // Cada pantalla suma su pestaña cuando existe (Formación, Equipo, Cuenta).
 export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | null; iniciales?: string }) {
@@ -62,7 +63,7 @@ export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | nul
           {cuentaAbierta && <div id={cuentaId} className="cuenta-opciones">
             <p className="cuenta-nombre">{usuario.nombreUsuario}</p>
             <Link href="/cuenta" onClick={() => setCuentaAbierta(false)}><UserRound aria-hidden="true" size={18} />Mi cuenta</Link>
-            <form action={logoutAction}><button type="submit"><LogOut aria-hidden="true" size={18} />Cerrar sesión</button></form>
+            <form action={logoutAction}><BotonEnviar><LogOut aria-hidden="true" size={18} />Cerrar sesión</BotonEnviar></form>
           </div>}
         </div></>
         : <Link className="button button-chico button-secondary" href="/login">Soy voluntario</Link>}</div>

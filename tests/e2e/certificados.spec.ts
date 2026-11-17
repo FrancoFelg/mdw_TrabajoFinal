@@ -31,7 +31,7 @@ test('H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegad
     const row = coordinator.getByRole('article', { name: `Certificado ${codigo}`, exact: true });
     await row.getByLabel('Resultado').selectOption('RECHAZADO');
     await row.getByRole('button', { name: 'Guardar validación' }).click();
-    await expect(coordinator.getByRole('status')).toHaveText('MOTIVO_REQUERIDO');
+    await expect(row.getByRole('alert')).toHaveText('Ingresá el motivo del rechazo (hasta 2000 caracteres).');
     await row.getByLabel('Motivo del rechazo').fill('El comprobante está incompleto.');
     await row.getByRole('button', { name: 'Guardar validación' }).click();
     await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');

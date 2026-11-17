@@ -709,3 +709,7 @@ tr:last-child td { border-bottom: 0; }
   .callout { padding: 24px; }
 }
 .solicitud-pendiente { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #dc2626; flex-shrink: 0; margin-right: 6px; }
+
+.form-campos { border: 0; padding: 0; margin: 0; min-width: 0; }
+.form-campos input, .form-campos select, .form-campos textarea { max-width: 100%; min-width: 0; }
+.error-campo { color: var(--danger, #b42318); overflow-wrap: anywhere; }

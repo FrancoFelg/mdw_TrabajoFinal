@@ -19,5 +19,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - En Windows puede usarse `$env:E2E_BROWSER_CHANNEL='chrome'` para usar Chrome instalado. No se necesitan usuarios especiales ni un modo de testing en la aplicación.
 - Resultados: `playwright-report/index.html`, `test-results/results.json`, trazas y capturas ante fallos. Informe versionado: `docs/pruebas-e2e.md`.
 - `tests/e2e/certificados.spec.ts` prueba carga PDF, curso opcional, rechazo con motivo, nueva carga, aprobación, habilitación de caso rojo, notificaciones, archivos privados, tamaño/formato y permisos vigentes. Los comprobantes E2E se aíslan en `.data/e2e/certificados`.
+- `tests/e2e/clase12.spec.ts` verifica errores por campo, errores de negocio arriba, foco y teclado a 375 px, conservación de datos y archivos, bloqueo durante guardado y rechazo de permisos revocados en Server Actions. La prueba física en teléfono se registra aparte en `docs/clase12.md`.
 - CI ejecuta pruebas en cada Pull Request. Los fallos de requisitos deben corregirse; no ocultarlos con `skip`, `fixme` o expectativas de fallo.
 - La protección de `main` y la aprobación de otro integrante deben comprobarse en GitHub; un workflow local no prueba que estén habilitadas.
