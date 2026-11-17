@@ -142,3 +142,71 @@ test('destinos de login conservan cuenta y ascensos sin permitir redirecciones e
   assert.equal(safeDestination('https://example.com'), '/casos');
   assert.equal(safeDestination('//example.com'), '/casos');
 });
+
+test('registro por API exige la misma política de contraseña que el formulario', async () => {
+  let registrado;
+  const registro = cargar('src/lib/registro.ts', {});
+  const api = cargar('src/app/api/usuarios/route.ts', {
+    '@/lib/auth': { getUserFromRequest: () => null },
+    '@/lib/cursoErrores': { RESPUESTA_NO_AUTORIZADO: () => new Response(null, { status: 401 }) },
+    '@/lib/usuarios-admin': { puedeGestionarUsuarios: async () => false },
+    '@/lib/registro': registro,
+    '../../../../services/usuario.service': { UsuarioService: class { async registrarUsuario(dto) { registrado = dto; return { id: 'nuevo' }; } } },
+  });
+  const alta = body => api.POST(new NextRequest('http://localhost/api/usuarios', { method: 'POST', body: JSON.stringify(body) }));
+  const valido = { nombreUsuario: ' ana ', email: ' ANA@Example.com ', password: 'contraseña-segura', persona: { nombre: 'Ana', apellido: 'Pérez', fechaNac: '1990-05-10' } };
+  for (const body of [
+    { ...valido, password: 'a' }, { ...valido, password: '1234567' }, { ...valido, password: 'ñ'.repeat(37) },
+    { ...valido, password: 12345678 }, { ...valido, nombreUsuario: { $ne: '' } }, { ...valido, email: 'no-es-email' },
+    { ...valido, persona: { ...valido.persona, fechaNac: 'ayer' } }, { ...valido, persona: { ...valido.persona, fechaNac: '2999-01-01' } },
+    { ...valido, persona: undefined }, { ...valido, nombreUsuario: undefined },
+  ]) {
+    registrado = undefined;
+    assert.equal((await alta(body)).status, 400);
+    assert.equal(registrado, undefined);
+  }
+  assert.equal((await alta(valido)).status, 201);
+  assert.equal(registrado.nombreUsuario, 'ana');
+  assert.equal(registrado.email, 'ana@example.com');
+  assert.equal(registrado.password, 'contraseña-segura');
+  assert.deepEqual(registrado.persona, { nombre: 'Ana', apellido: 'Pérez', fechaNac: new Date('1990-05-10') });
+  const telefonos = [{ tipo: 'celular', numero: '1122334455' }];
+  assert.equal((await alta({ ...valido, persona: { ...valido.persona, telefonos } })).status, 201);
+  assert.deepEqual(registrado.persona.telefonos, telefonos);
+  const { email: _sinEmail, ...sinEmail } = valido;
+  assert.equal((await alta(sinEmail)).status, 201);
+  assert.equal(registrado.email, undefined);
+});
+
+test('login bloquea la cuenta tras diez fallos seguidos y la API responde 429', async () => {
+  const servicio = cargar('services/auth.service.ts', {
+    '../repositories/usuario.repository': { UsuarioRepository: class {
+      async findParaLogin(nombre) { return ['ana', 'ana@example.com', 'ána'].includes(nombre.toLowerCase()) ? { id: 'u', nombreUsuario: 'ana', rol: 'VOLUNTARIO', password: 'hash' } : null; }
+    } },
+    bcrypt: { compare: async plano => plano === 'correcta' },
+    jsonwebtoken: { sign: () => 'token' },
+  });
+  process.env.JWT_SECRET = 'test';
+  const auth = new servicio.AuthService();
+  for (let i = 0; i < 9; i++) await assert.rejects(auth.login('ana', 'incorrecta'), /CREDANCIALES_INVALIDAS/);
+  assert.equal((await auth.login('ana', 'correcta')).token, 'token'); // Un ingreso correcto reinicia el contador.
+  // Los fallos se cuentan por cuenta: usuario, email y variantes que la base resuelve igual comparten contador.
+  for (const alias of [' ANA ', 'ana@example.com', 'ána', 'ana', 'ANA@example.com']) {
+    for (let i = 0; i < 2; i++) await assert.rejects(auth.login(alias, 'incorrecta'), /CREDANCIALES_INVALIDAS/);
+  }
+  for (const alias of ['ana', 'ana@example.com', 'ána']) await assert.rejects(auth.login(alias, 'correcta'), /DEMASIADOS_INTENTOS/);
+  for (let i = 0; i < 10; i++) await assert.rejects(auth.login('inexistente', 'x'), /CREDANCIALES_INVALIDAS/);
+  await assert.rejects(auth.login('inexistente', 'x'), /DEMASIADOS_INTENTOS/);
+  assert.equal((await auth.login('otra', 'x').catch(e => e.message)), 'CREDANCIALES_INVALIDAS'); // Otra cuenta no queda afectada.
+
+  const ruta = cargar('src/app/api/auth/login/route.ts', {
+    '../../../../../services/auth.service': servicio,
+    '@/lib/session': { sessionCookie: {} },
+  });
+  const log = console.error;
+  console.error = () => {};
+  try {
+    const respuesta = await ruta.POST(new NextRequest('http://localhost/api/auth/login', { method: 'POST', body: JSON.stringify({ nombreUsuario: 'ana', password: 'correcta' }) }));
+    assert.equal(respuesta.status, 429);
+  } finally { console.error = log; }
+});

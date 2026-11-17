@@ -42,6 +42,8 @@ export default async function Caso({ params }: { params: Promise<{ id: string }>
   }
 
   const conMapa = lat !== null && lng !== null;
+  // Las fotos válidas viven en el almacenamiento propio; una URL externa guardada antes no se muestra.
+  const foto = emergencia.imagen?.startsWith('/api/emergencias/') ? emergencia.imagen : null;
   return <article className={conMapa ? 'caso caso-con-mapa' : 'caso'}>
     {conMapa && <div className="caso-mapa">
       <MapaCaso lat={lat} lng={lng} prioridad={emergencia.prioridad} id={emergencia.id} estado={emergencia.estado} />
@@ -73,10 +75,10 @@ export default async function Caso({ params }: { params: Promise<{ id: string }>
         </a>}
       </section>
 
-      {emergencia.imagen && <a className="adjunto-foto-caso" href={emergencia.imagen} target="_blank" rel="noopener noreferrer">
-        {/* La foto puede estar en almacenamiento local autenticado o en una URL del backend existente. */}
+      {foto && <a className="adjunto-foto-caso" href={foto} target="_blank" rel="noopener noreferrer">
+        {/* Solo se muestra la foto del almacenamiento propio autenticado, nunca una URL externa. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={emergencia.imagen} alt="Foto del incidente reportado" />
+        <img src={foto} alt="Foto del incidente reportado" />
         <span className="sr-only">Abrir foto en otra pestaña</span>
       </a>}
       {emergencia.observacionesCierre && <section className="grupo"><h2>Informe final</h2><p>{emergencia.observacionesCierre}</p></section>}

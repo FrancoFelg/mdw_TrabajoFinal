@@ -20,8 +20,9 @@ const ERROR_Y = 'coordenada_y (latitud) debe estar entre -90 y 90.';
 export const CrearEmergenciaSchema = z
   .object({
     descripcion: z.string().trim().min(5, 'La descripción debe tener al menos 5 caracteres.').max(191, 'La descripción admite hasta 191 caracteres.'),
-    imagen: z.string().url('La imagen debe ser una URL válida.').max(191)
-      .refine(url => /^https?:\/\//i.test(url), 'La imagen debe usar HTTP o HTTPS.').optional(),
+    // La foto solo se adjunta con la carga firmada (POST /api/emergencias/:id/foto): una URL
+    // enviada por el reportante se mostraría al equipo y permitiría rastreo o phishing.
+    imagen: z.never({ error: 'La foto se adjunta con la carga de foto del reporte, no como URL.' }).optional(),
     prioridad: z.nativeEnum(Prioridad, { message: 'La prioridad debe ser ROJO, AMARILLO o VERDE.' }).optional(),
     direccion: z.string().trim().min(3, 'La dirección es demasiado corta.').max(250).optional(),
     coordenada_x: z.number().min(-180, ERROR_X).max(180, ERROR_X).optional(),
@@ -78,7 +79,6 @@ export class EmergenciaService {
     const emergencia = await this.emergenciaRepo.crear({
       id,
       descripcion: datos.descripcion,
-      imagen: datos.imagen,
       prioridad: datos.prioridad ?? Prioridad.VERDE,
       coordenada_x,
       coordenada_y,

@@ -34,8 +34,9 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/emergencias — reportar una emergencia (sin cuenta).
-// Body: { descripcion, imagen?, prioridad?, direccion }
-//    ó { descripcion, imagen?, prioridad?, coordenada_x, coordenada_y, provincia }
+// Body: { descripcion, prioridad?, direccion }
+//    ó { descripcion, prioridad?, coordenada_x, coordenada_y, provincia }
+// La foto se adjunta después con POST /api/emergencias/:id/foto y el permiso devuelto.
 // coordenada_x = longitud, coordenada_y = latitud. Sin prioridad, nace VERDE.
 export async function POST(req: NextRequest) {
     // Reintentar la misma clave recupera el caso si su respuesta se perdió.
