@@ -58,6 +58,9 @@ test('formularios: teclado, errores por campo, datos conservados y negocio arrib
   await expect(page.getByLabel('Contraseña', { exact: true })).toHaveValue('incorrecta');
 
   await page.goto('/reportar');
+  // Quien reporta tiene que ver siempre cómo llamar a emergencias, antes y después de enviar.
+  await expect(page.getByRole('link', { name: 'Llamar al 107' })).toHaveAttribute('href', 'tel:107');
+  await expect(page.getByRole('link', { name: 'Llamar al 911' })).toHaveAttribute('href', 'tel:911');
   await page.getByRole('button', { name: 'Reportar emergencia', exact: true }).click();
   await expect(page.locator('#reporte-descripcion-error')).toBeVisible();
   await page.getByLabel('¿Qué está pasando?').fill(`Reporte teclado ${randomUUID()}`);
@@ -70,6 +73,8 @@ test('formularios: teclado, errores por campo, datos conservados y negocio arrib
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'Emergencia reportada' })).toBeVisible();
   await expect(page.getByText('Foto adjuntada.', { exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Llamar al 107' })).toHaveAttribute('href', 'tel:107');
+  await expect(page.getByRole('link', { name: 'Llamar al 911' })).toHaveAttribute('href', 'tel:911');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 

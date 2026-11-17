@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { reportarAction, fotoReporteAction } from '@/app/actions/formularios';
 import { Formulario } from './formulario';
 import { LocateFixed, CheckCircle } from 'lucide-react';
-import { MAX_FOTO, TIPOS_FOTO } from '@/lib/reporte';
+import { MAX_FOTO, TIPOS_FOTO, OPCIONES_RESPUESTA, PREGUNTAS_ESTADO, derivarPrioridad, type RespuestasEstado } from '@/lib/reporte';
+import { MarcaPrioridad } from './marcas';
+import { LlamarEmergencias } from './llamar-emergencias';
 import { estimarProvincia, NOMBRES_PROVINCIA, PRIORIDADES } from '@/lib/casos';
 import type { Prioridad, Provincia } from '@prisma/client';
 
@@ -13,7 +15,8 @@ type Reportado = { id: string; permisoFoto: string | null; prioridad: Prioridad 
 
 export function ReporteForm({ provincias }: { provincias: string[] }) {
   const [descripcion, setDescripcion] = useState('');
-  const [prioridad, setPrioridad] = useState<Prioridad>('VERDE');
+  const [respuestas, setRespuestas] = useState<RespuestasEstado>({ responde: null, respira: null });
+  const prioridad = derivarPrioridad(respuestas);
   const [direccion, setDireccion] = useState('');
   const [provincia, setProvincia] = useState('');
   const [gps, setGps] = useState<GPS | null>(null);
@@ -145,15 +148,24 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
 
   return <Formulario id="reporte" action={enviar}>
     <fieldset className="reporte-campos stack" disabled={enviando || incierto}>
-      <div className="field"><label htmlFor="prioridad">Prioridad de la emergencia</label>
-        <select className="input" id="prioridad" name="prioridad" required value={prioridad} onChange={e => setPrioridad(e.target.value as Prioridad)}>
-          {(Object.entries(PRIORIDADES) as [Prioridad, { nombre: string; detalle: string }][]).map(([valor, opcion]) =>
-            <option key={valor} value={valor}>{opcion.nombre} — {opcion.detalle}</option>)}
-        </select></div>
       <div className="field"><label htmlFor="descripcion">¿Qué está pasando?</label>
         <textarea id="descripcion" name="descripcion" className="input textarea" required minLength={5} maxLength={191} value={descripcion}
           onChange={e => setDescripcion(e.target.value)} aria-describedby="descripcion-ayuda" />
         <small id="descripcion-ayuda" className="muted">Entre 5 y 191 caracteres. Incluí referencias para encontrar a la persona.</small></div>
+      {PREGUNTAS_ESTADO.map(pregunta => <fieldset key={pregunta.clave} className="pregunta">
+        <legend className="pregunta-texto">{pregunta.texto}</legend>
+        <div className="pregunta-opciones">
+          {OPCIONES_RESPUESTA.map(opcion => {
+            const elegida = respuestas[pregunta.clave] === opcion.valor;
+            return <label key={opcion.valor} className={`pregunta-op${elegida ? ' elegida' : ''}`}>
+              <input type="radio" name={pregunta.clave} value={opcion.valor} checked={elegida}
+                onChange={() => setRespuestas(actuales => ({ ...actuales, [pregunta.clave]: opcion.valor }))} />
+              {opcion.texto}</label>;
+          })}
+        </div>
+      </fieldset>)}
+      <p className="prioridad-derivada" role="status">Prioridad: <MarcaPrioridad prioridad={prioridad} detalle /></p>
+      {prioridad === 'ROJO' && <LlamarEmergencias />}
       <div className="stack"><h2>¿Dónde hace falta ayuda?</h2>
         <button type="button" className="button button-secondary" onClick={localizar} disabled={localizando}>
           <LocateFixed size={20} aria-hidden="true" />{localizando ? 'Buscando ubicación…' : 'Usar mi ubicación GPS'}</button>

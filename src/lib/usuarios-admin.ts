@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { db } from '../../config/database';
+import { asegurarSinCasoEnCamino } from '../../repositories/emergencia.repository';
 
 const texto = z.string().trim().min(1).max(100);
 const camposUsuario = z.object({
@@ -30,7 +31,7 @@ export async function editarUsuario(id: string, entrada: unknown, propia = false
   if (!destino) throw new Error('USUARIO_NO_ENCONTRADO');
   if (!propia && destino.rol === 'ADMIN') throw new Error('ADMIN_PROTEGIDO');
   const { persona, ...cuenta } = datos;
-  const resultado = await db.usuario.update({ where: { id }, data: {
+  const actualizar = (cliente: Pick<typeof db, 'usuario'>) => cliente.usuario.update({ where: { id }, data: {
     ...cuenta,
     ...(persona && { persona: { update: {
       nombre: persona.nombre, apellido: persona.apellido,
@@ -38,6 +39,13 @@ export async function editarUsuario(id: string, entrada: unknown, propia = false
       ...(persona.telefonos && { telefonos: { deleteMany: {}, create: persona.telefonos } }),
     } } }),
   }, include: { persona: { include: { telefonos: true } } } });
+  // Dejar de ser voluntario con un caso en camino lo dejaría sin nadie que pueda finalizarlo.
+  // Solo se verifica si es un ascenso: el formulario envía el rol en cada edición.
+  const nuevoRol = 'rol' in cuenta ? cuenta.rol : undefined;
+  const asciende = destino.rol === 'VOLUNTARIO' && nuevoRol !== undefined && nuevoRol !== 'VOLUNTARIO';
+  const resultado = asciende
+    ? await db.$transaction(async tx => { await asegurarSinCasoEnCamino(tx, id); return actualizar(tx); })
+    : await actualizar(db);
   const { password: _password, ...publico } = resultado;
   return publico;
 }

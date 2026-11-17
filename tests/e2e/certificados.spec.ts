@@ -22,12 +22,21 @@ test('H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegad
     expect(await file.body()).toEqual(pdf);
     await coordinator.goto('/certificados/revisar');
     const row = coordinator.getByRole('article', { name: `Certificado ${nombre} de ${user.nombreUsuario}`, exact: true });
-    await row.getByLabel('Resultado').selectOption('RECHAZADO');
-    await row.getByRole('button', { name: 'Guardar validación' }).click();
+    // No hay una decisión preseleccionada ni un motivo a la vista hasta elegir.
+    await expect(row.getByLabel('Resultado')).toHaveCount(0);
+    await expect(row.getByLabel('Motivo del rechazo')).toHaveCount(0);
+    // Cancelar vuelve a las dos opciones sin guardar nada.
+    await row.getByRole('button', { name: 'Aprobar', exact: true }).click();
+    await expect(row.getByText('podrá tomar casos rojos')).toBeVisible();
+    await row.getByRole('button', { name: 'Cancelar', exact: true }).click();
+    await expect(row.getByRole('button', { name: 'Confirmar aprobación' })).toHaveCount(0);
+    expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).estado).toBe('PENDIENTE');
+    await row.getByRole('button', { name: 'Rechazar', exact: true }).click();
+    await row.getByRole('button', { name: 'Confirmar rechazo' }).click();
     await expect(row.getByRole('alert')).toHaveText('Para rechazar, escribí el motivo (hasta 2000 caracteres).');
     await expect(row.getByLabel('Motivo del rechazo')).toBeFocused();
     await row.getByLabel('Motivo del rechazo').fill('El comprobante está incompleto.');
-    await row.getByRole('button', { name: 'Guardar validación' }).click();
+    await row.getByRole('button', { name: 'Confirmar rechazo' }).click();
     await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');
     certificado = await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } });
     expect(certificado.usuarioRevisionId).toBe(reviewer.id);
@@ -42,7 +51,9 @@ test('H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegad
     const caso = await report(request, 'ROJO');
     expect(await page.request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(403);
     await coordinator.reload();
-    await coordinator.getByRole('article', { name: `Certificado ${nombreNuevo} de ${user.nombreUsuario}`, exact: true }).getByRole('button', { name: 'Guardar validación' }).click();
+    const filaNueva = coordinator.getByRole('article', { name: `Certificado ${nombreNuevo} de ${user.nombreUsuario}`, exact: true });
+    await filaNueva.getByRole('button', { name: 'Aprobar', exact: true }).click();
+    await filaNueva.getByRole('button', { name: 'Confirmar aprobación' }).click();
     await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');
     expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).estado).toBe('APROBADO');
     expect(await page.request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(200);
@@ -169,7 +180,9 @@ test('H6: un rechazado corregido vuelve a revisión y se aprueba; nadie revisa s
 
     // Se puede revisar otra vez: el aviso a la persona no choca con el del rechazo.
     await coordinator.goto('/certificados/revisar');
-    await coordinator.getByRole('article', { name: `Certificado ${nombre} de ${user.nombreUsuario}`, exact: true }).getByRole('button', { name: 'Guardar validación' }).click();
+    const corregido = coordinator.getByRole('article', { name: `Certificado ${nombre} de ${user.nombreUsuario}`, exact: true });
+    await corregido.getByRole('button', { name: 'Aprobar', exact: true }).click();
+    await corregido.getByRole('button', { name: 'Confirmar aprobación' }).click();
     await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');
     expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).estado).toBe('APROBADO');
     expect(await db.notificacion.count({ where: { usuarioId: user.id, clave: { startsWith: `certificado_resuelto:${certificado.id}:` } } })).toBe(2);
@@ -181,7 +194,8 @@ test('H6: un rechazado corregido vuelve a revisión y se aprueba; nadie revisa s
     await coordinator.goto('/certificados/revisar');
     const tarjeta = coordinator.getByRole('article', { name: `Certificado ${propio} de ${reviewer.nombreUsuario}`, exact: true });
     await expect(tarjeta.getByText('Es tu certificado: lo revisa otra persona de coordinación.')).toBeVisible();
-    await expect(tarjeta.getByRole('button', { name: 'Guardar validación' })).toHaveCount(0);
+    await expect(tarjeta.getByRole('button', { name: 'Aprobar', exact: true })).toHaveCount(0);
+    await expect(tarjeta.getByRole('button', { name: 'Rechazar', exact: true })).toHaveCount(0);
     const intento = await ctx.request.patch(`/api/certificados/${suyo.id}`, { data: { estado: 'APROBADO' } });
     expect(intento.status()).toBe(403);
     expect((await intento.json()).codigo).toBe('CERTIFICADO_PROPIO');

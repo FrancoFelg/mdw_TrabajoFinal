@@ -275,6 +275,8 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .ubicar-buscando { cursor: progress; }
 /* Preguntas de estado: selector segmentado Sí / No / No sé. La elección se marca desde el estado de React. */
 .pregunta { display: flex; flex-direction: column; gap: 8px; }
+fieldset.pregunta { border: 0; margin: 0; padding: 0; min-width: 0; }
+.pregunta legend { padding: 0; margin-bottom: 8px; }
 .pregunta-texto { font-weight: 600; }
 .pregunta-opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: var(--r); background: var(--bg-2); }
 .pregunta-op { position: relative; display: grid; place-items: center; min-height: 44px; border-radius: var(--r-s); font-weight: 600; color: var(--text-2); cursor: pointer; transition: background-color .15s, color .15s; }
@@ -285,7 +287,7 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .prioridad-derivada { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: .9375rem; }
 .llamar { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--r); background: var(--red-soft); color: var(--red-ink); font-weight: 600; font-size: .9375rem; }
 .llamar svg { flex-shrink: 0; }
-.llamar a { color: inherit; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; padding: 6px 2px; }
+.llamar a { display: inline-block; min-width: 44px; padding: 11px 6px; text-align: center; color: inherit; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
 .llamar-compacto { padding: 10px 12px; }
 .error-campo { display: flex; align-items: center; gap: 6px; color: var(--red-ink); font-weight: 600; font-size: .9375rem; }
 .error-campo svg, .error-envio svg { flex-shrink: 0; }

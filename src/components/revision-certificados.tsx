@@ -16,6 +16,32 @@ export type CertificadoRevision = {
   propio: boolean;
 };
 
+// Aprobar habilita a la persona a tomar casos rojos, así que ninguna decisión viene elegida de
+// antemano: primero se elige Aprobar o Rechazar y después se confirma. El motivo solo se pide
+// al rechazar.
+function Decision({ certificado: c, onGuardado, onEnviar }: {
+  certificado: CertificadoRevision; onGuardado: () => void; onEnviar: () => void;
+}) {
+  const [decision, setDecision] = useState<'APROBADO' | 'RECHAZADO' | null>(null);
+  if (!decision) return <div className="actions">
+    <Button type="button" onClick={() => setDecision('APROBADO')}>Aprobar</Button>
+    <Button type="button" className="button-secondary" onClick={() => setDecision('RECHAZADO')}>Rechazar</Button>
+  </div>;
+  const aprobar = decision === 'APROBADO';
+  return <Formulario id={`revisar-${c.id}`} className="stack-chico"
+    action={datos => { onEnviar(); return revisarCertificadoAction(c.id, datos); }} onSuccess={onGuardado}>
+    <input type="hidden" name="estado" value={decision} />
+    {aprobar
+      ? <p>Al aprobarlo, {c.persona} podrá tomar casos rojos.</p>
+      : <div className="field"><label htmlFor={`motivo-${c.id}`}>Motivo del rechazo</label>
+        <textarea id={`motivo-${c.id}`} name="motivo" className="input textarea" maxLength={2000} autoFocus /></div>}
+    <div className="actions">
+      <Button type="submit">{aprobar ? 'Confirmar aprobación' : 'Confirmar rechazo'}</Button>
+      <Button type="button" className="button-secondary" onClick={() => setDecision(null)}>Cancelar</Button>
+    </div>
+  </Formulario>;
+}
+
 // Cola de validación (historia 6): pendientes primero, luego el historial resuelto.
 export function RevisionCertificados({ certificados }: { certificados: CertificadoRevision[] }) {
   const router = useRouter();
@@ -35,15 +61,8 @@ export function RevisionCertificados({ certificados }: { certificados: Certifica
     {c.motivoRechazo && <p className="aviso">Motivo: {c.motivoRechazo}</p>}
     <div className="actions"><a className="button button-chico button-secondary" href={`/api/certificados/${c.id}/archivo`} target="_blank" rel="noopener"><FileText aria-hidden="true" size={18} />Ver archivo<span className="sr-only"> (se abre en otra pestaña)</span></a></div>
     {c.estado === 'PENDIENTE' && c.propio && <p className="muted">Es tu certificado: lo revisa otra persona de coordinación.</p>}
-    {c.estado === 'PENDIENTE' && !c.propio && <Formulario id={`revisar-${c.id}`} className="stack-chico"
-      action={datos => { setMensaje(''); return revisarCertificadoAction(c.id, datos); }}
-      onSuccess={() => { setMensaje('Validación guardada.'); router.refresh(); }}>
-      <div className="field"><label htmlFor={`resultado-${c.id}`}>Resultado</label>
-        <select id={`resultado-${c.id}`} name="estado" className="input"><option value="APROBADO">Aprobar</option><option value="RECHAZADO">Rechazar</option></select></div>
-      <div className="field"><label htmlFor={`motivo-${c.id}`}>Motivo del rechazo</label>
-        <textarea id={`motivo-${c.id}`} name="motivo" className="input textarea" maxLength={2000} /></div>
-      <div><Button type="submit">Guardar validación</Button></div>
-    </Formulario>}
+    {c.estado === 'PENDIENTE' && !c.propio && <Decision certificado={c}
+      onGuardado={() => { setMensaje('Validación guardada.'); router.refresh(); }} onEnviar={() => setMensaje('')} />}
   </Card>;
 
   return <div className="stack">
