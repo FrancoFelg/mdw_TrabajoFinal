@@ -166,6 +166,63 @@ test('H3: solicitud, duplicado, rechazo, historial y aprobación con avisos', as
   } finally { await coordinator.dispose(); }
 });
 
+test('H3: no se asciende a quien tiene un caso en camino', async ({ request, playwright }) => {
+  const user = await account(request);
+  const coordinator = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:3100' });
+  try {
+    await account(coordinator, 'COORDINADOR');
+    const caso = await report(request);
+    expect(await request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(200);
+    const solicitud = await (await request.post('/api/solicitudes-ascenso')).json();
+
+    // Si se lo ascendiera, el caso quedaría en camino sin nadie que pueda finalizarlo.
+    const aprobar = await coordinator.post(`/api/solicitudes-ascenso/${solicitud.id}/aprobar`);
+    expect(aprobar.status()).toBe(409);
+    expect((await aprobar.json()).error).toBe('Tiene un caso en camino: tiene que finalizarlo antes del ascenso.');
+    const editar = await coordinator.patch(`/api/usuarios/${user.id}`, { data: { rol: 'COORDINADOR' } });
+    expect(editar.status()).toBe(409);
+    expect((await editar.json()).error).toBe('Tiene un caso en camino: tiene que finalizarlo antes del ascenso.');
+    expect((await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol).toBe('VOLUNTARIO');
+    expect((await db.solicitudAscenso.findUniqueOrThrow({ where: { id: solicitud.id } })).estado).toBe('PENDIENTE');
+    // El resto del perfil se puede seguir editando.
+    expect(await coordinator.patch(`/api/usuarios/${user.id}`, { data: { persona: { nombre: 'Editada' } } }).then(r => r.status())).toBe(200);
+
+    expect(await request.post(`/api/emergencias/${caso.id}/finalizar`, {
+      data: { observaciones: 'Asistencia finalizada antes del ascenso.' },
+    }).then(r => r.status())).toBe(200);
+    expect(await coordinator.post(`/api/solicitudes-ascenso/${solicitud.id}/aprobar`).then(r => r.status())).toBe(200);
+    expect((await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol).toBe('COORDINADOR');
+
+    // Quien ya coordina no está ascendiendo: su perfil se edita aunque arrastre un caso trabado
+    // de antes de esta regla (el formulario siempre envía el rol).
+    const previo = await report(request);
+    await db.emergencia.update({ where: { id: previo.id }, data: { estado: 'EN_CAMINO', usuarios: { create: { usuarioId: user.id } } } });
+    expect(await coordinator.patch(`/api/usuarios/${user.id}`, { data: { rol: 'COORDINADOR', persona: { nombre: 'Coordina' } } }).then(r => r.status())).toBe(200);
+  } finally { await coordinator.dispose(); }
+});
+
+test('H3: tomar un caso y ascender a la vez nunca deja a un coordinador con un caso en camino', async ({ playwright }) => {
+  const coordinator = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:3100' });
+  try {
+    await account(coordinator, 'COORDINADOR');
+    for (let i = 0; i < 10; i++) {
+      const voluntario = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:3100' });
+      try {
+        const user = await account(voluntario);
+        const caso = await report(voluntario);
+        const solicitud = await (await voluntario.post('/api/solicitudes-ascenso')).json();
+        await Promise.all([
+          voluntario.post(`/api/emergencias/${caso.id}/tomar`),
+          coordinator.post(`/api/solicitudes-ascenso/${solicitud.id}/aprobar`),
+        ]);
+        const rol = (await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol;
+        const enCamino = await db.emergencia.count({ where: { estado: 'EN_CAMINO', usuarios: { some: { usuarioId: user.id } } } });
+        expect(rol === 'COORDINADOR' && enCamino > 0, `iteración ${i}: rol ${rol}, casos en camino ${enCamino}`).toBe(false);
+      } finally { await voluntario.dispose(); }
+    }
+  } finally { await coordinator.dispose(); }
+});
+
 test('H10: rojo exige certificado aprobado', async ({ request }) => {
   const user = await account(request);
   const caso = await report(request, 'ROJO');

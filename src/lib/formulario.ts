@@ -23,6 +23,7 @@ export function falloFormulario(error: unknown): ResultadoFormulario {
     SOLICITUD_NO_PENDIENTE: 'La solicitud ya fue resuelta.',
     SOLICITUD_NO_ENCONTRADA: 'Solicitud no encontrada.',
     USUARIO_YA_ES_COORDINADOR: 'Solo voluntarios pueden recibir un ascenso.',
+    CASO_EN_CAMINO: 'Tiene un caso en camino: tiene que finalizarlo antes del ascenso.',
     SOLO_VOLUNTARIOS: 'Solo voluntarios pueden solicitar ascenso.',
     ESTADO_NO_PENDIENTE: 'El certificado ya fue resuelto.',
     CERTIFICADO_NO_ENCONTRADO: 'Certificado no encontrado.',

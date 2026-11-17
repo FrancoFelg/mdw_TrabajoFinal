@@ -13,8 +13,8 @@ let rol = 'VOLUNTARIO', destino = 'VOLUNTARIO', cambios;
 const db = { usuario: {
   findUnique: async ({ where }) => where.id === 'inexistente' ? null : { rol: where.id === 'actor' ? rol : destino },
   update: async datos => { cambios = datos; return { id: 'destino', password: 'secreto', rol: destino }; },
-} };
-const admin = cargar('src/lib/usuarios-admin.ts', { '../../config/database': { db } });
+}, $transaction: async operacion => operacion(db) };
+const admin = cargar('src/lib/usuarios-admin.ts', { '../../config/database': { db }, '../../repositories/emergencia.repository': { asegurarSinCasoEnCamino: async () => {} } });
 let autenticado = true;
 const ruta = cargar('src/app/api/usuarios/[id]/route.ts', {
   '@/lib/auth': { getUserFromRequest: () => autenticado ? { id: 'actor', rol: 'ADMIN' } : null },
@@ -145,7 +145,7 @@ test('destinos de login conservan cuenta y ascensos sin permitir redirecciones e
 
 
 test('coordinación no puede cambiar el email de otra persona; cada uno sí el propio', () => {
-  const { editarUsuarioSchema, editarCuentaSchema } = cargar('src/lib/usuarios-admin.ts', { '../../config/database': { db: {} } });
+  const { editarUsuarioSchema, editarCuentaSchema } = cargar('src/lib/usuarios-admin.ts', { '../../config/database': { db: {} }, '../../repositories/emergencia.repository': {} });
   assert.equal(editarUsuarioSchema.safeParse({ email: 'otro@example.com' }).success, false);
   assert.equal(editarUsuarioSchema.safeParse({ nombreUsuario: 'ana', email: 'otro@example.com' }).success, false);
   assert.equal(editarUsuarioSchema.safeParse({ nombreUsuario: 'ana', rol: 'COORDINADOR' }).success, true);

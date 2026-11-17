@@ -15,6 +15,7 @@ async function operar(req: NextRequest, params: Promise<{ id: string }>, editar:
     return jsonPublico(usuario, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof ZodError || error instanceof SyntaxError) return jsonPublico({ error: 'Datos inválidos. Revisá los campos y la fecha.' }, { status: 400 });
+    if (error instanceof Error && error.message === 'CASO_EN_CAMINO') return jsonPublico({ error: 'Tiene un caso en camino: tiene que finalizarlo antes del ascenso.' }, { status: 409 });
     if (error instanceof Error && error.message === 'ADMIN_PROTEGIDO') return jsonPublico({ error: 'No se permite modificar administradores.' }, { status: 403 });
     if (error instanceof Error && error.message === 'USUARIO_NO_ENCONTRADO' || (error as { code?: string })?.code === 'P2025') return jsonPublico({ error: 'Usuario no encontrado.' }, { status: 404 });
     if ((error as { code?: string })?.code === 'P2002') return jsonPublico({ error: 'El nombre de usuario o email ya está registrado.' }, { status: 409 });

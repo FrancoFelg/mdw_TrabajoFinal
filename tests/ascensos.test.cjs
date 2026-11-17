@@ -38,7 +38,7 @@ function escenario() {
   };
   const db = { usuario, solicitudAscenso, notificacion: { async create({ data }) { if (fallarAviso) throw Error('Sin DB'); datos.avisos.push(data); return data; } } };
   db.$transaction = async fn => { const copia = structuredClone(datos); try { return await fn(db); } catch (e) { datos = copia; throw e; } };
-  const { SolicitudAscensoRepository } = cargar('repositories/solicitudAscenso.repository.ts', { '../config/database': { db } });
+  const { SolicitudAscensoRepository } = cargar('repositories/solicitudAscenso.repository.ts', { '../config/database': { db }, './emergencia.repository': { asegurarSinCasoEnCamino: async () => {} } });
   const { SolicitudAscensoService } = cargar('services/solicitudAscenso.service.ts', { '../config/database': { db }, '../repositories/solicitudAscenso.repository': { SolicitudAscensoRepository } });
   let token = { id: 'v', rol: 'VOLUNTARIO' };
   const api = cargar('src/lib/ascensos-api.ts', { '../../config/database': { db }, '../../services/solicitudAscenso.service': { SolicitudAscensoService }, './auth': { getUserFromRequest: () => token } });
