@@ -40,38 +40,154 @@ HEALTH_INTERVAL="${HEALTH_INTERVAL:-5}"
 STATE_DIR="${STATE_DIR:-/var/lib/mdw-deploy}"
 MAX_ATTEMPTS="${MAX_ATTEMPTS:-3}"        # reintentos por commit antes de rendirse
 
-COMPOSE=(docker compose --env-file .env -f infra/docker/docker-compose.prod.yaml)
+PROJECT_NAME="${PROJECT_NAME:-mdw}"
+COMPOSE_FILE="infra/docker/docker-compose.prod.yaml"
+COMPOSE=(docker compose --env-file .env -f "$COMPOSE_FILE")
+# Lo único del host que el compose puede montar (rutas relativas a APP_DIR)
+ALLOWED_BINDS=(infra/docker/db_data)
+# Redes de Docker ajenas al proyecto a las que se puede conectar (JSON)
+EXTERNAL_NETWORKS='["proxy-network"]'
+# Servicios que pueden conectarse a esas redes. Compose registra el nombre del
+# servicio como alias DNS: un servicio llamado como el container de otra app le
+# robaría tráfico a global-nginx (JSON)
+EXTERNAL_SERVICES='["app"]'
 
 log() { printf '%s [mdw-deploy] %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*"; }
 die() { log "ERROR: $*"; exit 1; }
 
 # -----------------------------------------------------------------------------
-# Guardia del compose. El daemon de Docker es root: un compose con
-# `privileged`, el socket de Docker montado o un volumen de `/` le da el VPS
-# entero a quien lo mergee. Esta función renderiza el compose que se va a
-# ejecutar (`docker compose config`, ya con variables resueltas) y aborta si
-# aparece algo de la lista. Es la defensa que NO depende de GitHub.
+# Guardia del compose. El daemon de Docker es root y el VPS es compartido: un
+# compose malicioso puede darle el host entero a quien lo mergee (`privileged`,
+# el socket de Docker, montar `/`) o meterse con otras apps (sus volúmenes, sus
+# redes, su tráfico). Esta función es la defensa que NO depende de GitHub.
+#
+# Valida con LISTA BLANCA: solo pasa lo que este proyecto usa hoy. Si mañana
+# hace falta una clave nueva, se agrega acá con review del dueño del VPS.
+# Una lista negra no alcanza; compose tiene demasiadas formas de llegar al host.
+#
+#   1. Texto crudo: UTF-8 sin bytes NUL (si no, un archivo en UTF-16, que
+#      compose lee igual, esquiva el grep), y sin `extends`, `include` ni
+#      `env_file`. Compose los resuelve al renderizar (leen archivos del host
+#      como root) y la clave desaparece del resultado, así que hay que
+#      frenarlos antes. Sin `\` para que no se puedan escribir esas claves con
+#      escapes de YAML.
+#   2. Modelo renderizado (`config --format json`): claves permitidas, nombres
+#      propios del proyecto para volúmenes, redes, containers e imágenes, y
+#      `proxy-network` como única red externa, solo para EXTERNAL_SERVICES y
+#      sin alias ni IP fija.
+#   3. Rutas del host, ya resueltas con `realpath`. Binds: solo los de
+#      ALLOWED_BINDS, ruta exacta. Contexto de build: exactamente APP_DIR.
+#      Dockerfile: dentro del proyecto y fuera de los binds. No se aceptan
+#      subdirectorios arbitrarios: un container con un bind escribible podría
+#      crear ahí un symlink a `/` después de esta verificación, y otro
+#      container o el build lo seguirían en el mismo deploy.
+#
+# Requiere `jq` en el VPS.
 # -----------------------------------------------------------------------------
 check_compose() {
-  local rendered
-  rendered="$("${COMPOSE[@]}" config 2>&1)" || die "compose inválido: $rendered"
+  command -v jq >/dev/null || die "falta jq en el VPS (apt-get install -y jq); sin jq no se valida el compose"
 
-  # Cosas que ningún servicio de este proyecto tiene por qué pedir
-  local forbidden='privileged: true|cap_add:|network_mode: host|pid: host|ipc: host|userns_mode:|devices:|unconfined|/var/run/docker\.sock|^ +ports:'
+  # --- 1. Texto crudo
+  if [[ "$(tr -d '\000' <"$COMPOSE_FILE" | wc -c)" != "$(wc -c <"$COMPOSE_FILE")" ]] \
+    || ! iconv -f UTF-8 -t UTF-8 "$COMPOSE_FILE" >/dev/null 2>&1; then
+    die "compose rechazado, tiene que estar en UTF-8 sin bytes NUL"
+  fi
   local hit
-  if hit="$(grep -nE "$forbidden" <<<"$rendered")"; then
-    die "compose rechazado, contiene opciones prohibidas en este VPS:"$'\n'"$hit"
+  if hit="$(grep -niE 'extends|include|env_file|\\' "$COMPOSE_FILE")"; then
+    die "compose rechazado, usa extends/include/env_file o barras invertidas:"$'\n'"$hit"
   fi
 
-  # Bind mounts: solo dentro del directorio del proyecto. En el compose
-  # renderizado un bind aparece como `source: /ruta/absoluta`.
-  local bad_mounts
-  bad_mounts="$(grep -E '^ +source: /' <<<"$rendered" | grep -vE "^ +source: $APP_DIR/" || true)"
-  if [[ -n "$bad_mounts" ]]; then
-    die "compose rechazado, monta rutas fuera de $APP_DIR:"$'\n'"$bad_mounts"
+  # --- 2. Modelo renderizado. --no-env-resolution deja `env_file` a la vista
+  #        en vez de copiar el contenido del archivo a `environment`.
+  local rendered
+  rendered="$("${COMPOSE[@]}" config --format json --no-env-resolution 2>&1)" \
+    || die "compose inválido (salida omitida para no volcar archivos al log)"
+
+  local violations
+  violations="$(jq -r --arg p "$PROJECT_NAME" --argjson ext "$EXTERNAL_NETWORKS" \
+    --argjson extsvc "$EXTERNAL_SERVICES" '
+    def extra($allowed): (keys - $allowed)[];
+    ( select(.name != $p) | "nombre de proyecto \(.name), se espera \($p)" ),
+    ( keys - ["name", "services", "volumes", "networks"]
+      | map(select(startswith("x-") | not))[]
+      | "clave de primer nivel no permitida: \(.)" ),
+    ( .services // {} | to_entries[] | .key as $s | .value |
+        ( extra(["build", "command", "container_name", "depends_on", "deploy",
+                 "entrypoint", "environment", "expose", "healthcheck", "image",
+                 "logging", "networks", "restart", "security_opt", "volumes"])
+          | "\($s): clave no permitida: \(.)" ),
+        ( .container_name // empty | select(startswith("\($p)-") | not)
+          | "\($s): container_name \(.) tiene que empezar con \($p)-" ),
+        ( select(.build != null) | .image // empty | select(startswith("\($p)-") | not)
+          | "\($s): una imagen construida tiene que llamarse \($p)-*, no \(.)" ),
+        ( .build // {} | extra(["context", "dockerfile", "target"])
+          | "\($s): build.\(.) no permitido" ),
+        ( .build.dockerfile // empty | select(startswith("/") or contains(".."))
+          | "\($s): build.dockerfile \(.) fuera del contexto" ),
+        ( .deploy // {} | extra(["resources", "placement"])
+          | "\($s): deploy.\(.) no permitido" ),
+        ( .deploy.placement // {} | extra([])
+          | "\($s): deploy.placement.\(.) no permitido" ),
+        ( .deploy.resources // {} | extra(["limits"])
+          | "\($s): deploy.resources.\(.) no permitido" ),
+        ( .deploy.resources.limits // {} | extra(["cpus", "memory", "pids"])
+          | "\($s): deploy.resources.limits.\(.) no permitido" ),
+        ( .security_opt // [] | .[] | select(. != "no-new-privileges:true")
+          | "\($s): security_opt \(.) no permitido" ),
+        ( .logging // {} | select((.driver // "json-file") != "json-file")
+          | "\($s): logging.driver \(.driver) no permitido" ),
+        ( .networks // {} | to_entries[] | select(.value != null and .value != {})
+          | "\($s): red \(.key) con opciones (aliases, IP fija...) no permitidas" ),
+        ( select($s | IN($extsvc[]) | not) | .networks // {} | keys[] | select(IN($ext[]))
+          | "\($s): solo \($extsvc | join(", ")) puede conectarse a la red externa \(.)" ),
+        ( .volumes // [] | .[] | select(.type != "volume" and .type != "bind")
+          | "\($s): volumen de tipo \(.type) no permitido" ) ),
+    ( .volumes // {} | to_entries[] | .key as $v | .value |
+        ( extra(["name"]) | "volumen \($v): \(.) no permitido" ),
+        ( select(.name != "\($p)_\($v)")
+          | "volumen \($v): name \(.name) no permitido (volumen de otro proyecto)" ) ),
+    ( .networks // {} | to_entries[] | .key as $n | .value |
+        ( extra(["name", "ipam", "internal", "external"]) | "red \($n): \(.) no permitido" ),
+        ( select((.ipam // {}) != {}) | "red \($n): ipam no permitido" ),
+        ( select(.external == true and (.name | IN($ext[]) | not))
+          | "red \($n): red externa \(.name) no permitida" ),
+        ( select(.external != true and .name != "\($p)_\($n)")
+          | "red \($n): name \(.name) no permitido (red de otro proyecto)" ) )
+  ' <<<"$rendered")" || die "no pude analizar el compose renderizado"
+  if [[ -n "$violations" ]]; then
+    die "compose rechazado, usa opciones fuera de la lista blanca:"$'\n'"$violations"
   fi
 
-  log "compose verificado: sin opciones peligrosas"
+  # --- 3. Rutas del host. `realpath` resuelve symlinks: se compara la ruta
+  #        resuelta, no la escrita.
+  local root kind path real allowed ok
+  root="$(realpath "$APP_DIR")"
+  while IFS=$'\t' read -r kind path; do
+    [[ -n "$path" ]] || continue
+    real="$(realpath -m -- "$path")"
+    ok=false
+    case "$kind" in
+      context) [[ "$real" == "$root" ]] && ok=true ;;
+      bind)
+        for allowed in "${ALLOWED_BINDS[@]}"; do
+          [[ "$real" == "$root/$allowed" ]] && ok=true
+        done
+        ;;
+      dockerfile)
+        [[ "$real" == "$root/"* ]] && ok=true
+        for allowed in "${ALLOWED_BINDS[@]}"; do
+          [[ "$real" == "$root/$allowed" || "$real" == "$root/$allowed/"* ]] && ok=false
+        done
+        ;;
+    esac
+    $ok || die "compose rechazado, $kind no permitido: $path -> $real"
+  done < <(jq -r '.services[]
+    | ((.volumes // [])[] | select(.type == "bind") | ["bind", .source]),
+      (.build // empty | ["context", .context],
+        ["dockerfile", "\(.context)/\(.dockerfile // "Dockerfile")"])
+    | @tsv' <<<"$rendered")
+
+  log "compose verificado: solo opciones de la lista blanca"
 }
 
 # --- Lock: si otra corrida sigue en curso (build largo), esta sale sin hacer nada
