@@ -6,7 +6,7 @@ import { falloFormulario, type ResultadoFormulario } from '@/lib/formulario';
 import { errorCertificado } from '@/lib/certificadoErrores';
 import { mensajeErrorCurso } from '@/lib/cursoErrores';
 import { resolverCertificado } from '@/lib/certificados';
-import { avisarCertificadoNuevo } from '@/lib/avisos';
+import { avisarCertificadoNuevo, avisarCertificadoReenviado } from '@/lib/avisos';
 import { CertificadoService } from '../../../services/certificado.service';
 import { CursoService } from '../../../services/curso.service';
 
@@ -85,7 +85,7 @@ export async function guardarCertificadoAction(id: string | null, datos: FormDat
       atributos: atributos(datos, 'ATRIBUTO_VALOR_INVALIDO'),
     };
     const servicio = new CertificadoService();
-    if (id) await servicio.actualizar(id, entrada, archivo, quien);
+    if (id) await servicio.actualizar(id, entrada, archivo, quien, c => avisarCertificadoReenviado(c.id, quien.id, c.fechaActualizacion));
     else {
       const creado = await servicio.crear(entrada, archivo, quien);
       avisarCertificadoNuevo(creado.id, quien.id);

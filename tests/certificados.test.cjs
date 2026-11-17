@@ -95,7 +95,11 @@ function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tip
       if (fila) Object.assign(fila, update); else datos.rels.push({ ...create, id: `r${datos.rels.length}`, fechaEliminacion: null });
     },
   };
-  const db = { certificado, certificadosRelAtributos, cursos: { async findFirst({ where }) { return cursos.find(c => coincide(c, where)) ?? null; } }, notificacion: { async create({ data }) { datos.avisos.push(data); return data; } }, certificadoAtributo: { async findMany({ where }) { return catalogo.filter(a => coincide(a, where)); }, async findFirst({ where }) { return catalogo.find(a => coincide(a, where)) ?? null; } } };
+  const db = { certificado, certificadosRelAtributos, cursos: { async findFirst({ where }) { return cursos.find(c => coincide(c, where)) ?? null; } }, notificacion: { async create({ data }) {
+    // Como en la base: un aviso por persona y clave (@@unique([usuarioId, clave])).
+    if (datos.avisos.some(a => a.usuarioId === data.usuarioId && a.clave === data.clave)) throw Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
+    datos.avisos.push(data); return data;
+  } }, certificadoAtributo: { async findMany({ where }) { return catalogo.filter(a => coincide(a, where)); }, async findFirst({ where }) { return catalogo.find(a => coincide(a, where)) ?? null; } } };
   // Solo lo usa el bloqueo `SELECT … FROM Cursos WHERE id = ? FOR UPDATE`.
   db.$queryRaw = async (partes, id) => {
     assert.match(partes.join('?'), /FOR UPDATE/);
@@ -388,6 +392,38 @@ test('revisar guarda quién y cuándo, exige motivo al rechazar y avisa al dueñ
   assert.deepEqual(e.datos().avisos.map(a => [a.usuarioId, a.enlace]), [['v', '/certificados']]);
 });
 
+test('un certificado corregido y reenviado se puede revisar otra vez y avisa a las dos partes', async () => {
+  const e = escenarioCertificados();
+  const { resolverCertificado } = cargarRevision(e);
+  const c = await e.servicio.crear(entrada(), pdf(), VOL);
+  await resolverCertificado(c.id, 'RECHAZADO', 'Ilegible', 'c');
+  const reenvios = [];
+  // Editar uno pendiente no es un reenvío; editar uno rechazado sí.
+  const reenviado = await e.servicio.actualizar(c.id, { codigoVerificacion: 'A-2' }, null, VOL, cert => reenvios.push(cert.id));
+  assert.equal(reenviado.estado, 'PENDIENTE');
+  await e.servicio.actualizar(c.id, { codigoVerificacion: 'A-3' }, null, VOL, cert => reenvios.push(cert.id));
+  assert.deepEqual(reenvios, [c.id]);
+  await new Promise(r => setTimeout(r, 2)); // fechas de revisión distintas
+  await resolverCertificado(c.id, 'APROBADO', null, 'c');
+  assert.equal(e.datos().certificados[0].estado, 'APROBADO');
+  const avisos = e.datos().avisos.filter(a => a.usuarioId === 'v');
+  assert.equal(avisos.length, 2);
+  assert.notEqual(avisos[0].clave, avisos[1].clave);
+  assert.ok(avisos.every(a => a.clave.startsWith(`certificado_resuelto:${c.id}:`)));
+});
+
+test('coordinación no revisa su propio certificado; otra persona de coordinación sí', async () => {
+  const e = escenarioCertificados();
+  const { resolverCertificado } = cargarRevision(e);
+  const c = await e.servicio.crear(entrada(), pdf(), COORD);
+  await assert.rejects(resolverCertificado(c.id, 'APROBADO', null, 'c'), /CERTIFICADO_PROPIO/);
+  assert.equal(e.datos().certificados[0].estado, 'PENDIENTE');
+  await resolverCertificado(c.id, 'APROBADO', null, 'otra-coord');
+  assert.equal(e.datos().certificados[0].usuarioRevisionId, 'otra-coord');
+  const errores = cargar('src/lib/certificadoErrores.ts', { './cursoErrores': cargar('src/lib/cursoErrores.ts', {}) });
+  assert.equal(errores.errorCertificado('CERTIFICADO_PROPIO').status, 403);
+});
+
 test('dos revisiones simultáneas: la segunda no pisa a la primera', async () => {
   const e = escenarioCertificados();
   const { resolverCertificado } = cargarRevision(e);
@@ -439,7 +475,10 @@ function escenarioApi() {
     '../../services/certificadoAtributo.service': { CertificadoAtributoService },
     './auth': auth,
     './actor-actual': { actorActual: async () => token },
-    './avisos': { avisarCertificadoNuevo: (id, usuarioId) => avisados.push([id, usuarioId]) },
+    './avisos': {
+      avisarCertificadoNuevo: (id, usuarioId) => avisados.push([id, usuarioId]),
+      avisarCertificadoReenviado: (id, usuarioId, cuando) => avisados.push(['reenvio', id, usuarioId, cuando instanceof Date]),
+    },
     './certificados': cargarRevision(e),
     './respuesta-publica': cargar('src/lib/respuesta-publica.ts', {}),
     './archivos-certificado': archivos,
@@ -568,4 +607,24 @@ test('catálogo de atributos: GET exige sesión, POST solo coordinación y valid
   assert.equal((await e.api.crearAtributo(post({ nombre: 'Horas', tipo: 'NUMERO' }))).status, 201);
   assert.equal(e.atributos[0].tipo, 'NUMERO');
   assert.equal(e.atributos[0].usuarioCreacionId, 'c');
+});
+
+test('API: corregir un rechazado avisa a coordinación; nadie revisa su propio certificado (403)', async () => {
+  const e = escenarioApi();
+  const patch = (id, cuerpo) => e.api.cambiarEstadoCertificado(pedido(`/${id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify(cuerpo) }), id);
+  e.token(VOL);
+  const c = await (await e.api.crearCertificado(pedido('', { method: 'POST', body: formulario() }))).json();
+  e.token(COORD);
+  assert.equal((await patch(c.id, { estado: 'RECHAZADO', motivo: 'Ilegible' })).status, 200);
+  e.token(VOL);
+  const form = new FormData();
+  form.append('codigoVerificacion', 'B-7');
+  assert.equal((await e.api.actualizarCertificado(pedido(`/${c.id}`, { method: 'PUT', body: form }), c.id)).status, 200);
+  assert.deepEqual(e.avisados.at(-1), ['reenvio', c.id, 'v', true]);
+  e.token(COORD);
+  assert.equal((await patch(c.id, { estado: 'APROBADO' })).status, 200, 'el reenviado se puede revisar otra vez');
+  const propio = await (await e.api.crearCertificado(pedido('', { method: 'POST', body: formulario() }))).json();
+  const r = await patch(propio.id, { estado: 'APROBADO' });
+  assert.equal(r.status, 403);
+  assert.equal((await r.json()).codigo, 'CERTIFICADO_PROPIO');
 });

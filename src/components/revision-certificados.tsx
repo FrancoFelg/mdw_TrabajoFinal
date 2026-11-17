@@ -12,6 +12,8 @@ import { fechaLegible } from '@/lib/certificados-vista';
 export type CertificadoRevision = {
   id: string; nombre: string; entidadEmisora: string; fechaEmision: string; codigoVerificacion: string | null;
   estado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO'; motivoRechazo: string | null; persona: string; curso: string | null;
+  // Es de quien está revisando: lo revisa otra persona de coordinación.
+  propio: boolean;
 };
 
 // Cola de validación (historia 6): pendientes primero, luego el historial resuelto.
@@ -32,7 +34,8 @@ export function RevisionCertificados({ certificados }: { certificados: Certifica
     </dl>
     {c.motivoRechazo && <p className="aviso">Motivo: {c.motivoRechazo}</p>}
     <div className="actions"><a className="button button-chico button-secondary" href={`/api/certificados/${c.id}/archivo`} target="_blank" rel="noopener"><FileText aria-hidden="true" size={18} />Ver archivo<span className="sr-only"> (se abre en otra pestaña)</span></a></div>
-    {c.estado === 'PENDIENTE' && <Formulario id={`revisar-${c.id}`} className="stack-chico"
+    {c.estado === 'PENDIENTE' && c.propio && <p className="muted">Es tu certificado: lo revisa otra persona de coordinación.</p>}
+    {c.estado === 'PENDIENTE' && !c.propio && <Formulario id={`revisar-${c.id}`} className="stack-chico"
       action={datos => { setMensaje(''); return revisarCertificadoAction(c.id, datos); }}
       onSuccess={() => { setMensaje('Validación guardada.'); router.refresh(); }}>
       <div className="field"><label htmlFor={`resultado-${c.id}`}>Resultado</label>

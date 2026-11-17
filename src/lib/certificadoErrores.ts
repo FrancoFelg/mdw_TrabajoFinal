@@ -24,6 +24,7 @@ const ERRORES: Record<string, { status: number; mensaje: string; campo?: string 
   ESTADO_INVALIDO: { status: 400, mensaje: 'Estado inválido. Para filtrar: PENDIENTE, APROBADO o RECHAZADO; para revisar: APROBADO o RECHAZADO.' },
   // 409 como en /api/solicitudes-certificados: otra persona ya resolvió el certificado.
   ESTADO_NO_PENDIENTE: { status: 409, mensaje: 'Este certificado ya fue revisado.' },
+  CERTIFICADO_PROPIO: { status: 403, mensaje: 'No podés revisar tu propio certificado. Lo revisa otra persona de coordinación.' },
   MOTIVO_REQUERIDO: { status: 400, mensaje: 'Para rechazar, escribí el motivo (hasta 2000 caracteres).', campo: 'motivo' },
   ID_INVALIDO: { status: 400, mensaje: 'El identificador no es válido.' },
   EL_NOMBRE_ES_REQUERIDO: { status: 400, mensaje: 'El nombre del atributo es obligatorio.' },

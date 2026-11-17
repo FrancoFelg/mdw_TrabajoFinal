@@ -23,7 +23,7 @@ export default async function RevisarCertificados() {
     <RevisionCertificados certificados={certificados.map(c => ({
       id: c.id, nombre: c.nombre, entidadEmisora: c.entidadEmisora, fechaEmision: c.fechaEmision.toISOString(),
       codigoVerificacion: c.codigoVerificacion, estado: c.estado, motivoRechazo: c.motivoRechazo,
-      persona: c.usuario.nombreUsuario, curso: c.curso?.titulo ?? null,
+      persona: c.usuario.nombreUsuario, curso: c.curso?.titulo ?? null, propio: c.usuarioId === sesion.id,
     }))} />
   </section>;
 }

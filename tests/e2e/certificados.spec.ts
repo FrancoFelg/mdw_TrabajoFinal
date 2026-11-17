@@ -146,3 +146,46 @@ test('H4/H5: coordinación crea un curso que otorga certificado y la persona sol
     expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).fechaEliminacion).toBeNull();
   } finally { await ctx.close(); }
 });
+
+test('H6: un rechazado corregido vuelve a revisión y se aprueba; nadie revisa su propio certificado', async ({ page, browser }) => {
+  const user = await account(page.request);
+  const ctx = await browser.newContext();
+  try {
+    const reviewer = await account(ctx.request, 'COORDINADOR');
+    const coordinator = await ctx.newPage();
+    const nombre = `Reenvío ${randomUUID()}`;
+    await cargarCertificado(page, { nombre, codigo: `r-${randomUUID()}` });
+    const certificado = await db.certificado.findFirstOrThrow({ where: { usuarioId: user.id, nombre } });
+    expect(await ctx.request.patch(`/api/certificados/${certificado.id}`, { data: { estado: 'RECHAZADO', motivo: 'Falta la firma.' } }).then(r => r.status())).toBe(200);
+
+    // La persona corrige el rechazado: vuelve a PENDIENTE y coordinación recibe un aviso nuevo.
+    await page.goto(`/certificados/${certificado.id}/editar`);
+    await expect(page.getByText('Al guardar, el certificado vuelve a revisión.')).toBeVisible();
+    await page.getByLabel('Reemplazar archivo').setInputFiles({ name: 'firmado.pdf', mimeType: 'application/pdf', buffer: pdf });
+    await page.getByRole('button', { name: 'Guardar cambios' }).click();
+    await expect(page).toHaveURL(/\/certificados$/);
+    expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).estado).toBe('PENDIENTE');
+    await expect.poll(() => db.notificacion.count({ where: { usuarioId: reviewer.id, clave: { startsWith: `certificado:${certificado.id}:reenvio:` } } })).toBe(1);
+
+    // Se puede revisar otra vez: el aviso a la persona no choca con el del rechazo.
+    await coordinator.goto('/certificados/revisar');
+    await coordinator.getByRole('article', { name: `Certificado ${nombre} de ${user.nombreUsuario}`, exact: true }).getByRole('button', { name: 'Guardar validación' }).click();
+    await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');
+    expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).estado).toBe('APROBADO');
+    expect(await db.notificacion.count({ where: { usuarioId: user.id, clave: { startsWith: `certificado_resuelto:${certificado.id}:` } } })).toBe(2);
+
+    // El certificado propio aparece sin formulario y la API lo rechaza.
+    const propio = `Propio ${randomUUID()}`;
+    await cargarCertificado(coordinator, { nombre: propio, codigo: `p-${randomUUID()}` });
+    const suyo = await db.certificado.findFirstOrThrow({ where: { usuarioId: reviewer.id, nombre: propio } });
+    await coordinator.goto('/certificados/revisar');
+    const tarjeta = coordinator.getByRole('article', { name: `Certificado ${propio} de ${reviewer.nombreUsuario}`, exact: true });
+    await expect(tarjeta.getByText('Es tu certificado: lo revisa otra persona de coordinación.')).toBeVisible();
+    await expect(tarjeta.getByRole('button', { name: 'Guardar validación' })).toHaveCount(0);
+    const intento = await ctx.request.patch(`/api/certificados/${suyo.id}`, { data: { estado: 'APROBADO' } });
+    expect(intento.status()).toBe(403);
+    expect((await intento.json()).codigo).toBe('CERTIFICADO_PROPIO');
+    expect(await ctx.request.patch(`/api/solicitudes-certificados/${suyo.id}`, { data: { estado: 'APROBADO' } }).then(r => r.status())).toBe(403);
+    expect((await db.certificado.findUniqueOrThrow({ where: { id: suyo.id } })).estado).toBe('PENDIENTE');
+  } finally { await ctx.close(); }
+});
