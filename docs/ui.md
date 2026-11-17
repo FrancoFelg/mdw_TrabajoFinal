@@ -93,7 +93,7 @@ Verificación manual: abrir Home sin sesión, entrar a Reportar, enviar sin foto
 
 ## Formación y cierre
 
-`/certificados/nuevo` permite adjuntar PDF o imagen de hasta 5 MB con nombre, entidad emisora, fecha de emisión y número opcional (la vinculación con cursos llega en la parte 2). `/certificados` muestra historial, estado, motivo de rechazo y descarga privada. Coordinación revisa en `/certificados/revisar` y resuelve las pendientes; un rechazo exige motivo. `/formacion` redirige según rol. La API controla propietario, rol vigente y transiciones, y notifica cada decisión.
+`/certificados/nuevo` permite adjuntar PDF o imagen de hasta 5 MB con nombre, entidad emisora, fecha de emisión y número opcional. `/cursos` muestra el catálogo; si un curso terminado otorga certificado, «Cargar mi certificado» abre el mismo formulario con los datos del curso y solo pide el archivo. Coordinación crea, edita y da de baja cursos desde ahí. `/certificados` muestra historial, estado, motivo de rechazo y descarga privada. Coordinación revisa en `/certificados/revisar` y resuelve las pendientes; un rechazo exige motivo. `/formacion` redirige según rol. La API controla propietario, rol vigente y transiciones, y notifica cada decisión.
 
 Los comprobantes se guardan en `.data/certificados` o `CERTIFICATE_UPLOAD_DIR`. Ese directorio necesita escritura, persistencia y respaldo; varias instancias requieren almacenamiento compartido. Las pruebas usan exclusivamente `.data/e2e/certificados`.
 

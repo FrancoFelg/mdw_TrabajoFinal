@@ -4,6 +4,8 @@ import { requireSession } from '@/lib/session';
 import { aVista } from '@/lib/certificados-vista';
 import { CertificadosListado } from '@/components/certificados-listado';
 import { SinDatos } from '@/components/sin-datos';
+import { FormacionPestanas } from '@/components/formacion-pestanas';
+import { esCoordinacionVigente } from '@/lib/actor-actual';
 import { CertificadoService } from '../../../../services/certificado.service';
 import { EmergenciaRepository } from '../../../../repositories/emergencia.repository';
 
@@ -13,13 +15,15 @@ export default async function Certificados() {
   const sesion = await requireSession('/certificados');
   const quien = { id: sesion.id, rol: sesion.rol };
   // Siempre los propios, también para coordinación (la cola de revisión es otra pantalla).
-  const [certificados, habilitado] = await Promise.all([
+  const [certificados, habilitado, coordinacion] = await Promise.all([
     new CertificadoService().listar({ usuarioId: sesion.id }, quien),
     new EmergenciaRepository().tieneCertificadoAprobado(sesion.id),
+    esCoordinacionVigente(sesion.id),
   ]);
   const cargar = <Link className="button button-chico" href="/certificados/nuevo"><Plus aria-hidden="true" size={18} />Cargar certificado</Link>;
 
   return <section className="stack">
+    <FormacionPestanas actual="certificados" coordinacion={coordinacion} />
     <header className="pagina-cabecera">
       <h1>Mis certificados</h1>
       <p className="muted">Tus capacitaciones. Coordinación revisa cada certificado antes de darlo por válido.</p>

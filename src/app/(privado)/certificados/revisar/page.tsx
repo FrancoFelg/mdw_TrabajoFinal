@@ -1,5 +1,6 @@
 import { requireSession } from '@/lib/session';
 import { RevisionCertificados } from '@/components/revision-certificados';
+import { FormacionPestanas } from '@/components/formacion-pestanas';
 import { db } from '../../../../../config/database';
 
 export const metadata = { title: 'Revisar certificados | Red de Apoyo' };
@@ -17,6 +18,7 @@ export default async function RevisarCertificados() {
     include: { curso: { select: { titulo: true } }, usuario: { select: { nombreUsuario: true } } },
   });
   return <section className="stack">
+    <FormacionPestanas actual="revisar" coordinacion />
     <header className="pagina-cabecera"><h1>Revisar certificados</h1><p className="muted">Aprobá o rechazá cada certificado. Un rechazo necesita motivo y se avisa a la persona.</p></header>
     <RevisionCertificados certificados={certificados.map(c => ({
       id: c.id, nombre: c.nombre, entidadEmisora: c.entidadEmisora, fechaEmision: c.fechaEmision.toISOString(),

@@ -127,6 +127,10 @@ model Cursos {
   descripcion          String
   fechaDesde           DateTime
   fechaHasta           DateTime
+  horas                Int?
+  // Certificado que otorga el curso: los dos o ninguno. Se copian al certificado al cargarlo.
+  certificadoNombre    String?
+  certificadoEmisor    String?
   fechaCreacion        DateTime             @default(now())
   usuarioCreacionId    String
   usuarioCreacion      Usuario              @relation("CursosCreador", fields: [usuarioCreacionId], references: [id])

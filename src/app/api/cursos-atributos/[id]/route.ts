@@ -1,7 +1,8 @@
 import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextRequest } from 'next/server';
 import { CursoAtributoController } from '../../../../../controllers/cursoAtributo.controller';
-import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
+import { esCoordinadorOAdmin } from '@/lib/auth';
+import { actorActual } from '@/lib/actor-actual';
 import { RESPUESTA_NO_AUTORIZADO, RESPUESTA_PROHIBIDO, responderErrorCurso } from '@/lib/cursoErrores';
 
 const controller = new CursoAtributoController();
@@ -10,7 +11,7 @@ type Contexto = { params: Promise<{ id: string }> };
 
 // GET /api/cursos-atributos/:id
 export async function GET(req: NextRequest, { params }: Contexto) {
-  if (!getUserFromRequest(req)) return RESPUESTA_NO_AUTORIZADO();
+  if (!await actorActual(req)) return RESPUESTA_NO_AUTORIZADO();
   try {
     const { id } = await params;
     return jsonPublico(await controller.obtenerPorId(id));
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest, { params }: Contexto) {
 
 // DELETE /api/cursos-atributos/:id — baja lógica (coordinador/admin)
 export async function DELETE(req: NextRequest, { params }: Contexto) {
-  const usuario = getUserFromRequest(req);
+  const usuario = await actorActual(req);
   if (!usuario) return RESPUESTA_NO_AUTORIZADO();
   if (!esCoordinadorOAdmin(usuario)) return RESPUESTA_PROHIBIDO();
 

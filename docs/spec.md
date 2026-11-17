@@ -75,15 +75,16 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 ### 4. Gestión de cursos
 *Como coordinador*, quiero dar de alta, modificar y administrar el catálogo de cursos, *para definir los programas de capacitación disponibles.*
 - **Criterios de aceptación:**
-  * Permite crear, editar y listar cursos indicando título, descripción y horas lectivas.
-  * Los cursos sirven como referencia opcional para la posterior validación de certificados.
+  * Permite crear, editar, listar y dar de baja cursos indicando título, descripción, fechas y horas lectivas (opcionales).
+  * Un curso puede indicar el **certificado que otorga** (nombre y entidad emisora, los dos o ninguno).
+  * Los cursos sirven como referencia opcional para la posterior validación de certificados. Editar o dar de baja un curso no cambia los certificados ya cargados.
 
 ### 5. Gestionar certificados
 *Como usuario*, quiero subir y administrar mis certificados de capacitación, *para demostrar mis competencias ante la organización.*
 - **Criterios de aceptación:**
   * El usuario puede cargar, ver, editar y dar de baja sus propios certificados. Cada uno lleva nombre, entidad emisora, fecha de emisión (no futura), número opcional y un archivo PDF o imagen de hasta 5 MB.
   * Puede sumar datos adicionales elegidos del catálogo (`CertificadoAtributo`); cada valor se valida según su tipo.
-  * El campo `Curso` es **opcional** (se puede vincular a un curso del catálogo o dejarlo vacío para certificados externos/generales). *Vincular a un curso llega con la parte 2 del módulo; hoy solo se cargan certificados sin curso.*
+  * El campo `Curso` es **opcional** (se puede vincular a un curso del catálogo o dejarlo vacío para certificados externos/generales). Si el curso otorga certificado y ya terminó, la persona solo sube el archivo: nombre y entidad se copian del curso y la fecha de emisión es su fin. No puede tener dos certificados pendientes o aprobados del mismo curso.
   * Todo certificado nace `PENDIENTE`: esa es su solicitud de validación. Solo se edita mientras está `PENDIENTE` o `RECHAZADO`; editar uno rechazado lo devuelve a `PENDIENTE`. Uno `APROBADO` no se edita: se da de baja y se carga otro.
   * **Caso de error:** un usuario no puede ver, editar ni descargar certificados ajenos.
 
@@ -152,7 +153,7 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Reportar emergencia | `/reportar` | Público | Implementada; descripción, GPS o dirección manual y foto opcional con reintento |
 | Mis certificados | `/certificados`, `/certificados/nuevo`, `/certificados/[id]/editar` | Con sesión (editar: solo el dueño) | Implementada (parte 1: sin curso). `/formacion` redirige según rol. Ver `docs/certificados.md` |
 | Revisión de certificados | `/certificados/revisar` | Coordinador y administrador | Implementada; pendientes e historial, aprobación o rechazo con motivo y aviso a la persona |
-| Cursos | Por definir | Coordinación | Pendiente (parte 2); API de cursos existente |
+| Cursos | `/cursos`, `/cursos/nuevo`, `/cursos/[id]/editar` | Con sesión (crear, editar y dar de baja: coordinación) | Implementada (parte 2); desde el catálogo se carga el certificado de un curso |
 | Solicitudes de ascenso | `/ascensos` y `/usuarios/:id/solicitudes` | Según rol y operación | Implementada; historial, evaluación y avisos. Ver `docs/ascensos.md` |
 
 El acceso anónimo a `/usuarios` redirige a `/login?next=/usuarios`. Al iniciar sesión se recupera ese destino.

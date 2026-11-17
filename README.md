@@ -251,6 +251,8 @@ Campos de `POST /api/cursos`:
 | `descripcion` | string | Sí |
 | `fechaDesde` | fecha ISO | Sí |
 | `fechaHasta` | fecha ISO (no anterior a `fechaDesde`) | Sí |
+| `horas` | entero de 1 a 10000 | No |
+| `certificadoNombre`, `certificadoEmisor` | texto; certificado que otorga el curso (los dos o ninguno) | No |
 | `atributos` | `[{ "campoId": string, "dato": string, "fechaHasta"?: fecha }]` | No |
 
 Cada `campoId` debe ser un atributo existente de `/api/cursos-atributos` y no puede repetirse.
@@ -275,13 +277,13 @@ curl -X POST https://mdw.guillermonatali.com/api/cursos \
 }
 ```
 
-`PATCH /api/cursos/:id` acepta cualquier subconjunto de `titulo`, `descripcion`, `fechaDesde`, `fechaHasta` y `atributos`. Si se envía `atributos`, **reemplaza** el conjunto vigente completo.
+`PATCH /api/cursos/:id` acepta cualquier subconjunto de los campos. Si se envía `atributos`, **reemplaza** el conjunto vigente completo. `null` en `horas` o en los dos datos del certificado los quita. Los certificados ya cargados no cambian: copiaron los datos al cargarse.
 
 Errores comunes (cuerpo `{ "error", "codigo" }`):
 
 | Status | `codigo` |
 | :--- | :--- |
-| 400 | `BODY_INVALIDO`, `CAMPOS_OBLIGATORIOS_FALTANTES`, `FECHA_INVALIDA`, `RANGO_FECHAS_INVALIDO`, `TITULO_VACIO`, `DESCRIPCION_VACIA`, `ATRIBUTOS_DEBE_SER_LISTA`, `ATRIBUTO_INCOMPLETO_CAMPO_Y_DATO_REQUERIDOS`, `ATRIBUTO_DUPLICADO`, `FECHA_ATRIBUTO_INVALIDA`, `SIN_CAMBIOS` (PATCH sin campos) |
+| 400 | `BODY_INVALIDO`, `CAMPOS_OBLIGATORIOS_FALTANTES`, `FECHA_INVALIDA`, `RANGO_FECHAS_INVALIDO`, `TITULO_VACIO`, `DESCRIPCION_VACIA`, `ATRIBUTOS_DEBE_SER_LISTA`, `ATRIBUTO_INCOMPLETO_CAMPO_Y_DATO_REQUERIDOS`, `ATRIBUTO_DUPLICADO`, `FECHA_ATRIBUTO_INVALIDA`, `HORAS_INVALIDAS`, `CERTIFICADO_INCOMPLETO`, `SIN_CAMBIOS` (PATCH sin campos) |
 | 401 / 403 | sin token / rol insuficiente |
 | 404 | `CURSO_NO_ENCONTRADO`, `ATRIBUTO_NO_ENCONTRADO` |
 
@@ -337,10 +339,11 @@ Campos de `POST /api/certificados` (`multipart/form-data`; en `PUT` todos son op
 | `entidadEmisora` | texto | Sí |
 | `fechaEmision` | `YYYY-MM-DD`, no posterior a hoy (hora de Argentina) | Sí |
 | `codigoVerificacion` | texto (número del certificado) | No |
+| `cursoId` | curso del catálogo; solo al crear | No |
 | `atributos` | JSON `[{ "campoId": string, "dato": string }]`; cada dato se valida según el tipo del atributo | No |
 | `archivo` | PDF, JPG, PNG o WebP de hasta 5 MB (validado por contenido) | Sí |
 
-El dueño sale del token y el estado es siempre `PENDIENTE`. `cursoId` todavía no se admite (`400` `CURSO_NO_DISPONIBLE`).
+El dueño sale del token y el estado es siempre `PENDIENTE`. Con `cursoId` no se mandan `nombre`, `entidadEmisora` ni `fechaEmision`: se copian del curso (la fecha es su fin). El curso tiene que estar vigente, otorgar certificado y haber terminado. No se admiten dos certificados pendientes o aprobados del mismo curso por persona (`409`).
 
 ```bash
 curl -X POST https://mdw.guillermonatali.com/api/certificados \
@@ -358,7 +361,7 @@ curl -X POST https://mdw.guillermonatali.com/api/certificados \
 }
 ```
 
-Errores: la respuesta es `{ "error", "codigo", "campo"? }`. `401` · `400` `CAMPOS_OBLIGATORIOS_FALTANTES` / `FECHA_INVALIDA` / `ARCHIVO_REQUERIDO` / `ARCHIVO_INVALIDO` / `ATRIBUTO_DUPLICADO` / `ATRIBUTO_VALOR_INVALIDO` / `CURSO_NO_DISPONIBLE` / `SIN_CAMBIOS` · `404` `CERTIFICADO_NO_ENCONTRADO` / `ATRIBUTO_NO_ENCONTRADO` · `413` `ARCHIVO_DEMASIADO_GRANDE` · `422` `NO_EDITABLE`.
+Errores: la respuesta es `{ "error", "codigo", "campo"? }`. `401` · `400` `CAMPOS_OBLIGATORIOS_FALTANTES` / `FECHA_INVALIDA` / `ARCHIVO_REQUERIDO` / `ARCHIVO_INVALIDO` / `ATRIBUTO_DUPLICADO` / `ATRIBUTO_VALOR_INVALIDO` / `CURSO_SIN_CERTIFICADO` / `CURSO_NO_FINALIZADO` / `CURSO_NO_EDITABLE` / `DATOS_DEL_CURSO` / `SIN_CAMBIOS` · `404` `CERTIFICADO_NO_ENCONTRADO` / `ATRIBUTO_NO_ENCONTRADO` / `CURSO_NO_ENCONTRADO` · `409` `CERTIFICADO_DUPLICADO` · `413` `ARCHIVO_DEMASIADO_GRANDE` · `422` `NO_EDITABLE`.
 
 `PATCH /api/certificados/:id` (coordinador):
 

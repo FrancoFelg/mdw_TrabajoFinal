@@ -6,10 +6,7 @@ import { useRouter } from 'next/navigation';
 import { FileText, Pencil, Trash2 } from 'lucide-react';
 import { Button, Card } from './ui';
 import { MarcaRevision } from './marcas';
-import { editable, fechaLegible, type CertificadoVista } from '@/lib/certificados-vista';
-
-const valorLegible = (tipo: string, dato: string) =>
-  tipo === 'BOOLEANO' ? (dato === 'true' ? 'Sí' : 'No') : tipo === 'FECHA' ? fechaLegible(`${dato}T12:00:00.000Z`) : dato;
+import { editable, fechaLegible, valorAtributo, type CertificadoVista } from '@/lib/certificados-vista';
 
 export function CertificadosListado({ certificados }: { certificados: CertificadoVista[] }) {
   const router = useRouter();
@@ -39,10 +36,11 @@ export function CertificadosListado({ certificados }: { certificados: Certificad
         <MarcaRevision estado={c.estado} />
       </div>
       <dl className="datos">
+        {c.curso && <div><dt>Curso</dt><dd>{c.curso}</dd></div>}
         <div><dt>Entidad emisora</dt><dd>{c.entidadEmisora}</dd></div>
         <div><dt>Emitido</dt><dd>{fechaLegible(c.fechaEmision)}</dd></div>
         {c.codigoVerificacion && <div><dt>Número</dt><dd>{c.codigoVerificacion}</dd></div>}
-        {c.atributos.map(a => <div key={a.campoId}><dt>{a.nombre}</dt><dd>{valorLegible(a.tipo, a.dato)}</dd></div>)}
+        {c.atributos.map(a => <div key={a.campoId}><dt>{a.nombre}</dt><dd>{valorAtributo(a.tipo, a.dato)}</dd></div>)}
       </dl>
       {c.estado === 'RECHAZADO' && c.motivoRechazo && <p className="aviso">Motivo del rechazo: {c.motivoRechazo}</p>}
       <div className="actions">

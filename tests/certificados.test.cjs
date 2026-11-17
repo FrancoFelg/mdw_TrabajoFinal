@@ -62,13 +62,16 @@ test('nombreSeguro quita comillas y separadores pero conserva la ñ', () => {
 
 const hoyAR = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
 const mananaAR = () => { const d = new Date(`${hoyAR()}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10); };
-const coincide = (fila, where = {}) => Object.entries(where).every(([k, v]) => v === undefined || (v && Array.isArray(v.in) ? v.in.includes(fila[k]) : fila[k] === v));
+const coincide = (fila, where = {}) => Object.entries(where).every(([k, v]) => v === undefined
+  || (v && Array.isArray(v.in) ? v.in.includes(fila[k]) : v && typeof v === 'object' && 'not' in v ? fila[k] !== v.not : fila[k] === v));
+// Curso como lo guarda la API: días a medianoche UTC.
+const curso = (extra = {}) => ({ id: 'rcp', titulo: 'RCP', certificadoNombre: 'RCP básico', certificadoEmisor: 'Cruz Roja', fechaDesde: new Date('2026-01-01T00:00:00Z'), fechaHasta: new Date('2026-02-01T00:00:00Z'), fechaEliminacion: null, ...extra });
 
-function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tipo: 'NUMERO', fechaEliminacion: null }, { id: 'nivel', nombre: 'Nivel', tipo: 'TEXTO', fechaEliminacion: null }] } = {}) {
-  let datos = { certificados: [], rels: [], escritos: [], borrados: [], avisos: [] };
+function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tipo: 'NUMERO', fechaEliminacion: null }, { id: 'nivel', nombre: 'Nivel', tipo: 'TEXTO', fechaEliminacion: null }], cursos = [] } = {}) {
+  let datos = { certificados: [], rels: [], escritos: [], borrados: [], avisos: [], bloqueos: [] };
   let n = 0;
   let fallarEscritura = false;
-  const hidratar = c => c && ({ ...c, certificadosRelAtributos: datos.rels.filter(r => r.certificadoId === c.id && r.fechaEliminacion === null).map(r => ({ ...r, campos: catalogo.find(a => a.id === r.campoId) })) });
+  const hidratar = c => c && ({ ...c, curso: c.cursoId ? { id: c.cursoId, titulo: cursos.find(x => x.id === c.cursoId)?.titulo } : null, certificadosRelAtributos: datos.rels.filter(r => r.certificadoId === c.id && r.fechaEliminacion === null).map(r => ({ ...r, campos: catalogo.find(a => a.id === r.campoId) })) });
   const certificado = {
     async create({ data }) {
       const { certificadosRelAtributos, ...resto } = data;
@@ -82,6 +85,7 @@ function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tip
     async update({ where, data }) { const c = datos.certificados.find(x => x.id === where.id); Object.assign(c, data, { fechaActualizacion: new Date() }); return hidratar(c); },
     async updateMany({ where, data }) { const filas = datos.certificados.filter(c => coincide(c, where)); filas.forEach(c => Object.assign(c, data, { fechaActualizacion: new Date() })); return { count: filas.length }; },
     async findUniqueOrThrow({ where }) { return hidratar(datos.certificados.find(x => x.id === where.id)); },
+    async count({ where }) { return datos.certificados.filter(c => coincide(c, where)).length; },
   };
   const certificadosRelAtributos = {
     async updateMany({ where, data }) { const filas = datos.rels.filter(r => coincide(r, where)); filas.forEach(r => Object.assign(r, data)); return { count: filas.length }; },
@@ -91,7 +95,13 @@ function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tip
       if (fila) Object.assign(fila, update); else datos.rels.push({ ...create, id: `r${datos.rels.length}`, fechaEliminacion: null });
     },
   };
-  const db = { certificado, certificadosRelAtributos, notificacion: { async create({ data }) { datos.avisos.push(data); return data; } }, certificadoAtributo: { async findMany({ where }) { return catalogo.filter(a => coincide(a, where)); }, async findFirst({ where }) { return catalogo.find(a => coincide(a, where)) ?? null; } } };
+  const db = { certificado, certificadosRelAtributos, cursos: { async findFirst({ where }) { return cursos.find(c => coincide(c, where)) ?? null; } }, notificacion: { async create({ data }) { datos.avisos.push(data); return data; } }, certificadoAtributo: { async findMany({ where }) { return catalogo.filter(a => coincide(a, where)); }, async findFirst({ where }) { return catalogo.find(a => coincide(a, where)) ?? null; } } };
+  // Solo lo usa el bloqueo `SELECT … FROM Cursos WHERE id = ? FOR UPDATE`.
+  db.$queryRaw = async (partes, id) => {
+    assert.match(partes.join('?'), /FOR UPDATE/);
+    datos.bloqueos.push(id);
+    return cursos.filter(c => c.id === id).map(c => ({ id: c.id, fechaEliminacion: c.fechaEliminacion }));
+  };
   db.$transaction = async fn => { const copia = structuredClone(datos); try { return await fn(db); } catch (e) { datos = copia; throw e; } };
   const archivos = {
     ...cargarArchivos(),
@@ -100,7 +110,9 @@ function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tip
   };
   const { CertificadoRepository } = cargar('repositories/certificado.repository.ts', { '../config/database': { db } });
   const { CertificadoAtributoRepository } = cargar('repositories/certificadoAtributo.repository.ts', { '../config/database': { db } });
+  const { CursoRepository } = cargar('repositories/curso.repository.ts', { '../config/database': { db } });
   const servicio = cargar('services/certificado.service.ts', {
+    '../repositories/curso.repository': { CursoRepository },
     '../repositories/certificado.repository': { CertificadoRepository },
     '../repositories/certificadoAtributo.repository': { CertificadoAtributoRepository },
     '../src/lib/archivos-certificado': archivos,
@@ -110,7 +122,7 @@ function escenarioCertificados({ catalogo = [{ id: 'horas', nombre: 'Horas', tip
     const original = certificado.findFirst;
     certificado.findFirst = async args => { const r = await original(args); certificado.findFirst = original; if (r) Object.assign(datos.certificados.find(c => c.id === r.id), cambio); return r; };
   };
-  return { servicio: new servicio.CertificadoService(), modulo: servicio, db, datos: () => datos, fallarEscritura: () => { fallarEscritura = true; }, despuesDeLeer };
+  return { servicio: new servicio.CertificadoService(), modulo: servicio, db, cursos, datos: () => datos, fallarEscritura: () => { fallarEscritura = true; }, despuesDeLeer };
 }
 
 const VOL = { id: 'v', rol: 'VOLUNTARIO' };
@@ -145,9 +157,75 @@ test('crear exige nombre, emisor, fecha y archivo', async () => {
   assert.equal(e.datos().certificados.length, 0);
 });
 
-test('crear rechaza cursoId en la parte 1', async () => {
-  const e = escenarioCertificados();
-  await assert.rejects(e.servicio.crear(entrada({ cursoId: 'curso1' }), pdf(), VOL), /CURSO_NO_DISPONIBLE/);
+test('con curso copia nombre, emisor y fin del curso e ignora lo que mande el cliente', async () => {
+  const e = escenarioCertificados({ cursos: [curso()] });
+  const c = await e.servicio.crear({ cursoId: 'rcp', nombre: 'Otro', entidadEmisora: 'Otra', fechaEmision: '2020-01-01', codigoVerificacion: ' A-1 ' }, pdf(), VOL);
+  assert.equal(c.cursoId, 'rcp');
+  assert.equal(c.nombre, 'RCP básico');
+  assert.equal(c.entidadEmisora, 'Cruz Roja');
+  assert.equal(c.fechaEmision.toISOString(), '2026-02-01T12:00:00.000Z');
+  assert.equal(c.codigoVerificacion, 'A-1');
+  assert.equal(c.estado, 'PENDIENTE');
+  assert.equal(c.curso.titulo, 'RCP');
+  assert.deepEqual(e.datos().bloqueos, ['rcp']);
+  // Editar el curso después no cambia el certificado ya cargado.
+  e.cursos[0].certificadoNombre = 'RCP avanzado';
+  assert.equal((await e.servicio.obtener(c.id, VOL)).nombre, 'RCP básico');
+});
+
+test('con curso exige que exista, otorgue certificado y haya terminado', async () => {
+  const e = escenarioCertificados({ cursos: [
+    curso({ id: 'baja', fechaEliminacion: new Date() }),
+    curso({ id: 'sin', certificadoNombre: null, certificadoEmisor: null }),
+    curso({ id: 'hoy', fechaHasta: new Date(`${hoyAR()}T00:00:00Z`) }),
+    curso({ id: 'futuro', fechaHasta: new Date(`${mananaAR()}T00:00:00Z`) }),
+  ] });
+  await assert.rejects(e.servicio.crear({ cursoId: 'nada' }, pdf(), VOL), /CURSO_NO_ENCONTRADO/);
+  await assert.rejects(e.servicio.crear({ cursoId: 'baja' }, pdf(), VOL), /CURSO_NO_ENCONTRADO/);
+  await assert.rejects(e.servicio.crear({ cursoId: 'sin' }, pdf(), VOL), /CURSO_SIN_CERTIFICADO/);
+  await assert.rejects(e.servicio.crear({ cursoId: 'futuro' }, pdf(), VOL), /CURSO_NO_FINALIZADO/);
+  await assert.rejects(e.servicio.crear({ cursoId: 'hoy' }, null, VOL), /ARCHIVO_REQUERIDO/);
+  assert.equal((await e.servicio.crear({ cursoId: 'hoy' }, pdf(), VOL)).fechaEmision.toISOString(), `${hoyAR()}T12:00:00.000Z`);
+  assert.equal(e.datos().certificados.length, 1);
+});
+
+test('con curso: uno activo por persona; tras un rechazo o una baja se puede volver a cargar', async () => {
+  const e = escenarioCertificados({ cursos: [curso()] });
+  const primero = await e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL);
+  await assert.rejects(e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL), /CERTIFICADO_DUPLICADO/);
+  assert.ok(await e.servicio.crear({ cursoId: 'rcp' }, pdf(), OTRO), 'otra persona sí puede');
+  e.datos().certificados.find(c => c.id === primero.id).estado = 'APROBADO';
+  await assert.rejects(e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL), /CERTIFICADO_DUPLICADO/);
+  e.datos().certificados.find(c => c.id === primero.id).estado = 'RECHAZADO';
+  const segundo = await e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL);
+  await e.servicio.eliminar(segundo.id, VOL);
+  assert.ok(await e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL));
+  assert.equal(e.datos().escritos.length, 4, 'el duplicado no escribe archivo');
+});
+
+test('si el curso se da de baja mientras se carga, no queda el certificado', async () => {
+  const e = escenarioCertificados({ cursos: [curso()] });
+  // El servicio vio el curso vigente; la baja llega antes del bloqueo.
+  const original = e.db.cursos.findFirst;
+  e.db.cursos.findFirst = async args => { const r = await original(args); e.cursos[0].fechaEliminacion = new Date(); return r; };
+  await assert.rejects(e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL), /CURSO_NO_ENCONTRADO/);
+  assert.equal(e.datos().certificados.length, 0);
+});
+
+test('editar un certificado de curso: no cambia curso ni datos copiados; reenviar respeta el único activo', async () => {
+  const e = escenarioCertificados({ cursos: [curso()] });
+  const rechazado = await e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL);
+  e.datos().certificados.find(c => c.id === rechazado.id).estado = 'RECHAZADO';
+  await assert.rejects(e.servicio.actualizar(rechazado.id, { nombre: 'Otro' }, null, VOL), /DATOS_DEL_CURSO/);
+  await assert.rejects(e.servicio.actualizar(rechazado.id, { fechaEmision: '2026-01-01' }, null, VOL), /DATOS_DEL_CURSO/);
+  await assert.rejects(e.servicio.actualizar(rechazado.id, { cursoId: '' }, null, VOL), /CURSO_NO_EDITABLE/);
+  const nuevo = await e.servicio.crear({ cursoId: 'rcp' }, pdf(), VOL);
+  await assert.rejects(e.servicio.actualizar(rechazado.id, { codigoVerificacion: 'B-2' }, null, VOL), /CERTIFICADO_DUPLICADO/);
+  assert.equal(e.datos().certificados.find(c => c.id === rechazado.id).estado, 'RECHAZADO');
+  await e.servicio.eliminar(nuevo.id, VOL);
+  const reenviado = await e.servicio.actualizar(rechazado.id, { codigoVerificacion: 'B-2' }, null, VOL);
+  assert.equal(reenviado.estado, 'PENDIENTE');
+  assert.equal(reenviado.nombre, 'RCP básico');
 });
 
 test('fecha de hoy en Argentina se acepta; mañana no', async () => {
@@ -237,7 +315,7 @@ test('editar valida igual que crear', async () => {
   const c = await e.servicio.crear(entrada(), pdf(), VOL);
   await assert.rejects(e.servicio.actualizar(c.id, { nombre: ' ' }, null, VOL), /CAMPOS_OBLIGATORIOS_FALTANTES/);
   await assert.rejects(e.servicio.actualizar(c.id, { fechaEmision: mananaAR() }, null, VOL), /FECHA_INVALIDA/);
-  await assert.rejects(e.servicio.actualizar(c.id, { cursoId: 'x' }, null, VOL), /CURSO_NO_DISPONIBLE/);
+  await assert.rejects(e.servicio.actualizar(c.id, { cursoId: 'x' }, null, VOL), /CURSO_NO_EDITABLE/);
   await assert.rejects(e.servicio.actualizar(c.id, {}, { bytes: Buffer.from('txt'), nombre: 'a.pdf' }, VOL), /ARCHIVO_INVALIDO/);
   const editado = await e.servicio.actualizar(c.id, { nombre: 'RCP', codigoVerificacion: '' }, null, VOL);
   assert.equal(editado.nombre, 'RCP');

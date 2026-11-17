@@ -43,7 +43,9 @@ export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | nul
     ...(usuario.rol === 'VOLUNTARIO' ? [{ href: '/ascensos', label: 'Mis ascensos', Icono: Users }] : []),
     ...(coordinador ? [{ href: '/usuarios', label: 'Usuarios', Icono: Users }] : []),
   ] : [];
-  const activo = (href: string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+  // «Formación» agrupa certificados y cursos.
+  const activo = (href: string) => href === '/' ? pathname === '/'
+    : pathname === href || pathname.startsWith(`${href}/`) || (href === '/certificados' && (pathname === '/cursos' || pathname.startsWith('/cursos/')));
   const inicial = iniciales || (usuario?.nombreUsuario?.charAt(0).toUpperCase() ?? '');
 
   return <header className="marco">

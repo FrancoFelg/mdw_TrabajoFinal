@@ -6,6 +6,7 @@ import {
   CertificadoRepository,
 } from '../repositories/certificado.repository';
 import { CertificadoAtributoRepository } from '../repositories/certificadoAtributo.repository';
+import { CursoRepository } from '../repositories/curso.repository';
 import { MAX_ARCHIVO, guardarArchivo, borrarArchivo, nombreSeguro, tipoArchivo } from '../src/lib/archivos-certificado';
 
 export interface Solicitante {
@@ -87,6 +88,28 @@ function validarArchivo(archivo: ArchivoEntrada | null) {
 export class CertificadoService {
   private repo = new CertificadoRepository();
   private atributoRepo = new CertificadoAtributoRepository();
+  private cursoRepo = new CursoRepository();
+
+  // Certificado de un curso: nombre y emisor se copian del curso y la fecha de emisión es su fin.
+  // Copiarlos (y no leerlos del curso) hace que editar el curso no cambie certificados ya cargados.
+  private async datosDelCurso(cursoId: string) {
+    const curso = await this.cursoRepo.findById(cursoId);
+    if (!curso) throw new Error('CURSO_NO_ENCONTRADO');
+    if (!curso.certificadoNombre || !curso.certificadoEmisor) throw new Error('CURSO_SIN_CERTIFICADO');
+    // Los cursos guardan días a medianoche UTC: ese día es el de emisión.
+    const dia = curso.fechaHasta.toISOString().slice(0, 10);
+    if (dia > diaAR(new Date())) throw new Error('CURSO_NO_FINALIZADO');
+    return { cursoId, nombre: curso.certificadoNombre, entidadEmisora: curso.certificadoEmisor, fechaEmision: new Date(`${dia}T12:00:00.000Z`) };
+  }
+
+  // Sin curso: la persona carga nombre, emisor y fecha.
+  private datosManuales(entrada: CertificadoEntrada) {
+    const nombre = texto(entrada.nombre);
+    const entidadEmisora = texto(entrada.entidadEmisora);
+    const fecha = texto(entrada.fechaEmision);
+    if (!nombre || !entidadEmisora || !fecha) throw new Error('CAMPOS_OBLIGATORIOS_FALTANTES');
+    return { cursoId: null, nombre, entidadEmisora, fechaEmision: fechaEmision(fecha) };
+  }
 
   // Valida la lista de datos adicionales contra el catálogo vigente y el tipo de cada campo.
   private async normalizarAtributos(atributos: unknown): Promise<AtributoValor[] | undefined> {
@@ -106,12 +129,8 @@ export class CertificadoService {
   }
 
   async crear(entrada: CertificadoEntrada, archivo: ArchivoEntrada | null, solicitante: Solicitante): Promise<CertificadoDetalle> {
-    if (texto(entrada.cursoId)) throw new Error('CURSO_NO_DISPONIBLE');
-    const nombre = texto(entrada.nombre);
-    const entidadEmisora = texto(entrada.entidadEmisora);
-    const fecha = texto(entrada.fechaEmision);
-    if (!nombre || !entidadEmisora || !fecha) throw new Error('CAMPOS_OBLIGATORIOS_FALTANTES');
-    const emision = fechaEmision(fecha);
+    const cursoId = texto(entrada.cursoId);
+    const identidad = cursoId ? await this.datosDelCurso(cursoId) : this.datosManuales(entrada);
     const datosArchivo = validarArchivo(archivo);
     const atributos = (await this.normalizarAtributos(entrada.atributos)) ?? [];
 
@@ -120,9 +139,7 @@ export class CertificadoService {
       return await this.repo.crearConArchivo(
         {
           usuarioId: solicitante.id,
-          nombre,
-          entidadEmisora,
-          fechaEmision: emision,
+          ...identidad,
           codigoVerificacion: texto(entrada.codigoVerificacion) ?? null,
           ...datosArchivo,
           atributos,
@@ -158,7 +175,10 @@ export class CertificadoService {
     if (actual.estado !== CertificadoEstado.PENDIENTE && actual.estado !== CertificadoEstado.RECHAZADO) {
       throw new Error('NO_EDITABLE');
     }
-    if (texto(entrada.cursoId)) throw new Error('CURSO_NO_DISPONIBLE');
+    if (entrada.cursoId !== undefined) throw new Error('CURSO_NO_EDITABLE');
+    if (actual.cursoId && (entrada.nombre !== undefined || entrada.entidadEmisora !== undefined || entrada.fechaEmision !== undefined)) {
+      throw new Error('DATOS_DEL_CURSO');
+    }
 
     const cambios: CambiosCertificado = {};
     for (const campo of ['nombre', 'entidadEmisora'] as const) {
@@ -178,7 +198,8 @@ export class CertificadoService {
     const atributos = await this.normalizarAtributos(entrada.atributos);
 
     if (!Object.keys(cambios).length && atributos === undefined) throw new Error('SIN_CAMBIOS');
-    if (actual.estado === CertificadoEstado.RECHAZADO) {
+    const reenvia = actual.estado === CertificadoEstado.RECHAZADO;
+    if (reenvia) {
       Object.assign(cambios, { estado: CertificadoEstado.PENDIENTE, motivoRechazo: null, fechaRevision: null, usuarioRevisionId: null });
     }
 
@@ -187,6 +208,7 @@ export class CertificadoService {
       usuarioId: solicitante.id,
       escribir: archivoNuevo ? () => guardarArchivo(id, archivoNuevo.bytes) : undefined,
       condicion: { estados: [CertificadoEstado.PENDIENTE, CertificadoEstado.RECHAZADO], error: 'NO_EDITABLE' },
+      unicoDelCurso: reenvia && actual.cursoId ? { cursoId: actual.cursoId, usuarioId: solicitante.id } : undefined,
     });
   }
 

@@ -8,6 +8,7 @@ export interface AtributoValor {
 
 export interface CrearCertificadoData {
   usuarioId: string;
+  cursoId: string | null;
   nombre: string;
   entidadEmisora: string;
   fechaEmision: Date;
@@ -37,6 +38,7 @@ export type CambiosCertificado = Partial<{
 
 // Solo los datos adicionales (EAV) vigentes, con nombre y tipo del campo.
 const includeDetalle = {
+  curso: { select: { id: true, titulo: true } },
   certificadosRelAtributos: {
     where: { fechaEliminacion: null },
     include: { campos: true },
@@ -45,12 +47,30 @@ const includeDetalle = {
 
 export type CertificadoDetalle = Prisma.CertificadoGetPayload<{ include: typeof includeDetalle }>;
 
+const ACTIVOS = [CertificadoEstado.PENDIENTE, CertificadoEstado.APROBADO];
+
+// Una persona no puede tener dos certificados activos (pendiente o aprobado) del mismo curso.
+// Bloquea la fila del curso hasta el fin de la transacción: dos cargas simultáneas se ordenan
+// y la segunda ve a la primera. `vigente` exige además que el curso no esté dado de baja.
+async function asegurarUnicoDelCurso(
+  tx: Prisma.TransactionClient,
+  { cursoId, usuarioId, excepto, vigente }: { cursoId: string; usuarioId: string; excepto?: string; vigente: boolean }
+) {
+  const filas = await tx.$queryRaw<{ id: string; fechaEliminacion: Date | null }[]>`SELECT id, fechaEliminacion FROM Cursos WHERE id = ${cursoId} FOR UPDATE`;
+  if (vigente && (!filas.length || filas[0].fechaEliminacion)) throw new Error('CURSO_NO_ENCONTRADO');
+  const activos = await tx.certificado.count({
+    where: { usuarioId, cursoId, fechaEliminacion: null, estado: { in: ACTIVOS }, ...(excepto ? { id: { not: excepto } } : {}) },
+  });
+  if (activos) throw new Error('CERTIFICADO_DUPLICADO');
+}
+
 export class CertificadoRepository {
   // Crea la fila y sus atributos; `escribir` guarda el archivo dentro de la transacción,
   // así un fallo de disco revierte la fila.
   async crearConArchivo(data: CrearCertificadoData, escribir: (id: string) => Promise<void>): Promise<CertificadoDetalle> {
     return await db.$transaction(async (tx) => {
       const { atributos, ...troncal } = data;
+      if (data.cursoId) await asegurarUnicoDelCurso(tx, { cursoId: data.cursoId, usuarioId: data.usuarioId, vigente: true });
       const creado = await tx.certificado.create({
         data: {
           ...troncal,
@@ -93,10 +113,13 @@ export class CertificadoRepository {
       usuarioId?: string;
       escribir?: () => Promise<void>;
       condicion?: { estados: CertificadoEstado[]; error: string };
+      // Si el certificado vuelve a revisión, que no quede otro activo del mismo curso.
+      unicoDelCurso?: { cursoId: string; usuarioId: string };
     } = {}
   ): Promise<CertificadoDetalle> {
-    const { atributos, usuarioId, escribir, condicion } = opciones;
+    const { atributos, usuarioId, escribir, condicion, unicoDelCurso } = opciones;
     return await db.$transaction(async (tx) => {
+      if (unicoDelCurso) await asegurarUnicoDelCurso(tx, { ...unicoDelCurso, excepto: id, vigente: false });
       const { count } = await tx.certificado.updateMany({
         where: { id, fechaEliminacion: null, ...(condicion ? { estado: { in: condicion.estados } } : {}) },
         data: cambios,

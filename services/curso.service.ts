@@ -12,6 +12,9 @@ export interface CursoInput {
   descripcion?: string;
   fechaDesde?: string | Date;
   fechaHasta?: string | Date;
+  horas?: unknown;
+  certificadoNombre?: unknown;
+  certificadoEmisor?: unknown;
   atributos?: { campoId?: string; dato?: unknown; fechaHasta?: string | Date | null }[];
 }
 
@@ -29,6 +32,29 @@ function parseFecha(valor: string | Date | null | undefined, codigoError: string
     throw new Error(codigoError);
   }
   return fecha;
+}
+
+// Horas: entero entre 1 y 10000. null o '' lo quitan (para editar).
+function leerHoras(valor: unknown): number | null | undefined {
+  if (valor === undefined) return undefined;
+  if (valor === null || valor === '') return null;
+  const horas = typeof valor === 'number' ? valor : typeof valor === 'string' ? Number(valor.trim()) : NaN;
+  if (!Number.isInteger(horas) || horas < 1 || horas > 10000) throw new Error('HORAS_INVALIDAS');
+  return horas;
+}
+
+// Certificado que otorga: nombre y emisor van juntos. Los dos vacíos = no otorga.
+function leerCertificado(nombre: unknown, emisor: unknown, actual?: { certificadoNombre: string | null; certificadoEmisor: string | null }) {
+  if (nombre === undefined && emisor === undefined) return undefined;
+  const limpiar = (v: unknown) => {
+    if (v === null) return null;
+    if (typeof v !== 'string') throw new Error('CAMPO_DEBE_SER_TEXTO');
+    return v.trim().slice(0, 191) || null;
+  };
+  const certificadoNombre = nombre === undefined ? actual?.certificadoNombre ?? null : limpiar(nombre);
+  const certificadoEmisor = emisor === undefined ? actual?.certificadoEmisor ?? null : limpiar(emisor);
+  if (!certificadoNombre !== !certificadoEmisor) throw new Error('CERTIFICADO_INCOMPLETO');
+  return { certificadoNombre, certificadoEmisor };
 }
 
 export class CursoService {
@@ -99,6 +125,8 @@ export class CursoService {
     }
     this.validarRangoFechas(fechaDesde, fechaHasta);
 
+    const horas = leerHoras(data.horas) ?? null;
+    const certificado = leerCertificado(data.certificadoNombre, data.certificadoEmisor) ?? { certificadoNombre: null, certificadoEmisor: null };
     const atributos = await this.normalizarAtributos(data.atributos);
 
     const payload: CrearCursoData = {
@@ -106,6 +134,8 @@ export class CursoService {
       descripcion,
       fechaDesde,
       fechaHasta,
+      horas,
+      ...certificado,
       usuarioCreacionId,
       atributos,
     };
@@ -150,6 +180,9 @@ export class CursoService {
     // El rango se valida combinando lo nuevo con lo que ya tenía el curso.
     this.validarRangoFechas(cambios.fechaDesde ?? actual.fechaDesde, cambios.fechaHasta ?? actual.fechaHasta);
 
+    cambios.horas = leerHoras(data.horas);
+    // Cambiar el certificado que otorga no toca los certificados ya cargados: sus datos se copiaron.
+    Object.assign(cambios, leerCertificado(data.certificadoNombre, data.certificadoEmisor, actual));
     cambios.atributos = await this.normalizarAtributos(data.atributos);
 
     if (Object.keys(cambios).every((k) => cambios[k as keyof ActualizarCursoData] === undefined)) {

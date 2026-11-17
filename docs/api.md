@@ -13,11 +13,11 @@
 | `POST /api/solicitudes-ascenso/:id/aprobar` | Aprueba la solicitud de ascenso de la persona | Coordinador | H3 |
 | `POST /api/solicitudes-ascenso/:id/rechazar` | Desaprueba la solicitud de ascenso de la persona | Coordinador | H3 |
 | `GET /api/cursos` | Consultar el catálogo de cursos | Autenticado | H4 |
-| `POST /api/cursos` | Crear un nuevo curso en el catálogo | Coordinador | H4 |
-| `PATCH /api/cursos/:id` | Editar información o atributos de un curso | Coordinador | H4 |
+| `POST /api/cursos` | Crear un curso: `titulo`, `descripcion`, fechas, `horas` y certificado que otorga (`certificadoNombre` y `certificadoEmisor`) opcionales | Coordinador | H4 |
+| `PATCH /api/cursos/:id` | Editar información o atributos de un curso; no cambia certificados ya cargados | Coordinador | H4 |
 | `DELETE /api/cursos/:id` | Desactivar o eliminar un curso del catálogo | Coordinador | H4 |
 | `GET /api/certificados` | Listar los certificados propios; coordinación ve todos y filtra con `?estado=` y `?usuarioId=` | Autenticado | H5 |
-| `POST /api/certificados` | Cargar un certificado propio sin curso (`multipart/form-data`: `nombre`, `entidadEmisora`, `fechaEmision`, `codigoVerificacion` opcional, `archivo` PDF/imagen hasta 5 MB y datos adicionales); propietario y estado `PENDIENTE` salen del servidor | Autenticado | H5 |
+| `POST /api/certificados` | Cargar un certificado propio (`multipart/form-data`: `nombre`, `entidadEmisora`, `fechaEmision`, `codigoVerificacion` opcional, `archivo` PDF/imagen hasta 5 MB y datos adicionales). Con `cursoId` solo van el archivo y el número: nombre, entidad y fecha salen del curso. Propietario y estado `PENDIENTE` salen del servidor | Autenticado | H5 |
 | `GET /api/certificados/:id` | Detalle de un certificado; solo dueño o coordinación (terceros reciben 404) | Autenticado | H5 |
 | `PUT /api/certificados/:id` | El dueño edita un certificado `PENDIENTE` o `RECHAZADO` (un rechazado vuelve a `PENDIENTE`) | Autenticado | H5 |
 | `DELETE /api/certificados/:id` | Baja lógica; solo dueño o coordinación | Autenticado | H5 |
