@@ -320,6 +320,7 @@ select.input { appearance: none; background-image: linear-gradient(45deg, transp
 .ubicacion-aviso { flex-direction: column; align-items: flex-start; }
 .orden { display: flex; gap: 8px; }
 .orden .chip { padding: 0 14px; font-weight: 600; font-size: .875rem; gap: 6px; }
+.filtro-distancia { flex-wrap: wrap; }
 .distancia { color: var(--text); font-weight: 700; }
 .mi-caso { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r-l); background: var(--text); color: var(--bg); transition: transform .12s var(--ease); }
 .mi-caso:active { transform: scale(.99); }
