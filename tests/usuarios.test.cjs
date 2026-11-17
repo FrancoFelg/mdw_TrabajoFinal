@@ -142,3 +142,12 @@ test('destinos de login conservan cuenta y ascensos sin permitir redirecciones e
   assert.equal(safeDestination('https://example.com'), '/casos');
   assert.equal(safeDestination('//example.com'), '/casos');
 });
+
+
+test('coordinación no puede cambiar el email de otra persona; cada uno sí el propio', () => {
+  const { editarUsuarioSchema, editarCuentaSchema } = cargar('src/lib/usuarios-admin.ts', { '../../config/database': { db: {} } });
+  assert.equal(editarUsuarioSchema.safeParse({ email: 'otro@example.com' }).success, false);
+  assert.equal(editarUsuarioSchema.safeParse({ nombreUsuario: 'ana', email: 'otro@example.com' }).success, false);
+  assert.equal(editarUsuarioSchema.safeParse({ nombreUsuario: 'ana', rol: 'COORDINADOR' }).success, true);
+  assert.equal(editarCuentaSchema.safeParse({ email: 'Ana@Example.com' }).data.email, 'ana@example.com');
+});

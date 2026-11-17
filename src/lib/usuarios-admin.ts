@@ -15,7 +15,8 @@ const camposUsuario = z.object({
     telefonos: z.array(z.object({ tipo: texto, numero: z.string().trim().min(1).max(50) }).strict()).max(10).optional(),
   }).strict().optional(),
 }).strict();
-export const editarUsuarioSchema = camposUsuario.refine(datos => Object.keys(datos).length > 0, 'Indicá los cambios');
+// Coordinación edita datos de otra persona, pero no su email: es su credencial de acceso.
+export const editarUsuarioSchema = camposUsuario.omit({ email: true }).strict().refine(datos => Object.keys(datos).length > 0, 'Indicá los cambios');
 export const editarCuentaSchema = camposUsuario.omit({ rol: true }).strict().refine(datos => Object.keys(datos).length > 0, 'Indicá los cambios');
 
 export async function puedeGestionarUsuarios(id: string) {
