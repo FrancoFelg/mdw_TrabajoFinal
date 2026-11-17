@@ -219,3 +219,23 @@ test('login bloquea la cuenta tras diez fallos seguidos y la API responde 429', 
     assert.equal(respuesta.status, 429);
   } finally { console.error = log; }
 });
+
+test('llenar el registro de fallos con usuarios inexistentes no desbloquea una cuenta real', async () => {
+  const servicio = cargar('services/auth.service.ts', {
+    '../repositories/usuario.repository': { UsuarioRepository: class {
+      async findParaLogin(nombre) { return nombre === 'ana' ? { id: 'u', nombreUsuario: 'ana', rol: 'VOLUNTARIO', password: 'hash' } : null; }
+    } },
+    bcrypt: { compare: async plano => plano === 'correcta' },
+    jsonwebtoken: { sign: () => 'token' },
+  });
+  process.env.JWT_SECRET = 'test';
+  const auth = new servicio.AuthService();
+  for (let i = 0; i < 10; i++) await assert.rejects(auth.login('ana', 'incorrecta'), /CREDANCIALES_INVALIDAS/);
+  await assert.rejects(auth.login('ana', 'correcta'), /DEMASIADOS_INTENTOS/);
+  // Diez mil identificadores distintos llenan el registro en memoria.
+  for (let i = 0; i < 10_000; i++) await assert.rejects(auth.login(`falso-${i}`, 'x'), /CREDANCIALES_INVALIDAS/);
+  await assert.rejects(auth.login('ana', 'correcta'), /DEMASIADOS_INTENTOS/);
+  // Un identificador nuevo se sigue contando: se descartan primero los inexistentes más viejos.
+  for (let i = 0; i < 10; i++) await assert.rejects(auth.login('otro-falso', 'x'), /CREDANCIALES_INVALIDAS/);
+  await assert.rejects(auth.login('otro-falso', 'x'), /DEMASIADOS_INTENTOS/);
+});

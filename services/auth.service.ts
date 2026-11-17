@@ -15,12 +15,24 @@ function bloqueada(clave: string) {
   return (fallos.get(clave)?.cantidad ?? 0) >= MAX_FALLOS;
 }
 
-function anotarFallo(clave: string) {
-  if (fallos.size >= MAX_CUENTAS && !fallos.has(clave)) {
-    const ahora = Date.now();
-    for (const [k, v] of fallos) if (v.vence <= ahora) fallos.delete(k);
-    if (fallos.size >= MAX_CUENTAS) fallos.clear();
+// Con el registro lleno: primero se descartan los vencidos y, si no alcanza, el identificador
+// inexistente más viejo (Map conserva el orden de inserción). Los contadores de cuentas reales no
+// se descartan nunca: si no, inundar el login con usuarios inventados reiniciaría un bloqueo.
+function liberarLugar() {
+  const ahora = Date.now();
+  for (const [k, v] of fallos) if (v.vence <= ahora) fallos.delete(k);
+  if (fallos.size < MAX_CUENTAS) return true;
+  for (const k of fallos.keys()) {
+    if (k.startsWith('entrada:')) {
+      fallos.delete(k);
+      return true;
+    }
   }
+  return false;
+}
+
+function anotarFallo(clave: string) {
+  if (fallos.size >= MAX_CUENTAS && !fallos.has(clave) && !liberarLugar()) return;
   const registro = fallos.get(clave) ?? { cantidad: 0, vence: Date.now() + VENTANA_MS };
   registro.cantidad++;
   fallos.set(clave, registro);
