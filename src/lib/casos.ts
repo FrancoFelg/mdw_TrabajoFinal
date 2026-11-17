@@ -137,6 +137,20 @@ export function formatoDistancia(metros: number) {
   if (metros < 1000) return `${Math.max(10, Math.round(metros / 10) * 10)} m`;
   return `${(metros / 1000).toLocaleString('es-AR', { maximumFractionDigits: metros < 10000 ? 1 : 0 })} km`;
 }
+// Filtro por proximidad (historia 8). Radios ofrecidos en la lista y el mapa, en metros.
+export const RADIOS_CERCANIA = [1000, 5000, 10000] as const;
+
+// Deja los casos que están a `radio` metros o menos de `yo`. Sin radio, no filtra.
+// Un caso sin coordenadas (dirección manual aún sin geocodificar) no tiene distancia
+// conocida: queda afuera mientras haya un radio elegido, porque no se puede afirmar que esté cerca.
+export function filtrarPorRadio<T extends { lat: number | null; lng: number | null }>(
+  casos: T[],
+  yo: { lat: number; lng: number } | null,
+  radio: number | null,
+): T[] {
+  if (radio === null || !yo) return casos;
+  return casos.filter(c => c.lat !== null && c.lng !== null && distanciaMetros(yo, { lat: c.lat, lng: c.lng }) <= radio);
+}
 
 // Habilitación para casos rojos según los certificados de la persona (regla 2).
 export type EstadoHabilitacion = 'aprobado' | 'revision' | 'rechazado' | 'sin';
