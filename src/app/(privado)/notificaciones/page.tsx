@@ -6,6 +6,7 @@ import { marcarTodasAction } from '@/app/actions/notificaciones';
 import { ActivarPush } from '@/components/activar-push';
 import { AvisoItem } from '@/components/aviso-item';
 import { Refrescar } from '@/components/refrescar';
+import { Formulario } from '@/components/formulario';
 
 export const metadata = { title: 'Avisos | Red de Apoyo' };
 
@@ -21,7 +22,7 @@ export default async function Notificaciones() {
     <Refrescar segundos={30} />
     <header className="pagina-cabecera avisos-cabecera">
       <span><h1>Avisos</h1><p className="muted">{noLeidas ? `${noLeidas} sin leer` : 'Estás al día'}</p></span>
-      {noLeidas > 0 && <form action={marcarTodasAction}><button className="button button-chico button-secondary"><CheckCheck aria-hidden="true" size={18} />Marcar todo como leído</button></form>}
+      {noLeidas > 0 && <Formulario id="marcar-avisos" action={marcarTodasAction}><button className="button button-chico button-secondary"><CheckCheck aria-hidden="true" size={18} />Marcar todo como leído</button></Formulario>}
     </header>
 
     {avisos.length

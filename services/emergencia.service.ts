@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { EmergenciaRepository } from '../repositories/emergencia.repository';
 import { GeocodingService } from './geocoding.service';
 import { ModoViaje, Punto, RutasService } from './rutas.service';
-import { EmergenciaEstado, Prioridad, Provincia } from '@prisma/client';
+import { EmergenciaEstado, Prioridad, Provincia, Prisma } from '@prisma/client';
 import { db } from '../config/database';
 
 // Evita consultar repetidamente direcciones pendientes durante el refresco del mapa.
@@ -126,8 +126,8 @@ export class EmergenciaService {
   }
 
   // Listar todas las emergencias
-  async listarEmergencias() {
-    const emergencias = await this.emergenciaRepo.findAll();
+  async listarEmergencias(where: Prisma.EmergenciaWhereInput = {}) {
+    const emergencias = await this.emergenciaRepo.findAll(where);
     if (ubicandoPendientes || Date.now() < proximoIntentoUbicaciones) return emergencias;
     const candidatos = emergencias.filter(e =>
       e.estado !== EmergenciaEstado.GESTIONADA && e.ubicacion.direccion &&
@@ -151,13 +151,13 @@ export class EmergenciaService {
           // El caso permanece visible en la lista y se reintentará más adelante.
         }
       }));
-      return await this.emergenciaRepo.findAll();
+      return await this.emergenciaRepo.findAll(where);
     } finally { ubicandoPendientes = false; }
   }
 
   // Obtener detalle de una emergencia
-  async obtenerPorId(id: string) {
-    const emergencia = await this.emergenciaRepo.findById(id);
+  async obtenerPorId(id: string, where: Prisma.EmergenciaWhereInput = {}) {
+    const emergencia = await this.emergenciaRepo.findById(id, where);
     if (!emergencia) {
       throw new Error('EMERGENCIA_NO_ENCONTRADA');
     }

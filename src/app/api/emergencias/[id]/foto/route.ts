@@ -2,6 +2,7 @@ import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '../../../../../../config/database';
 import { getUserFromRequest } from '@/lib/auth';
+import { casosVisibles } from '@/lib/acceso-casos';
 import { guardarFoto, leerFoto, tipoFoto, verificarPermisoFoto } from '@/lib/fotos-emergencia';
 import { MAX_FOTO } from '@/lib/reporte';
 
@@ -44,8 +45,14 @@ export async function POST(req: NextRequest, { params }: Contexto) {
 }
 
 export async function GET(req: NextRequest, { params }: Contexto) {
-  if (!getUserFromRequest(req)) return new NextResponse(null, { status: 401 });
+  const usuario = getUserFromRequest(req);
+  if (!usuario) return new NextResponse(null, { status: 401 });
   const { id } = await params;
+  const actor = await db.usuario.findUnique({ where: { id: usuario.id }, select: { id: true, rol: true } });
+  if (!actor) return new NextResponse(null, { status: 401 });
+  if (!await db.emergencia.findFirst({ where: { AND: [{ id }, casosVisibles(actor)] }, select: { id: true } })) {
+    return new NextResponse(null, { status: 404 });
+  }
   try {
     const bytes = await leerFoto(id);
     return new NextResponse(new Uint8Array(bytes), { headers: {

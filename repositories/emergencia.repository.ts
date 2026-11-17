@@ -1,5 +1,5 @@
 import { db } from '../config/database';
-import { Emergencia, EmergenciaEstado, Prioridad, CertificadoEstado, Provincia } from '@prisma/client';
+import { Emergencia, EmergenciaEstado, Prioridad, CertificadoEstado, Provincia, Prisma } from '@prisma/client';
 
 export class EmergenciaRepository {
   // Emergencia con sus coordenadas (para calcular rutas hacia ella)
@@ -46,8 +46,9 @@ export class EmergenciaRepository {
   }
 
   // Listar todas las emergencias
-  async findAll() {
+  async findAll(where: Prisma.EmergenciaWhereInput = {}) {
     return await db.emergencia.findMany({
+      where,
       include: {
         ubicacion: true,
         usuarios: {
@@ -74,9 +75,9 @@ export class EmergenciaRepository {
   }
 
   // Buscar una emergencia por ID
-  async findById(id: string) {
-    return await db.emergencia.findUnique({
-      where: { id },
+  async findById(id: string, where: Prisma.EmergenciaWhereInput = {}) {
+    return await db.emergencia.findFirst({
+      where: { AND: [{ id }, where] },
       include: {
         ubicacion: true,
         usuarios: {

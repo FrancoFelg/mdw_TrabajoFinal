@@ -8,6 +8,7 @@ import { logoutAction } from '@/app/actions/auth';
 import type { UsuarioToken } from '@/lib/auth';
 import { Campana } from './campana';
 import { TemaBoton } from './tema';
+import { BotonEnviar } from './boton-enviar';
 
 // Cada pantalla suma su pestaña cuando existe (Formación, Equipo, Cuenta).
 export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | null; iniciales?: string }) {
@@ -55,13 +56,14 @@ export function Navegacion({ usuario, iniciales }: { usuario: UsuarioToken | nul
         </Link>)}
       </nav>}
       <div className="marco-acciones"><TemaBoton />{usuario
-        ? <><Campana /><div className="cuenta-desplegable" ref={cuentaRef} onBlur={event => {
+        ? <><Campana /><div className="marco-identidad"><strong title={usuario.nombreUsuario}>{usuario.nombreUsuario}</strong><span>{({ VOLUNTARIO: 'Voluntario', COORDINADOR: 'Coordinador', ADMIN: 'Administrador' })[usuario.rol ?? 'VOLUNTARIO']}</span></div><div className="cuenta-desplegable" ref={cuentaRef} onBlur={event => {
           if (!event.currentTarget.contains(event.relatedTarget)) setCuentaAbierta(false);
         }}>
           <button ref={avatarRef} type="button" className="marco-avatar" aria-label={`Opciones de cuenta (${usuario.nombreUsuario})`} aria-expanded={cuentaAbierta} aria-controls={cuentaId} onClick={() => setCuentaAbierta(!cuentaAbierta)}>{inicial}</button>
           {cuentaAbierta && <div id={cuentaId} className="cuenta-opciones">
+            <p className="cuenta-nombre">{usuario.nombreUsuario}</p>
             <Link href="/cuenta" onClick={() => setCuentaAbierta(false)}><UserRound aria-hidden="true" size={18} />Mi cuenta</Link>
-            <form action={logoutAction}><button type="submit"><LogOut aria-hidden="true" size={18} />Cerrar sesión</button></form>
+            <form action={logoutAction}><BotonEnviar><LogOut aria-hidden="true" size={18} />Cerrar sesión</BotonEnviar></form>
           </div>}
         </div></>
         : <Link className="button button-chico button-secondary" href="/login">Soy voluntario</Link>}</div>

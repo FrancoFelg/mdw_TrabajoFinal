@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   // Genera .next/standalone con server.js y solo las deps necesarias,
   // requerido por infra/docker/Dockerfile
   output: "standalone",
+  experimental: { serverActions: { bodySizeLimit: "6mb" } },
 
   // El traceo del standalone con pnpm copia el symlink de @swc/helpers dentro
   // del directorio de Next pero no todos los archivos del paquete (faltan los
