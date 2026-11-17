@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { db } from '../../../../config/database';
 import { permisoFoto } from '@/lib/fotos-emergencia';
 import { getUserFromRequest } from '@/lib/auth';
+import { casosVisibles } from '@/lib/acceso-casos';
 import { avisarEmergenciaNueva } from '@/lib/avisos';
 import { RESPUESTA_NO_AUTORIZADO } from '@/lib/cursoErrores';
 import { EmergenciaController } from '../../../../controllers/emergencia.controller';
@@ -19,7 +20,9 @@ export async function GET(req: NextRequest) {
     if (!usuario) return RESPUESTA_NO_AUTORIZADO();
 
     try {
-        const emergencias = await service.listarEmergencias();
+        const actor = await db.usuario.findUnique({ where: { id: usuario.id }, select: { id: true, rol: true } });
+        if (!actor) return RESPUESTA_NO_AUTORIZADO();
+        const emergencias = await service.listarEmergencias(casosVisibles(actor));
         return jsonPublico(emergencias, { status: 200 });
     } catch (error: any) {
         console.error('Error en GET /api/emergencias:', error);

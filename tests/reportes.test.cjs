@@ -18,6 +18,7 @@ function cargar(archivo, dobles = {}) {
   const resolver = nombre => {
     if (Object.hasOwn(dobles, nombre)) return dobles[nombre];
     if (nombre === '@/lib/respuesta-publica') return cargar('src/lib/respuesta-publica.ts', dobles);
+    if (nombre === '@/lib/acceso-casos') return cargar('src/lib/acceso-casos.ts', dobles);
     if (nombre.startsWith('./')) return cargar(path.resolve(path.dirname(absoluto), `${nombre}.ts`), dobles);
     return requerir(nombre);
   };

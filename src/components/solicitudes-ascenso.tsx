@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { ascensoAction } from '@/app/actions/formularios';
 import { Button, Card } from './ui';
 import { MarcaRevision } from './marcas';
 
 type Solicitud = { id: string; estado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO'; creadoEn: string };
 
 export function SolicitudesAscenso({ solicitudes, puedeSolicitar, puedeResolver }: { solicitudes: Solicitud[]; puedeSolicitar: boolean; puedeResolver: boolean }) {
-  const router = useRouter();
+
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<{ error: boolean; texto: string } | null>(null);
   async function operar(accion: 'crear' | 'aprobar' | 'rechazar', id?: string) {
@@ -16,15 +16,14 @@ export function SolicitudesAscenso({ solicitudes, puedeSolicitar, puedeResolver 
     setOcupado(true);
     setAviso(null);
     try {
-      const respuesta = await fetch(`/api/solicitudes-ascenso${id ? `/${id}/${accion}` : ''}`, { method: 'POST', signal: AbortSignal.timeout(20000) });
-      const datos = await respuesta.json();
-      if (!respuesta.ok) throw new Error(datos.error || 'No se pudo completar la operación.');
+      const datos = await ascensoAction(accion, id);
+      if (!datos.ok) throw new Error(datos.error);
       setAviso({ error: false, texto: accion === 'crear' ? 'Solicitud enviada. Te avisaremos cuando se resuelva.' : accion === 'aprobar' ? 'Ascenso aprobado. Se notificó a la persona.' : 'Ascenso denegado. Se notificó a la persona.' });
     } catch (error) {
       setAviso({ error: true, texto: error instanceof Error && error.name !== 'TimeoutError' && error.name !== 'TypeError' ? error.message : 'No se pudo confirmar el resultado. Actualizá el historial antes de reintentar.' });
     } finally {
       setOcupado(false);
-      router.refresh();
+
     }
   }
   return <div className="stack" aria-busy={ocupado}>

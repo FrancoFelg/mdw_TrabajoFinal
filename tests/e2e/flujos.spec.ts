@@ -6,6 +6,7 @@ test.afterAll(async () => db.$disconnect());
 
 test('H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega personas distintas, edita voluntario y sale', async ({ page, browser, request }) => {
   test.setTimeout(120_000);
+  await page.setViewportSize({ width: 375, height: 812 });
   const coordinator = await registerInBrowser(page);
   // Preparar la autoridad inicial en la base aislada; el registro público siempre crea voluntarios.
   await db.usuario.update({ where: { id: coordinator.id }, data: { rol: 'COORDINADOR' } });
@@ -27,6 +28,7 @@ test('H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega perso
   await expect(page.getByRole('link').filter({ hasText: caso.descripcion })).toBeVisible();
   for (const [index, user] of candidates.entries()) {
     await page.goto(`/usuarios/${user.id}/solicitudes`);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.getByRole('button', { name: index === 0 ? 'Ascender a Coordinador' : 'Denegar ascenso', exact: true }).click();
     await expect(page.getByRole('status')).toHaveText(index === 0 ? 'Ascenso aprobado. Se notificó a la persona.' : 'Ascenso denegado. Se notificó a la persona.');
     expect((await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol).toBe(index === 0 ? 'COORDINADOR' : 'VOLUNTARIO');
@@ -35,6 +37,7 @@ test('H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega perso
   const volunteer = candidates[1];
   await page.goto(`/usuarios/${volunteer.id}`);
   await page.getByRole('button', { name: 'Editar usuario', exact: true }).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByLabel('Nombre', { exact: true }).fill('Nombre actualizado');
   await page.getByLabel('Apellido', { exact: true }).fill('Apellido actualizado');
   await page.getByRole('button', { name: 'Guardar cambios', exact: true }).click();
@@ -45,6 +48,7 @@ test('H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega perso
 });
 test('H1/H2/H3/H5/H7-H11: persona sin cuenta reporta; voluntario se registra, atiende, carga certificado, solicita ascenso y sale', async ({ page }) => {
   test.setTimeout(120_000);
+  await page.setViewportSize({ width: 375, height: 812 });
   const description = `Persona necesita asistencia E2E ${randomUUID()}`;
   await page.goto('/reportar');
   await page.getByLabel('¿Qué está pasando?').fill(description);

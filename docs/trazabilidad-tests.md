@@ -18,6 +18,7 @@ El registro público siempre crea voluntarios. La autoridad del coordinador inic
 | `permisos.spec.ts` | Roles de las 31 operaciones de `docs/api.md`, H1–H12 |
 | `concurrencia.spec.ts` y mutación | H10 y reglas de negocio 5 y 6: un ganador por caso y un caso activo por voluntario |
 | `certificados.spec.ts` | H5/H6, regla de negocio 2, archivos y validaciones de `docs/ui.md` y `docs/api.md` |
+| `clase12.spec.ts` | Formularios y mutaciones de clase 12 en `docs/tareasPorHacer.md`: validación, persistencia de datos ante errores, guardado, permisos vigentes, teclado y 375 px |
 | Otros escenarios de `flujos.spec.ts` | H1/H2: duplicidad, credenciales y privacidad; H3: historial y decisiones; H7: GPS, foto y recuperación documentada; H8/H9: mapa y filtros; H10: certificado para rojo; H11: cierre por asignado e informe |
 | `usuarios.test.cjs` | H1/H2/H3, edición y privacidad de `docs/usuarios.md`, sesión y destinos permitidos de `docs/ui.md` |
 | `ascensos.test.cjs` | H3/H12 y transacciones, avisos, permisos e historial de `docs/ascensos.md` |

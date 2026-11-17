@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import jwt from 'jsonwebtoken';
 import { Rol } from '@prisma/client';
 import type { UsuarioToken } from './auth';
-import { db } from '../../config/database';
+import { db } from './db';
 
 export const sessionCookie = { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, path: '/', maxAge: 28800 };
 
@@ -29,6 +29,6 @@ const DESTINOS = ['/cuenta', '/casos', '/notificaciones', '/usuarios', '/sistema
 
 export function safeDestination(value: unknown) {
   if (typeof value !== 'string') return '/casos';
-  if (DESTINOS.includes(value) || /^\/casos\/[a-z0-9]{20,64}$/.test(value)) return value;
+  if (DESTINOS.includes(value) || /^\/casos\/[a-z0-9]{20,64}$/.test(value) || /^\/usuarios\/[a-z0-9]{20,64}(?:\/solicitudes)?$/.test(value)) return value;
   return '/casos';
 }

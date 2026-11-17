@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { reportarAction, fotoReporteAction } from '@/app/actions/formularios';
+import { Formulario } from './formulario';
 import { LocateFixed, CheckCircle } from 'lucide-react';
 import { MAX_FOTO, TIPOS_FOTO } from '@/lib/reporte';
 import { estimarProvincia, NOMBRES_PROVINCIA, PRIORIDADES } from '@/lib/casos';
@@ -19,7 +21,7 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
   const [mensajeGps, setMensajeGps] = useState('');
   const [foto, setFoto] = useState<File | null>(null);
   const [errorFoto, setErrorFoto] = useState('');
-  const [error, setError] = useState('');
+  const [errorFotoReintento, setErrorFotoReintento] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [incierto, setIncierto] = useState(false);
   const [reportado, setReportado] = useState<Reportado | null>(null);
@@ -80,47 +82,36 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
   async function subirFoto(reporte: Reportado) {
     if (!foto) return;
     if (!reporte.permisoFoto) throw new Error('La carga de fotos no está configurada. El reporte está guardado.');
-    const respuesta = await fetch(`/api/emergencias/${reporte.id}/foto`, {
-      method: 'POST', headers: { 'Content-Type': foto.type, 'x-permiso-foto': reporte.permisoFoto }, body: foto,
-      signal: AbortSignal.timeout(30000),
-    });
-    const datos = await respuesta.json();
-    if (!respuesta.ok) throw new Error(datos.error || 'No pudimos adjuntar la foto.');
+    const datos = new FormData(); datos.set('foto', foto);
+    const resultado = await fotoReporteAction(reporte.id, reporte.permisoFoto, datos);
+    if (!resultado.ok) throw new Error(resultado.campos.foto || resultado.error);
   }
 
-  async function enviar(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (bloqueo.current || localizando) return;
+  async function enviar() {
+    if (bloqueo.current || localizando) return { ok: false, error: 'Esperá a que termine la ubicación.', campos: {} };
     bloqueo.current = true;
     setEnviando(true);
-    setError('');
+
     try {
       // La clave se conserva al fallar: reintentar recupera el caso sin duplicarlo.
       clave.current ||= crypto.randomUUID();
       cuerpo.current ??= JSON.stringify({ descripcion, prioridad, ...(gps ? { ...gps, provincia } : { direccion }) });
       setIncierto(true);
-      const respuesta = await fetch('/api/emergencias', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': clave.current },
-        body: cuerpo.current,
-        signal: AbortSignal.timeout(20000),
-      });
-      const datos = await respuesta.json();
-      if (!respuesta.ok) {
-        if ((respuesta.status >= 400 && respuesta.status < 500) || datos.reporteGuardado === false) {
-          setIncierto(false); cuerpo.current = null; clave.current = '';
-        }
-        throw new Error(datos.error || 'No pudimos guardar el reporte.');
+      const datos = await reportarAction(clave.current, JSON.parse(cuerpo.current));
+      if (!datos.ok || !datos.reporte) {
+        if (Object.keys(datos.campos).length) { setIncierto(false); cuerpo.current = null; clave.current = ''; }
+        return { ok: false, error: datos.error, campos: datos.campos };
       }
-      const reporte = { id: datos.id, permisoFoto: datos.permisoFoto, prioridad: datos.prioridad };
+      const reporte = { ...datos.reporte };
       setReportado(reporte);
       if (foto) {
         setFotoPendiente(true);
         try { await subirFoto(reporte); setFotoPendiente(false); }
         catch { setErrorFoto('No pudimos adjuntar la foto. El reporte ya está guardado; podés reintentar.'); }
       }
-    } catch (fallo) {
-      setError(fallo instanceof Error && !['TimeoutError', 'TypeError', 'SyntaxError'].includes(fallo.name)
-        ? fallo.message : 'No recibimos confirmación. Revisá tu conexión y reintentá. Reenviaremos el mismo reporte para evitar duplicados.');
+      return { ok: true, error: '', campos: {} };
+    } catch {
+      return { ok: false, error: 'No se pudo confirmar el reporte. Reintentá el mismo envío.', campos: {} };
     } finally { bloqueo.current = false; setEnviando(false); }
   }
 
@@ -140,27 +131,27 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
     {foto && !fotoPendiente && !enviando && <p>Foto adjuntada.</p>}
     {fotoPendiente && <div className="stack"><p role="alert">{errorFoto || 'Adjuntando foto…'}</p>
       <div className="field"><label htmlFor="foto-reintento">Cambiar foto pendiente (opcional)</label>
-        <input className="input" id="foto-reintento" type="file" accept="image/jpeg,image/png,image/webp" disabled={enviando} onChange={e => {
+        <input className="input" id="foto-reintento" type="file" accept="image/jpeg,image/png,image/webp" disabled={enviando} aria-invalid={!!errorFotoReintento} aria-describedby={errorFotoReintento ? 'foto-reintento-error' : undefined} onChange={e => {
           const archivo = e.target.files?.[0];
           if (!archivo) return;
           if (archivo.size > MAX_FOTO || !TIPOS_FOTO.includes(archivo.type)) {
-            setErrorFoto('Elegí una foto JPG, PNG o WebP de hasta 5 MB.'); e.target.value = ''; return;
+            setErrorFotoReintento('Elegí una foto JPG, PNG o WebP de hasta 5 MB.'); e.target.value = ''; return;
           }
-          setFoto(archivo); setErrorFoto('Foto lista para adjuntar.');
-        }} /></div>
-      <button className="button button-secondary" disabled={enviando} onClick={reintentarFoto}>{enviando ? 'Adjuntando…' : 'Reintentar foto'}</button></div>}
+          setFoto(archivo); setErrorFotoReintento('');
+        }} />{errorFotoReintento && <p id="foto-reintento-error" className="error-campo" role="alert">{errorFotoReintento}</p>}</div>
+      <button className="button button-secondary" disabled={enviando || !!errorFotoReintento} onClick={reintentarFoto}>{enviando ? 'Adjuntando…' : 'Reintentar foto'}</button></div>}
     <a className="button" href="/reportar">Reportar otra emergencia</a>
   </div>;
 
-  return <form className="stack" onSubmit={enviar} aria-busy={enviando}>
+  return <Formulario id="reporte" action={enviar}>
     <fieldset className="reporte-campos stack" disabled={enviando || incierto}>
       <div className="field"><label htmlFor="prioridad">Prioridad de la emergencia</label>
-        <select className="input" id="prioridad" required value={prioridad} onChange={e => setPrioridad(e.target.value as Prioridad)}>
+        <select className="input" id="prioridad" name="prioridad" required value={prioridad} onChange={e => setPrioridad(e.target.value as Prioridad)}>
           {(Object.entries(PRIORIDADES) as [Prioridad, { nombre: string; detalle: string }][]).map(([valor, opcion]) =>
             <option key={valor} value={valor}>{opcion.nombre} — {opcion.detalle}</option>)}
         </select></div>
       <div className="field"><label htmlFor="descripcion">¿Qué está pasando?</label>
-        <textarea id="descripcion" className="input textarea" required minLength={5} maxLength={191} value={descripcion}
+        <textarea id="descripcion" name="descripcion" className="input textarea" required minLength={5} maxLength={191} value={descripcion}
           onChange={e => setDescripcion(e.target.value)} aria-describedby="descripcion-ayuda" />
         <small id="descripcion-ayuda" className="muted">Entre 5 y 191 caracteres. Incluí referencias para encontrar a la persona.</small></div>
       <div className="stack"><h2>¿Dónde hace falta ayuda?</h2>
@@ -170,13 +161,13 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
         {gps ? <div className="stack">
           <p>Latitud {gps.coordenada_y.toFixed(5)}, longitud {gps.coordenada_x.toFixed(5)}.</p>
           <div className="field"><label htmlFor="provincia">Provincia del incidente</label>
-            <select className="input" id="provincia" required value={provincia} onChange={e => setProvincia(e.target.value)}>
+            <select className="input" id="provincia" name="provincia" required value={provincia} onChange={e => setProvincia(e.target.value)}>
               <option value="">Seleccioná una provincia</option>
               {provincias.map(p => <option key={p} value={p}>{NOMBRES_PROVINCIA[p as Provincia]}</option>)}
             </select></div>
           <button type="button" className="button button-secondary" onClick={() => { setGps(null); setMensajeGps('Escribí la dirección del incidente.'); }}>Usar dirección manual</button>
         </div> : <div className="field"><label htmlFor="direccion">Dirección del incidente</label>
-          <input ref={entradaDireccion} className="input" id="direccion" value={direccion} required minLength={3} maxLength={250}
+          <input ref={entradaDireccion} className="input" id="direccion" name="direccion" value={direccion} required minLength={3} maxLength={250}
             placeholder="Calle, altura, localidad y provincia" autoComplete="off" aria-describedby="direccion-ayuda"
             onKeyDown={e => { if (e.key === 'Escape') setSugerencias([]); }}
             onChange={e => { setDireccion(e.target.value); setSugerencias([]); setAvisoDireccion(''); }} />
@@ -189,7 +180,7 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
           <small className="muted">Se guarda aunque no tengas GPS ni acceso a Google Maps. Incluí localidad y provincia para facilitar la atención.</small></div>}
       </div>
       <div className="field"><label htmlFor="foto">Foto (opcional)</label>
-        <input className="input" id="foto" type="file" accept="image/jpeg,image/png,image/webp" onChange={e => {
+        <input className="input" id="foto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" aria-invalid={!!errorFoto} aria-describedby={errorFoto ? 'foto-ayuda foto-error' : 'foto-ayuda'} onChange={e => {
           const archivo = e.target.files?.[0] ?? null;
           if (archivo && (archivo.size > MAX_FOTO || !TIPOS_FOTO.includes(archivo.type))) {
             setErrorFoto('Elegí una foto JPG, PNG o WebP de hasta 5 MB. Podés reportar sin foto.');
@@ -197,12 +188,12 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
           }
           setFoto(archivo); setErrorFoto('');
         }} />
-        <small className="muted">JPG, PNG o WebP. Hasta 5 MB.</small>
+        <small id="foto-ayuda" className="muted">JPG, PNG o WebP. Hasta 5 MB.</small>
         {foto && <p>Foto seleccionada: {foto.name}</p>}
-        {errorFoto && <p role="alert">{errorFoto}</p>}
+        {errorFoto && <p id="foto-error" className="error-campo" role="alert">{errorFoto}</p>}
       </div>
     </fieldset>
-    {error && <p className="alert" role="alert">{error}</p>}
+
     <button className="button" type="submit" disabled={localizando || enviando}>{enviando ? 'Enviando reporte…' : incierto ? 'Reintentar el mismo reporte' : 'Reportar emergencia'}</button>
-  </form>;
+  </Formulario>;
 }

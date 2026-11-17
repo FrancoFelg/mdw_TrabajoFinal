@@ -29,7 +29,7 @@
 | `PATCH /api/solicitudes-certificados/:id` | Igual que `PATCH /api/certificados/:id`: resolver con `estado` APROBADO o RECHAZADO; rechazo exige `motivo`; decisión repetida devuelve 409 | Coordinador | H6 |
 | `POST /api/emergencias` | Reportar una nueva emergencia en la vía pública | **Público** | H7 |
 | `GET /api/emergencias` | Listar y filtrar emergencias activas para el mapa | Autenticado | H8 |
-| `GET /api/emergencias/:id` | Obtener detalle y ficha completa de una emergencia | Autenticado | H8 |
+| `GET /api/emergencias/:id` | Obtener detalle; casos cerrados solo para su asignado o coordinación, con 404 para terceros | Autenticado | H8 |
 | `POST /api/emergencias/:id/tomar` | Asignarse y marcar la emergencia como `EN CAMINO` | Voluntario | H10 |
 | `POST /api/emergencias/:id/finalizar` | Guardar `observaciones` (10 a 10000 caracteres) y marcar como GESTIONADA; PUT permanece por compatibilidad | Voluntario (asignado) | H11 |
 | `GET /api/notificaciones` | Avisos del usuario (historia 12) con `noLeidas`; `?resumen=1` devuelve solo el contador. Si consulta coordinación, revisa los casos sin atender (una vez por minuto como máximo) | Autenticado | H12 |

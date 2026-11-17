@@ -2,8 +2,13 @@
 
 import { UsuarioService } from '../../../services/usuario.service';
 import { z } from 'zod';
+import { getSession } from '@/lib/session';
+import { falloFormulario, type ResultadoFormulario } from '@/lib/formulario';
+import { revalidatePath } from 'next/cache';
 
-export async function registroAction(_state: { error: string; success: boolean }, data: FormData) {
+export async function registroAction(_state: unknown, data: FormData): Promise<ResultadoFormulario> {
+  // Registro público: todos los visitantes pueden crear una cuenta de voluntario; el rol no llega del formulario.
+  await getSession();
   const nombreUsuario = String(data.get('nombreUsuario') ?? '').trim();
   const email = String(data.get('email') ?? '').trim().toLowerCase();
   const nombre = String(data.get('nombre') ?? '').trim();
@@ -11,24 +16,25 @@ export async function registroAction(_state: { error: string; success: boolean }
   const password = String(data.get('password') ?? '');
   const fechaTexto = String(data.get('fechaNac') ?? '');
   const fechaNac = new Date(`${fechaTexto}T00:00:00.000Z`);
-  const fail = (error: string) => ({ error, success: false });
-  if (!z.string().email().max(191).safeParse(email).success) return fail('Ingresá un email válido.');
-
-  if (!nombreUsuario || !nombre || !apellido) return fail('Completá nombre, apellido y nombre de usuario.');
-  if ([nombreUsuario, nombre, apellido].some(value => value.length > 100)) return fail('Nombre, apellido y usuario admiten hasta 100 caracteres.');
-  if (password.length < 8 || Buffer.byteLength(password, 'utf8') > 72) return fail('La contraseña debe tener al menos 8 caracteres y no superar 72 bytes.');
-  if (password !== data.get('confirmarPassword')) return fail('Las contraseñas no coinciden.');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaTexto) || !Number.isFinite(fechaNac.getTime()) || fechaNac.toISOString().slice(0, 10) !== fechaTexto || fechaNac > new Date()) {
-    return fail('Ingresá una fecha de nacimiento válida que no sea futura.');
-  }
+  const validacion = z.object({
+    email: z.string().email('Ingresá un email válido.').max(191),
+    nombreUsuario: z.string().min(1, 'Ingresá un usuario.').max(100),
+    nombre: z.string().min(1, 'Ingresá tu nombre.').max(100),
+    apellido: z.string().min(1, 'Ingresá tu apellido.').max(100),
+    password: z.string().min(8, 'Usá al menos 8 caracteres.').refine(v => Buffer.byteLength(v, 'utf8') <= 72, 'Máximo 72 bytes.'),
+    confirmarPassword: z.string(),
+    fechaNac: z.string().refine(v => /^\d{4}-\d{2}-\d{2}$/.test(v) && Number.isFinite(fechaNac.getTime()) && fechaNac.toISOString().slice(0,10) === v && fechaNac <= new Date(), 'Ingresá una fecha válida, no futura.'),
+  }).refine(v => v.password === v.confirmarPassword, { path: ['confirmarPassword'], message: 'Las contraseñas no coinciden.' }).safeParse({ email, nombreUsuario, nombre, apellido, password, confirmarPassword: data.get('confirmarPassword'), fechaNac: fechaTexto });
+  if (!validacion.success) return falloFormulario(validacion.error);
 
   try {
     await new UsuarioService().registrarUsuario({ nombreUsuario, email, password, persona: { nombre, apellido, fechaNac } });
-    return { error: '', success: true };
+    revalidatePath('/usuarios');
+    return { ok: true, error: '', campos: {} };
   } catch (error) {
     if (error instanceof Error && (error.message === 'NOMBRE_USUARIO_EXISTENTE' || ('code' in error && error.code === 'P2002'))) {
-      return fail('El nombre de usuario o email ya está registrado.');
+      return { ok: false, error: 'El nombre de usuario o email ya está registrado.', campos: {} };
     }
-    return fail('No pudimos crear la cuenta. Intentá nuevamente en unos momentos.');
+    return falloFormulario(error);
   }
 }

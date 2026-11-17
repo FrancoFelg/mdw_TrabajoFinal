@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import type { EmergenciaEstado } from '@prisma/client';
 import { CircleCheck, Hand, LoaderCircle, Lock } from 'lucide-react';
 import { finalizarCasoAction, tomarCasoAction } from '@/app/actions/emergencias';
 import { Alert } from './ui';
+import { Formulario } from './formulario';
 
 type Props = {
   id: string; estado: EmergenciaEstado; propio: boolean; asignado: string | null;
@@ -15,7 +16,7 @@ type Props = {
 export function CasoAcciones({ id, estado, propio, asignado, bloqueo }: Props) {
   const [error, setError] = useState('');
   const [tomando, startTomar] = useTransition();
-  const [fin, finalizar, finalizando] = useActionState(finalizarCasoAction.bind(null, id), { ok: false, error: '' });
+
 
   if (estado === 'SIN_GESTIONAR') {
     return <div className="acciones-caso">
@@ -34,18 +35,18 @@ export function CasoAcciones({ id, estado, propio, asignado, bloqueo }: Props) {
   }
 
   if (estado === 'EN_CAMINO' && propio) {
-    return <form className="acciones-caso" action={finalizar} aria-busy={finalizando}>
+    return <Formulario id="finalizar" className="acciones-caso" action={async datos => { const r = await finalizarCasoAction(id, { ok: false, error: '' }, datos); return { ...r, campos: r.campos ?? {} }; }}>
       <div className="field">
         <label htmlFor="informe">Informe final</label>
         <textarea id="informe" name="informe" className="input textarea" rows={4} required minLength={10} maxLength={2000} placeholder="Qué encontraste, qué hiciste y cómo quedó la persona." aria-describedby="informe-ayuda" />
         <p id="informe-ayuda" className="muted">Al finalizar, el caso pasa a Gestionada y sale de la lista.</p>
       </div>
-      {fin.error && <Alert>{fin.error}</Alert>}
-      <button className="button button-grande" disabled={finalizando}>
-        {finalizando ? <LoaderCircle aria-hidden="true" className="girar" size={22} /> : <CircleCheck aria-hidden="true" size={22} />}
-        {finalizando ? 'Finalizando…' : 'Finalizar atención'}
+
+      <button className="button button-grande">
+        <CircleCheck aria-hidden="true" size={22} />
+        Finalizar atención
       </button>
-    </form>;
+    </Formulario>;
   }
 
   if (estado === 'EN_CAMINO') return <p className="acciones-caso nota">{asignado ?? 'Otro voluntario'} ya va en camino a este caso.</p>;
