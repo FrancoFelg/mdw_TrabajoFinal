@@ -1,14 +1,15 @@
 import { jsonPublico } from '@/lib/respuesta-publica';
 import { NextRequest } from 'next/server';
 import { CursoAtributoController } from '../../../../controllers/cursoAtributo.controller';
-import { esCoordinadorOAdmin, getUserFromRequest } from '@/lib/auth';
+import { esCoordinadorOAdmin } from '@/lib/auth';
+import { actorActual } from '@/lib/actor-actual';
 import { leerBody, RESPUESTA_NO_AUTORIZADO, RESPUESTA_PROHIBIDO, responderErrorCurso } from '@/lib/cursoErrores';
 
 const controller = new CursoAtributoController();
 
 // GET /api/cursos-atributos — paramétrica de atributos posibles para un curso (autenticado)
 export async function GET(req: NextRequest) {
-  if (!getUserFromRequest(req)) return RESPUESTA_NO_AUTORIZADO();
+  if (!await actorActual(req)) return RESPUESTA_NO_AUTORIZADO();
   try {
     const atributos = await controller.listar();
     return jsonPublico(atributos);
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/cursos-atributos — alta de un atributo en la paramétrica (coordinador/admin)
 export async function POST(req: NextRequest) {
-  const usuario = getUserFromRequest(req);
+  const usuario = await actorActual(req);
   if (!usuario) return RESPUESTA_NO_AUTORIZADO();
   if (!esCoordinadorOAdmin(usuario)) return RESPUESTA_PROHIBIDO();
 

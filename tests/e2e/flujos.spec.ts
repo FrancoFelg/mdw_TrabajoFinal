@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { account, db, password, report, registerInBrowser, loginInBrowser, logoutInBrowser } from './helpers';
+import { account, cargarCertificado, datosCertificado, db, password, report, registerInBrowser, loginInBrowser, logoutInBrowser } from './helpers';
 
 test.afterAll(async () => db.$disconnect());
 
@@ -78,13 +78,9 @@ test('H1/H2/H3/H5/H7-H11: persona sin cuenta reporta; voluntario se registra, at
   expect((await db.emergencia.findUniqueOrThrow({ where: { id } })).observacionesCierre).toBe('Se brindó asistencia y se resolvió la situación.');
   await page.goto('/casos');
   await expect(page.getByText(description, { exact: true })).toHaveCount(0);
-  await page.goto('/formacion');
   const codigo = `recorrido-${randomUUID()}`;
-  await page.getByLabel('Código de verificación').fill(codigo);
-  await page.getByLabel('Archivo del certificado').setInputFiles({ name: 'curso.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF') });
-  await page.getByRole('button', { name: 'Enviar certificado' }).click();
-  await expect(page.getByRole('status')).toHaveText('Certificado enviado a revisión.');
-  const certificado = await db.certificado.findUniqueOrThrow({ where: { codigoVerificacion: codigo } });
+  await cargarCertificado(page, { nombre: 'Primeros auxilios', codigo });
+  const certificado = await db.certificado.findFirstOrThrow({ where: { codigoVerificacion: codigo } });
   expect(certificado.usuarioId).toBe(user.id);
   expect(certificado.estado).toBe('PENDIENTE');
   await page.goto('/ascensos');
@@ -139,7 +135,8 @@ test('H10: rojo exige certificado aprobado', async ({ request }) => {
   const user = await account(request);
   const caso = await report(request, 'ROJO');
   expect(await request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(403);
-  await db.certificado.create({ data: { usuarioId: user.id, usuarioCreacionId: user.id, codigoVerificacion: randomUUID(), estado: 'APROBADO' } });
+  await db.certificado.create({ data: { usuarioId: user.id, usuarioCreacionId: user.id, codigoVerificacion: randomUUID(), estado: 'APROBADO',
+    ...datosCertificado, fechaEmision: new Date('2026-01-15T12:00:00Z'), archivoTipo: 'application/pdf', archivoNombre: 'curso.pdf' } });
   expect(await request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(200);
 });
 
@@ -219,8 +216,11 @@ test('H5/H6: acceso a formación desde el bloqueo de un caso rojo', async ({ pag
   const caso = await report(request, 'ROJO');
   await page.goto(`/casos/${caso.id}`);
   const link = page.getByRole('link', { name: 'Cargar un certificado' });
-  await expect(link).toHaveAttribute('href', '/formacion');
-  const response = await page.goto('/formacion');
+  await expect(link).toHaveAttribute('href', '/certificados/nuevo');
+  const response = await page.goto('/certificados/nuevo');
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole('heading', { level: 1, name: 'Formación y certificados' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Cargar certificado' })).toBeVisible();
+  // La ruta anterior sigue funcionando: lleva a los certificados propios.
+  await page.goto('/formacion');
+  await expect(page).toHaveURL(/\/certificados$/);
 });

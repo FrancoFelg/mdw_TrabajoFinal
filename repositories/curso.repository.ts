@@ -12,6 +12,9 @@ export interface CrearCursoData {
   descripcion: string;
   fechaDesde: Date;
   fechaHasta: Date;
+  horas: number | null;
+  certificadoNombre: string | null;
+  certificadoEmisor: string | null;
   usuarioCreacionId: string;
   atributos?: CursoAtributoValorInput[];
 }
@@ -21,6 +24,9 @@ export interface ActualizarCursoData {
   descripcion?: string;
   fechaDesde?: Date;
   fechaHasta?: Date;
+  horas?: number | null;
+  certificadoNombre?: string | null;
+  certificadoEmisor?: string | null;
   // Si viene, se reemplaza el set de atributos vigentes del curso por este.
   atributos?: CursoAtributoValorInput[];
 }
@@ -41,6 +47,9 @@ export class CursoRepository {
         descripcion: data.descripcion,
         fechaDesde: data.fechaDesde,
         fechaHasta: data.fechaHasta,
+        horas: data.horas,
+        certificadoNombre: data.certificadoNombre,
+        certificadoEmisor: data.certificadoEmisor,
         usuarioCreacionId: data.usuarioCreacionId,
         cursosRelAtributos: data.atributos?.length
           ? {

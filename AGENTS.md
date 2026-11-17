@@ -11,7 +11,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Pruebas y calidad
 
 - `pnpm test`: pruebas unitarias con dobles de datos en `tests/*.test.cjs`.
-- `pnpm test:e2e`: Playwright contra la aplicación real y MySQL local exclusivo de pruebas. Lee las 24 filas de `docs/api.md` y verifica sus permisos como anónimo, voluntario, coordinador y administrador. Incluye navegador, usuarios, ascensos y concurrencia.
+- `pnpm test:e2e`: Playwright contra la aplicación real y MySQL local exclusivo de pruebas. Lee las 31 filas de `docs/api.md` y verifica sus permisos como anónimo, voluntario, coordinador y administrador. Incluye navegador, usuarios, ascensos y concurrencia.
 - `pnpm test:e2e -- tests/e2e/concurrencia.spec.ts`: diez solicitudes simultáneas mediante `Promise.all`, tanto sobre el mismo caso como sobre casos distintos del mismo voluntario.
 - `pnpm test:e2e:mutation`: quita temporalmente la condición de estado de la actualización, exige que falle la prueba de concurrencia y restaura el archivo mediante `finally`. No ejecutar junto a otras pruebas ni interrumpirlo durante la mutación.
 - Requisitos: MySQL local, dependencias instaladas y `pnpm exec playwright install chromium`. `E2E_DATABASE_URL` debe usar `localhost` o `127.0.0.1` y una base `mdw_e2e` o `mdw_e2e_*`. Sin esta variable, el lanzador toma credenciales locales de `.env` y cambia exclusivamente el nombre a `mdw_e2e`. Nunca ejecuta pruebas contra la base original.

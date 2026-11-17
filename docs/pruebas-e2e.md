@@ -50,7 +50,7 @@ Resultados completos: `playwright-report/index.html`, `test-results/results.json
 3. La finalización acepta POST y conserva PUT por compatibilidad. Exige voluntario asignado e informe de 10 a 10000 caracteres.
 4. Un detalle de emergencia inexistente responde 404.
 5. Tomar y finalizar comprueban el rol VOLUNTARIO en MySQL. Coordinación recibe 403 y la pantalla bloquea la toma.
-6. `/formacion` permite cargar comprobantes, consultar historial, descargar archivos privados y resolver pendientes. Un rechazo exige motivo.
+6. `/certificados/nuevo` permite cargar comprobantes; `/certificados` muestra historial y motivo de rechazo con descarga privada; coordinación resuelve pendientes en `/certificados/revisar`. Un rechazo exige motivo. `/formacion` redirige según rol.
 7. El informe se persiste en `observacionesCierre` y aparece en detalle e historial. Un cierre repetido devuelve 409 y conserva el informe anterior.
 8. El aviso de edición de usuario permanece visible después de cambiar el rol; el componente conserva su identidad al refrescar.
 
@@ -72,7 +72,7 @@ La solicitud usa el propio registro Certificado, sin una segunda tabla de solici
 | H11: finalizar | Cierre en navegador y por POST/PUT; voluntario ajeno rechazado; informe corto rechazado; persistencia real; cierre repetido bloqueado. |
 | H12: avisos | Permisos del listado y avisos persistidos de ascensos/certificados. Push y alertas por antigüedad no quedan certificados exhaustivamente. |
 
-La matriz lee las 24 filas de `docs/api.md` y ejecuta cada una como anónimo, voluntario, coordinador y administrador. Los casos permitidos usan cuerpo vacío o ID inexistente para comprobar acceso antes de validación/recurso. No equivalen al CRUD positivo completo de cada endpoint. La descarga privada tiene comprobaciones funcionales adicionales.
+La matriz lee las 31 filas de `docs/api.md` y ejecuta cada una como anónimo, voluntario, coordinador y administrador. Los casos permitidos usan cuerpo vacío o ID inexistente para comprobar acceso antes de validación/recurso. No equivalen al CRUD positivo completo de cada endpoint. La descarga privada tiene comprobaciones funcionales adicionales.
 
 ## Clase 13
 

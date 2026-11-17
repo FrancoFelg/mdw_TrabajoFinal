@@ -7,11 +7,9 @@ import { getSession } from '@/lib/session';
 import { db } from '@/lib/db';
 import { falloFormulario, type ResultadoFormulario } from '@/lib/formulario';
 import { editarUsuario } from '@/lib/usuarios-admin';
-import { resolverCertificado } from '@/lib/certificados';
-import { MAX_CERTIFICADO, tipoCertificado, guardarCertificado, borrarArchivoCertificado } from '@/lib/archivos-certificados';
 import { guardarFoto, tipoFoto, permisoFoto, verificarPermisoFoto } from '@/lib/fotos-emergencia';
 import { MAX_FOTO } from '@/lib/reporte';
-import { avisarCertificadoNuevo, avisarEmergenciaNueva } from '@/lib/avisos';
+import { avisarEmergenciaNueva } from '@/lib/avisos';
 import { SolicitudAscensoService } from '../../../services/solicitudAscenso.service';
 import { CrearEmergenciaSchema, EmergenciaService } from '../../../services/emergencia.service';
 
@@ -63,41 +61,6 @@ export async function ascensoAction(operacion: 'crear' | 'aprobar' | 'rechazar',
     }
     return resultado;
   }
-}
-
-export async function subirCertificadoAction(datos: FormData): Promise<ResultadoFormulario> {
-  try {
-    const usuario = await actor();
-    const { codigoVerificacion: codigo } = z.object({ codigoVerificacion: z.string().trim().min(1, 'Ingresá el código.').max(191) }).parse({ codigoVerificacion: datos.get('codigoVerificacion') });
-    const cursoId = String(datos.get('cursoId') ?? '');
-    const archivo = datos.get('archivo');
-    if (!(archivo instanceof File) || !archivo.size || archivo.size > MAX_CERTIFICADO) return { ...bien, ok: false, campos: { archivo: 'Adjuntá un PDF o imagen de hasta 5 MB.' } };
-    const bytes = new Uint8Array(await archivo.arrayBuffer());
-    if (!tipoCertificado(bytes)) return { ...bien, ok: false, campos: { archivo: 'Solo PDF, JPG, PNG o WebP.' } };
-    if (!codigo) return { ...bien, ok: false, campos: { codigoVerificacion: 'Ingresá el código.' } };
-    if (cursoId && !await db.cursos.findFirst({ where: { id: cursoId, fechaEliminacion: null } })) return { ...bien, ok: false, campos: { cursoId: 'Curso inexistente.' } };
-    const id = randomUUID();
-    await guardarCertificado(id, bytes);
-    try {
-      await db.certificado.create({ data: { id, usuarioId: usuario.id, usuarioCreacionId: usuario.id, codigoVerificacion: codigo, cursoId: cursoId || null, estado: 'PENDIENTE', archivo: `/api/certificados/${id}/archivo` } });
-    } catch (error) { await borrarArchivoCertificado(id).catch(() => {}); throw error; }
-    avisarCertificadoNuevo(id, usuario.id);
-    revalidatePath('/formacion');
-    return bien;
-  } catch (error) { return falloFormulario(error); }
-}
-
-export async function resolverCertificadoAction(id: string, datos: FormData): Promise<ResultadoFormulario> {
-  try {
-    await actor(true);
-    const estado = datos.get('estado');
-    const motivo = String(datos.get('motivo') ?? '').trim();
-    if (estado !== 'APROBADO' && estado !== 'RECHAZADO') return { ...bien, ok: false, campos: { estado: 'Elegí un resultado válido.' } };
-    if (estado === 'RECHAZADO' && (!motivo || motivo.length > 2000)) return { ...bien, ok: false, campos: { motivo: 'Ingresá el motivo del rechazo (hasta 2000 caracteres).' } };
-    await resolverCertificado(id, estado, motivo);
-    revalidatePath('/formacion'); revalidatePath('/notificaciones'); revalidatePath('/casos');
-    return bien;
-  } catch (error) { return falloFormulario(error); }
 }
 
 // H7 es pública: una persona sin cuenta también puede reportar y adjuntar su foto.

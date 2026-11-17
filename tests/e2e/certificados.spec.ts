@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { account, db, report } from './helpers';
+import { account, cargarCertificado, datosCertificado, db, pdf, report } from './helpers';
 
-const pdf = Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF');
 test.afterAll(async () => db.$disconnect());
 
 test('H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegador', async ({ page, browser, request }) => {
@@ -11,45 +10,39 @@ test('H5/H6: subir, rechazar con motivo, volver a cargar y aprobar desde navegad
   try {
     const reviewer = await account(ctx.request, 'COORDINADOR');
     const coordinator = await ctx.newPage();
-    const curso = await ctx.request.post('/api/cursos', { data: { titulo: `RCP ${randomUUID()}`, descripcion: 'Primeros auxilios', fechaDesde: '2026-01-01', fechaHasta: '2026-02-01' } });
-    expect(curso.status()).toBe(201);
-    const cursoCreado = await curso.json();
-    await page.goto('/formacion');
     const codigo = `rechazar-${randomUUID()}`;
-    await page.getByLabel('Código de verificación').fill(codigo);
-    await page.getByLabel('Archivo del certificado').setInputFiles({ name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf });
-    await page.getByRole('button', { name: 'Enviar certificado' }).click();
-    await expect(page.getByRole('status')).toHaveText('Certificado enviado a revisión.');
-    let certificado = await db.certificado.findUniqueOrThrow({ where: { codigoVerificacion: codigo } });
+    const nombre = `RCP ${randomUUID()}`;
+    await cargarCertificado(page, { nombre, codigo });
+    let certificado = await db.certificado.findFirstOrThrow({ where: { codigoVerificacion: codigo } });
     expect(certificado.usuarioId).toBe(user.id);
     expect(certificado.cursoId).toBeNull();
     expect(certificado.estado).toBe('PENDIENTE');
-    const file = await page.request.get(certificado.archivo!);
+    const file = await page.request.get(`/api/certificados/${certificado.id}/archivo`);
     expect(file.status()).toBe(200);
     expect(await file.body()).toEqual(pdf);
-    await coordinator.goto('/formacion');
-    const row = coordinator.getByRole('article', { name: `Certificado ${codigo}`, exact: true });
+    await coordinator.goto('/certificados/revisar');
+    const row = coordinator.getByRole('article', { name: `Certificado ${nombre} de ${user.nombreUsuario}`, exact: true });
     await row.getByLabel('Resultado').selectOption('RECHAZADO');
     await row.getByRole('button', { name: 'Guardar validación' }).click();
-    await expect(row.getByRole('alert')).toHaveText('Ingresá el motivo del rechazo (hasta 2000 caracteres).');
+    await expect(row.getByRole('alert')).toHaveText('Para rechazar, escribí el motivo (hasta 2000 caracteres).');
+    await expect(row.getByLabel('Motivo del rechazo')).toBeFocused();
     await row.getByLabel('Motivo del rechazo').fill('El comprobante está incompleto.');
     await row.getByRole('button', { name: 'Guardar validación' }).click();
     await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');
-    await page.reload();
-    await expect(page.getByText('Motivo: El comprobante está incompleto.')).toBeVisible();
+    certificado = await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } });
+    expect(certificado.usuarioRevisionId).toBe(reviewer.id);
+    expect(certificado.fechaRevision).not.toBeNull();
+    await page.goto('/certificados');
+    await expect(page.getByText('Motivo del rechazo: El comprobante está incompleto.')).toBeVisible();
     expect(await ctx.request.patch(`/api/solicitudes-certificados/${certificado.id}`, { data: { estado: 'APROBADO' } }).then(r => r.status())).toBe(409);
     const nuevo = `aprobar-${randomUUID()}`;
-    await page.getByLabel('Código de verificación').fill(nuevo);
-    await page.getByLabel('Curso (opcional)').selectOption(cursoCreado.id);
-    await page.getByLabel('Archivo del certificado').setInputFiles({ name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf });
-    await page.getByRole('button', { name: 'Enviar certificado' }).click();
-    await expect(page.getByRole('status')).toHaveText('Certificado enviado a revisión.');
-    certificado = await db.certificado.findUniqueOrThrow({ where: { codigoVerificacion: nuevo } });
-    expect(certificado.cursoId).toBe(cursoCreado.id);
+    const nombreNuevo = `RCP ${randomUUID()}`;
+    await cargarCertificado(page, { nombre: nombreNuevo, codigo: nuevo });
+    certificado = await db.certificado.findFirstOrThrow({ where: { codigoVerificacion: nuevo } });
     const caso = await report(request, 'ROJO');
     expect(await page.request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(403);
     await coordinator.reload();
-    await coordinator.getByRole('article', { name: `Certificado ${nuevo}`, exact: true }).getByRole('button', { name: 'Guardar validación' }).click();
+    await coordinator.getByRole('article', { name: `Certificado ${nombreNuevo} de ${user.nombreUsuario}`, exact: true }).getByRole('button', { name: 'Guardar validación' }).click();
     await expect(coordinator.getByRole('status')).toHaveText('Validación guardada.');
     expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).estado).toBe('APROBADO');
     expect(await page.request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(200);
@@ -65,22 +58,91 @@ test('H5/H6: archivos privados, rechazo de archivos inválidos y permisos vigent
   try {
     await account(other);
     const actor = await account(coordinator, 'COORDINADOR');
-    const invalid = await request.post('/api/certificados', { multipart: { codigoVerificacion: randomUUID(), archivo: { name: 'bad.svg', mimeType: 'image/svg+xml', buffer: Buffer.from('<svg/>') } } });
+    const campos = { ...datosCertificado, codigoVerificacion: randomUUID() };
+    const invalid = await request.post('/api/certificados', { multipart: { ...campos, archivo: { name: 'bad.svg', mimeType: 'image/svg+xml', buffer: Buffer.from('<svg/>') } } });
     expect(invalid.status()).toBe(400);
-    expect(await request.post('/api/certificados', { multipart: { codigoVerificacion: randomUUID(), archivo: { name: 'exceso.pdf', mimeType: 'application/pdf', buffer: Buffer.alloc(6 * 1024 * 1024) } } }).then(r => r.status())).toBe(413);
-    const codigo = randomUUID();
-    const upload = () => request.post('/api/certificados', { multipart: { codigoVerificacion: codigo, usuarioId: actor.id, estado: 'APROBADO', archivo: { name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf } } });
-    const res = await upload(); expect(res.status()).toBe(201);
+    expect(await request.post('/api/certificados', { multipart: { ...campos, archivo: { name: 'exceso.pdf', mimeType: 'application/pdf', buffer: Buffer.alloc(6 * 1024 * 1024) } } }).then(r => r.status())).toBe(413);
+    const curso = await request.post('/api/certificados', { multipart: { ...campos, cursoId: randomUUID(), archivo: { name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf } } });
+    expect(curso.status()).toBe(404);
+    expect((await curso.json()).codigo).toBe('CURSO_NO_ENCONTRADO');
+    const res = await request.post('/api/certificados', { multipart: { ...campos, usuarioId: actor.id, estado: 'APROBADO', archivo: { name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf } } });
+    expect(res.status()).toBe(201);
     const cert = await res.json();
     expect(cert.usuarioId).toBe(user.id); expect(cert.estado).toBe('PENDIENTE');
-    expect(await upload().then(r => r.status())).toBe(409);
-    expect(await other.get(cert.archivo).then(r => r.status())).toBe(404);
-    expect(await coordinator.get(cert.archivo).then(r => r.status())).toBe(200);
+    const archivo = `/api/certificados/${cert.id}/archivo`;
+    expect(await other.get(archivo).then(r => r.status())).toBe(404);
+    expect(await coordinator.get(archivo).then(r => r.status())).toBe(200);
     expect(await other.patch(`/api/certificados/${cert.id}`, { data: { estado: 'APROBADO' } }).then(r => r.status())).toBe(403);
     expect(await coordinator.put(`/api/certificados/${cert.id}`, { data: { estado: 'APROBADO' } }).then(r => r.status())).toBe(400);
     await db.usuario.update({ where: { id: actor.id }, data: { rol: 'VOLUNTARIO' } });
     expect(await coordinator.patch(`/api/solicitudes-certificados/${cert.id}`, { data: { estado: 'APROBADO' } }).then(r => r.status())).toBe(403);
-    expect(await coordinator.get(cert.archivo).then(r => r.status())).toBe(404);
-    expect(await db.certificado.count({ where: { codigoVerificacion: codigo } })).toBe(1);
+    expect(await coordinator.patch(`/api/certificados/${cert.id}`, { data: { estado: 'APROBADO' } }).then(r => r.status())).toBe(403);
+    expect(await coordinator.get(archivo).then(r => r.status())).toBe(404);
+    expect((await db.certificado.findUniqueOrThrow({ where: { id: cert.id } })).estado).toBe('PENDIENTE');
   } finally { await other.dispose(); await coordinator.dispose(); }
+});
+
+test('H4/H5: coordinación crea un curso que otorga certificado y la persona solo sube el archivo', async ({ page, browser }) => {
+  const user = await account(page.request);
+  const ctx = await browser.newContext();
+  try {
+    await account(ctx.request, 'COORDINADOR');
+    const coordinator = await ctx.newPage();
+    const titulo = `Primeros auxilios ${randomUUID()}`;
+    await coordinator.goto('/cursos/nuevo');
+    await coordinator.getByLabel('Título').fill(titulo);
+    await coordinator.getByLabel('Descripción').fill('Curso presencial de primeros auxilios.');
+    await coordinator.getByLabel('Fecha de inicio').fill('2026-01-05');
+    await coordinator.getByLabel('Fecha de fin').fill('2026-02-01');
+    await coordinator.getByLabel('Horas').fill('20');
+    await coordinator.getByLabel('Al terminar, el curso otorga un certificado').check();
+    await coordinator.getByRole('button', { name: 'Crear curso' }).click();
+    await expect(coordinator.locator('#curso-curso-cert-nombre-error')).toHaveText('Para que el curso otorgue un certificado, completá su nombre y la entidad emisora.');
+    await expect(coordinator.getByLabel('Nombre del certificado')).toBeFocused();
+    await coordinator.getByLabel('Nombre del certificado').fill('Certificado de Primeros Auxilios');
+    await coordinator.getByLabel('Entidad emisora del certificado').fill('Cruz Roja Argentina');
+    await coordinator.getByRole('button', { name: 'Crear curso' }).click();
+    await expect(coordinator).toHaveURL(/\/cursos$/);
+    const curso = await db.cursos.findFirstOrThrow({ where: { titulo } });
+    expect(curso.horas).toBe(20);
+    expect(curso.certificadoNombre).toBe('Certificado de Primeros Auxilios');
+
+    await page.goto('/cursos');
+    const tarjeta = page.getByRole('article', { name: `Curso ${titulo}`, exact: true });
+    await expect(tarjeta.getByRole('link', { name: /Editar/ })).toHaveCount(0);
+    await expect(tarjeta.getByRole('button', { name: /Dar de baja/ })).toHaveCount(0);
+    await tarjeta.getByRole('link', { name: `Cargar mi certificado de ${titulo}` }).click();
+    await expect(page).toHaveURL(new RegExp(`/certificados/nuevo\\?cursoId=${curso.id}$`));
+    await expect(page.getByText('Certificado de Primeros Auxilios', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Nombre del certificado')).toHaveCount(0);
+    await page.getByLabel('Archivo', { exact: true }).setInputFiles({ name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf });
+    await page.getByRole('button', { name: 'Cargar certificado' }).click();
+    await expect(page).toHaveURL(/\/certificados$/);
+    const certificado = await db.certificado.findFirstOrThrow({ where: { usuarioId: user.id, cursoId: curso.id } });
+    expect(certificado).toMatchObject({ nombre: 'Certificado de Primeros Auxilios', entidadEmisora: 'Cruz Roja Argentina', estado: 'PENDIENTE' });
+    expect(certificado.fechaEmision.toISOString()).toBe('2026-02-01T12:00:00.000Z');
+
+    // Un segundo certificado activo del mismo curso se rechaza; editar el curso no cambia el ya cargado.
+    const duplicado = await page.request.post('/api/certificados', { multipart: { cursoId: curso.id, archivo: { name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf } } });
+    expect(duplicado.status()).toBe(409);
+    expect((await duplicado.json()).codigo).toBe('CERTIFICADO_DUPLICADO');
+    expect(await ctx.request.patch(`/api/cursos/${curso.id}`, { data: { certificadoNombre: 'Otro nombre' } }).then(r => r.status())).toBe(200);
+    expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).nombre).toBe('Certificado de Primeros Auxilios');
+    await page.goto('/cursos');
+    await expect(tarjeta.getByText('Ya cargaste tu certificado de este curso.')).toBeVisible();
+
+    // Un curso que todavía no terminó no permite cargar su certificado.
+    const futuro = await ctx.request.post('/api/cursos', { data: { titulo: `Futuro ${randomUUID()}`, descripcion: 'Más adelante', fechaDesde: '2026-01-01', fechaHasta: '2099-01-01', certificadoNombre: 'X', certificadoEmisor: 'Y' } });
+    expect(futuro.status()).toBe(201);
+    const enCurso = await page.request.post('/api/certificados', { multipart: { cursoId: (await futuro.json()).id, archivo: { name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf } } });
+    expect(enCurso.status()).toBe(400);
+    expect((await enCurso.json()).codigo).toBe('CURSO_NO_FINALIZADO');
+
+    // La baja del curso la decide coordinación y no toca los certificados.
+    coordinator.on('dialog', d => d.accept());
+    await coordinator.goto('/cursos');
+    await coordinator.getByRole('article', { name: `Curso ${titulo}`, exact: true }).getByRole('button', { name: `Dar de baja ${titulo}` }).click();
+    await expect(coordinator.getByRole('article', { name: `Curso ${titulo}`, exact: true })).toHaveCount(0);
+    expect((await db.certificado.findUniqueOrThrow({ where: { id: certificado.id } })).fechaEliminacion).toBeNull();
+  } finally { await ctx.close(); }
 });

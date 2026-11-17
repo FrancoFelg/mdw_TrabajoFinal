@@ -2,7 +2,8 @@ import { db } from '../../config/database';
 import { CertificadoEstado } from '@prisma/client';
 import { jsonPublico } from './respuesta-publica';
 
-export async function resolverCertificado(id: string, estado: unknown, motivo: unknown) {
+// `revisorId`: quién decide (se guarda junto con la fecha de revisión).
+export async function resolverCertificado(id: string, estado: unknown, motivo: unknown, revisorId?: string) {
   if (estado !== 'APROBADO' && estado !== 'RECHAZADO') throw new Error('ESTADO_INVALIDO');
   if (estado === 'RECHAZADO' && (typeof motivo !== 'string' || !motivo.trim() || motivo.length > 2000)) {
     throw new Error('MOTIVO_REQUERIDO');
@@ -12,14 +13,17 @@ export async function resolverCertificado(id: string, estado: unknown, motivo: u
     if (!certificado) throw new Error('CERTIFICADO_NO_ENCONTRADO');
     const cambio = await tx.certificado.updateMany({
       where: { id, estado: CertificadoEstado.PENDIENTE, fechaEliminacion: null },
-      data: { estado, motivoRechazo: estado === 'RECHAZADO' ? (motivo as string).trim() : null },
+      data: {
+        estado, motivoRechazo: estado === 'RECHAZADO' ? (motivo as string).trim() : null,
+        fechaRevision: new Date(), usuarioRevisionId: revisorId ?? null,
+      },
     });
     if (cambio.count !== 1) throw new Error('ESTADO_NO_PENDIENTE');
     await tx.notificacion.create({ data: {
       usuarioId: certificado.usuarioId, tipo: 'VALIDACION_PENDIENTE',
       titulo: estado === 'APROBADO' ? 'Certificado aprobado' : 'Certificado rechazado',
       cuerpo: estado === 'APROBADO' ? 'Tu certificado fue aprobado.' : (motivo as string).trim(),
-      enlace: '/formacion', clave: `certificado_resuelto:${id}`,
+      enlace: '/certificados', clave: `certificado_resuelto:${id}`,
     } });
     return tx.certificado.findUniqueOrThrow({ where: { id } });
   });

@@ -94,20 +94,25 @@ test('perfil valida cada campo y una sesión con rol revocado no modifica otro u
   expect((await db.usuario.findUniqueOrThrow({ where: { id: destino.id }, include: { persona: true } })).persona.nombre).toBe('Prueba');
 });
 
-test('certificado conserva archivo y código ante validación y permisos vigentes', async ({ page }) => {
+test('certificado conserva archivo y datos ante validación', async ({ page }) => {
   const usuario = await account(page.request);
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto('/formacion');
+  await page.goto('/certificados/nuevo');
   const codigo = `archivo-${randomUUID()}`;
-  await page.getByLabel('Código de verificación').fill(codigo);
-  await page.getByLabel('Archivo del certificado').setInputFiles({ name: 'invalido.svg', mimeType: 'image/svg+xml', buffer: Buffer.from('<svg/>') });
-  await page.getByRole('button', { name: 'Enviar certificado' }).click();
-  await expect(page.locator('#cargar-archivo-error')).toHaveText('Solo PDF, JPG, PNG o WebP.');
-  await expect(page.getByLabel('Código de verificación')).toHaveValue(codigo);
-  expect(await page.getByLabel('Archivo del certificado').evaluate((input: HTMLInputElement) => input.files?.[0]?.name)).toBe('invalido.svg');
-  await page.getByLabel('Archivo del certificado').setInputFiles({ name: 'valido.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n%%EOF') });
-  await page.getByRole('button', { name: 'Enviar certificado' }).click();
-  await expect(page.getByRole('article', { name: `Certificado ${codigo}`, exact: true })).toBeVisible();
-  expect((await db.certificado.findUniqueOrThrow({ where: { codigoVerificacion: codigo } })).usuarioId).toBe(usuario.id);
+  await page.getByLabel('Nombre del certificado').fill('Primeros auxilios');
+  await page.getByLabel('Entidad emisora').fill('Cruz Roja Argentina');
+  await page.getByLabel('Fecha de emisión').fill('2026-01-15');
+  await page.getByLabel('Número de certificado').fill(codigo);
+  await page.getByLabel('Archivo', { exact: true }).setInputFiles({ name: 'invalido.svg', mimeType: 'image/svg+xml', buffer: Buffer.from('<svg/>') });
+  await page.getByRole('button', { name: 'Cargar certificado' }).click();
+  await expect(page.locator('#certificado-cert-archivo-error')).toHaveText('Elegí un PDF o una imagen JPG, PNG o WebP de hasta 5 MB.');
+  await expect(page.getByLabel('Archivo', { exact: true })).toBeFocused();
+  await expect(page.getByLabel('Número de certificado')).toHaveValue(codigo);
+  await expect(page.getByLabel('Nombre del certificado')).toHaveValue('Primeros auxilios');
+  expect(await page.getByLabel('Archivo', { exact: true }).evaluate((input: HTMLInputElement) => input.files?.[0]?.name)).toBe('invalido.svg');
+  await page.getByLabel('Archivo', { exact: true }).setInputFiles({ name: 'valido.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n%%EOF') });
+  await page.getByRole('button', { name: 'Cargar certificado' }).click();
+  await expect(page).toHaveURL(/\/certificados$/);
+  expect((await db.certificado.findFirstOrThrow({ where: { codigoVerificacion: codigo } })).usuarioId).toBe(usuario.id);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

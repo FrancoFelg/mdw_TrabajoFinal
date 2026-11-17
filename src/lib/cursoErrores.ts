@@ -34,6 +34,8 @@ const ERRORES_NEGOCIO: Record<string, { status: number; mensaje: string }> = {
   SIN_CAMBIOS: { status: 400, mensaje: 'No se enviaron campos para actualizar.' },
   ID_INVALIDO: { status: 400, mensaje: 'El id indicado no es válido.' },
   CAMPO_DEBE_SER_TEXTO: { status: 400, mensaje: 'titulo y descripcion deben ser texto.' },
+  HORAS_INVALIDAS: { status: 400, mensaje: 'Las horas deben ser un número entero entre 1 y 10000.' },
+  CERTIFICADO_INCOMPLETO: { status: 400, mensaje: 'Para que el curso otorgue un certificado, completá su nombre y la entidad emisora.' },
   // 401 Unauthorized: sin token o token inválido
   USUARIO_CREACION_REQUERIDO: { status: 401, mensaje: 'No autorizado o token inválido.' },
   USUARIO_ELIMINACION_REQUERIDO: { status: 401, mensaje: 'No autorizado o token inválido.' },
@@ -49,6 +51,11 @@ const ERRORES_NEGOCIO: Record<string, { status: number; mensaje: string }> = {
     mensaje: 'El atributo está en uso por al menos un curso y no puede eliminarse.',
   },
 };
+
+// Para Server Actions: mensaje de un código de negocio de cursos, o null si no es conocido.
+export function mensajeErrorCurso(codigo: string): string | null {
+  return ERRORES_NEGOCIO[codigo]?.mensaje ?? null;
+}
 
 // ---------------------------------------------------------------------------
 // Errores de Prisma: se traducen por código para no filtrar detalles internos.

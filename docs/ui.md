@@ -14,6 +14,9 @@ El sistema visual completo está en `DESIGN.md`.
 | `/reportar` | Público, sin cuenta | Reporte en una pantalla, accesible desde Home y desde la pestaña Reportar. Descripción, GPS o dirección manual y foto opcional. Confirmación con código del caso. |
 | `/casos` | Con sesión | Mapa arriba y hoja con la lista (en escritorio, lista a la izquierda y mapa a la derecha). Libres o en camino, con filtro por prioridad. Se refresca cada 30 s. Si tenés un caso en camino, aparece primero. Muestra tu ubicación en vivo (punto azul con margen), la distancia a cada caso y el orden "Más cerca" (historia 8: filtro por proximidad). Tocar una marca abre una tarjeta con prioridad, descripción, código, estado y "Ver caso". |
 | `/casos/[id]` | Con sesión | Detalle, etapas, mapa con tu ubicación, distancia en línea recta y "Cómo llegar". Tomar el caso o finalizarlo con informe. Explica por qué no podés tomarlo (caso rojo sin certificado, otro caso activo, ya tomado). |
+| `/certificados` | Con sesión | "Mis certificados" (pestaña Formación): aviso de si podés tomar casos rojos, una tarjeta por certificado con estado, datos adicionales y motivo de rechazo; ver archivo, editar (pendiente o rechazado) y dar de baja. Ver `docs/certificados.md`. |
+| `/certificados/nuevo` | Con sesión | Cargar un certificado sin curso: nombre, entidad emisora, fecha de emisión, número opcional, archivo (PDF o imagen, hasta 5 MB) y datos adicionales del catálogo. Los errores quedan junto al campo sin perder lo cargado. |
+| `/certificados/[id]/editar` | Dueño | Mismo formulario precargado; el archivo es opcional. Un certificado aprobado no se edita: la pantalla explica por qué. |
 | `/notificaciones` | Con sesión | Avisos (caso rojo nuevo, cola de coordinación, caso sin atender) con no leídos marcados, "Marcar todo como leído" y el interruptor de push para este dispositivo. La campanita del encabezado muestra el contador. |
 
 En el celular la navegación va en pestañas abajo; desde 960 px sube a la barra superior. Cada pantalla nueva suma su pestaña en `src/components/navegacion.tsx`.
@@ -69,6 +72,10 @@ El destino después del login se limita a rutas explícitas del sistema. El cier
 9. Tomar un caso libre; intentar tomar otro (debe explicar que ya tenés uno); con dos sesiones, tomar el mismo caso a la vez y ver el aviso de que otro lo tomó.
 10. Finalizar un caso propio con informe; intentar finalizar con menos de 10 caracteres.
 11. Con un voluntario sin certificado aprobado, abrir un caso rojo: el botón queda bloqueado con el motivo.
+12. En Formación, cargar un certificado con un PDF: aparece Pendiente y "Ver archivo" lo abre en otra pestaña.
+13. Subir un `.txt` renombrado a `.pdf`: el error aparece junto al archivo y los demás campos siguen cargados. Un archivo de más de 5 MB se rechaza antes de enviar.
+14. Editar un certificado reemplazando solo el archivo: guarda. Con un atributo `NUMERO` en el catálogo, cargar texto en ese dato: lo rechaza.
+15. Aprobar el certificado por API (`PATCH`): desaparece "Editar" y el aviso pasa a "Podés tomar casos rojos." Tomar un caso rojo funciona; darlo de baja vuelve a bloquearlo.
 
 Las rutas que todavía no tienen pantalla se documentan en la sección 5 de `docs/spec.md`.
 
@@ -90,7 +97,7 @@ Verificación manual: abrir Home sin sesión, entrar a Reportar, enviar sin foto
 
 ## Formación y cierre
 
-`/formacion` permite adjuntar PDF o imagen de hasta 5 MB con código de verificación y curso opcional. Muestra historial, estado, motivo de rechazo y descarga privada. Coordinación ve todas las solicitudes y puede resolver las pendientes; un rechazo exige motivo. La API controla propietario, rol vigente y transiciones, y notifica cada decisión.
+`/certificados/nuevo` permite adjuntar PDF o imagen de hasta 5 MB con nombre, entidad emisora, fecha de emisión y número opcional. `/cursos` muestra el catálogo; si un curso terminado otorga certificado, «Cargar mi certificado» abre el mismo formulario con los datos del curso y solo pide el archivo. Coordinación crea, edita y da de baja cursos desde ahí. `/certificados` muestra historial, estado, motivo de rechazo y descarga privada. Coordinación revisa en `/certificados/revisar` y resuelve las pendientes; un rechazo exige motivo. `/formacion` redirige según rol. La API controla propietario, rol vigente y transiciones, y notifica cada decisión.
 
 Los comprobantes se guardan en `.data/certificados` o `CERTIFICATE_UPLOAD_DIR`. Ese directorio necesita escritura, persistencia y respaldo; varias instancias requieren almacenamiento compartido. Las pruebas usan exclusivamente `.data/e2e/certificados`.
 

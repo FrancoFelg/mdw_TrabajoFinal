@@ -65,6 +65,10 @@ COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=build --chown=nextjs:nodejs /app/public ./public
 
+# Archivos subidos (certificados, fotos). En prod se monta el volumen mdw_uploads
+# acá; crearlo con dueño nextjs hace que el volumen nuevo herede ese dueño.
+RUN mkdir -p /app/.data && chown nextjs:nodejs /app/.data
+
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000

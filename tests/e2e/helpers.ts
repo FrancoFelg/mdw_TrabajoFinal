@@ -62,3 +62,18 @@ export async function report(request: APIRequestContext, prioridad = 'VERDE') {
   expect(response.status()).toBe(201);
   return response.json();
 }
+
+export const pdf = Buffer.from('%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF');
+export const datosCertificado = { nombre: 'Primeros auxilios', entidadEmisora: 'Cruz Roja Argentina', fechaEmision: '2026-01-15' };
+
+// Carga un certificado sin curso desde /certificados/nuevo y vuelve al listado.
+export async function cargarCertificado(page: Page, { nombre, codigo }: { nombre: string; codigo: string }) {
+  await page.goto('/certificados/nuevo');
+  await page.getByLabel('Nombre del certificado').fill(nombre);
+  await page.getByLabel('Entidad emisora').fill(datosCertificado.entidadEmisora);
+  await page.getByLabel('Fecha de emisión').fill(datosCertificado.fechaEmision);
+  await page.getByLabel('Número de certificado').fill(codigo);
+  await page.getByLabel('Archivo', { exact: true }).setInputFiles({ name: 'curso.pdf', mimeType: 'application/pdf', buffer: pdf });
+  await page.getByRole('button', { name: 'Cargar certificado' }).click();
+  await expect(page).toHaveURL(/\/certificados$/);
+}

@@ -251,6 +251,8 @@ Campos de `POST /api/cursos`:
 | `descripcion` | string | Sí |
 | `fechaDesde` | fecha ISO | Sí |
 | `fechaHasta` | fecha ISO (no anterior a `fechaDesde`) | Sí |
+| `horas` | entero de 1 a 10000 | No |
+| `certificadoNombre`, `certificadoEmisor` | texto; certificado que otorga el curso (los dos o ninguno) | No |
 | `atributos` | `[{ "campoId": string, "dato": string, "fechaHasta"?: fecha }]` | No |
 
 Cada `campoId` debe ser un atributo existente de `/api/cursos-atributos` y no puede repetirse.
@@ -275,13 +277,13 @@ curl -X POST https://mdw.guillermonatali.com/api/cursos \
 }
 ```
 
-`PATCH /api/cursos/:id` acepta cualquier subconjunto de `titulo`, `descripcion`, `fechaDesde`, `fechaHasta` y `atributos`. Si se envía `atributos`, **reemplaza** el conjunto vigente completo.
+`PATCH /api/cursos/:id` acepta cualquier subconjunto de los campos. Si se envía `atributos`, **reemplaza** el conjunto vigente completo. `null` en `horas` o en los dos datos del certificado los quita. Los certificados ya cargados no cambian: copiaron los datos al cargarse.
 
 Errores comunes (cuerpo `{ "error", "codigo" }`):
 
 | Status | `codigo` |
 | :--- | :--- |
-| 400 | `BODY_INVALIDO`, `CAMPOS_OBLIGATORIOS_FALTANTES`, `FECHA_INVALIDA`, `RANGO_FECHAS_INVALIDO`, `TITULO_VACIO`, `DESCRIPCION_VACIA`, `ATRIBUTOS_DEBE_SER_LISTA`, `ATRIBUTO_INCOMPLETO_CAMPO_Y_DATO_REQUERIDOS`, `ATRIBUTO_DUPLICADO`, `FECHA_ATRIBUTO_INVALIDA`, `SIN_CAMBIOS` (PATCH sin campos) |
+| 400 | `BODY_INVALIDO`, `CAMPOS_OBLIGATORIOS_FALTANTES`, `FECHA_INVALIDA`, `RANGO_FECHAS_INVALIDO`, `TITULO_VACIO`, `DESCRIPCION_VACIA`, `ATRIBUTOS_DEBE_SER_LISTA`, `ATRIBUTO_INCOMPLETO_CAMPO_Y_DATO_REQUERIDOS`, `ATRIBUTO_DUPLICADO`, `FECHA_ATRIBUTO_INVALIDA`, `HORAS_INVALIDAS`, `CERTIFICADO_INCOMPLETO`, `SIN_CAMBIOS` (PATCH sin campos) |
 | 401 / 403 | sin token / rol insuficiente |
 | 404 | `CURSO_NO_ENCONTRADO`, `ATRIBUTO_NO_ENCONTRADO` |
 
@@ -317,47 +319,56 @@ Respuesta `201`: `{ "id": "cm...", "nombre": "Entidad emisora", "tipo": "TEXTO",
 
 ### Certificados
 
-Comprobantes de capacitación de un usuario. Estados: `PENDIENTE` (default), `APROBADO`, `RECHAZADO`, `VENCIDO`. Con baja lógica.
+Comprobantes de capacitación de un usuario (historia 5). Estados: `PENDIENTE` (siempre al cargar), `APROBADO`, `RECHAZADO`. Con baja lógica. Detalle en `docs/certificados.md`.
 
-| Método y ruta | Rol (según el código) | Qué hace |
+| Método y ruta | Rol | Qué hace |
 | :--- | :--- | :--- |
-| `GET /api/certificados` | Autenticado | Listar certificados vigentes: coordinador y admin ven todos, un voluntario solo los suyos |
-| `GET /api/certificados/:id` | Autenticado | Detalle; un voluntario solo ve los suyos (`404` si no existe o es de otro usuario) |
-| `POST /api/certificados` | Autenticado | Crear |
-| `PATCH /api/certificados/:id` | Coordinador | Aprobar o rechazar un certificado pendiente |
-| `PUT /api/certificados/:id` | Coordinador | Actualizar `estado` y/o `codigoVerificacion` |
-| `DELETE /api/certificados/:id` | Coordinador | Baja lógica; el usuario que elimina se toma del token |
+| `GET /api/certificados` | Autenticado | Los propios; coordinación ve todos y filtra con `?estado=` y `?usuarioId=` |
+| `GET /api/certificados/:id` | Dueño o coordinación | Detalle (`404` si es de otra persona) |
+| `POST /api/certificados` | Autenticado | Cargar uno propio (`multipart/form-data`, con archivo) |
+| `PUT /api/certificados/:id` | Dueño | Editar mientras está `PENDIENTE` o `RECHAZADO`; editar un rechazado lo vuelve a `PENDIENTE` |
+| `PATCH /api/certificados/:id` | Coordinador | Aprobar o rechazar un certificado pendiente (rechazo con motivo) |
+| `DELETE /api/certificados/:id` | Dueño o coordinación | Baja lógica |
+| `GET /api/certificados/:id/archivo` | Dueño o coordinación | Descarga el archivo (`inline`) |
 
-Campos de `POST /api/certificados`:
+Campos de `POST /api/certificados` (`multipart/form-data`; en `PUT` todos son opcionales):
 
 | Campo | Tipo | Obligatorio |
 | :--- | :--- | :--- |
-| `usuarioId` | string (dueño del certificado) | Sí |
-| `codigoVerificacion` | string (único) | Sí |
-| `cursoId` | string | No |
-| `estado` | enum de estados | No (default `PENDIENTE`) |
-| `atributos` | `[{ "campoId": string, "dato": string, "fechaHasta"?: fecha }]` | No |
+| `nombre` | texto | Sí |
+| `entidadEmisora` | texto | Sí |
+| `fechaEmision` | `YYYY-MM-DD`, no posterior a hoy (hora de Argentina) | Sí |
+| `codigoVerificacion` | texto (número del certificado) | No |
+| `cursoId` | curso del catálogo; solo al crear | No |
+| `atributos` | JSON `[{ "campoId": string, "dato": string }]`; cada dato se valida según el tipo del atributo | No |
+| `archivo` | PDF, JPG, PNG o WebP de hasta 5 MB (validado por contenido) | Sí |
+
+El dueño sale del token y el estado es siempre `PENDIENTE`. Con `cursoId` no se mandan `nombre`, `entidadEmisora` ni `fechaEmision`: se copian del curso (la fecha es su fin). El curso tiene que estar vigente, otorgar certificado y haber terminado. No se admiten dos certificados pendientes o aprobados del mismo curso por persona (`409`).
 
 ```bash
 curl -X POST https://mdw.guillermonatali.com/api/certificados \
-  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{ "usuarioId": "<mi-id>", "codigoVerificacion": "RCP-2026-0001", "cursoId": "<id-curso>" }'
+  -H "Authorization: Bearer $TOKEN" \
+  -F nombre="Primeros auxilios" -F entidadEmisora="Cruz Roja Argentina" -F fechaEmision=2026-03-10 \
+  -F 'atributos=[{"campoId":"<id-atributo>","dato":"20"}]' -F archivo=@certificado.pdf
 ```
 
 ```json
 {
-  "id": "cm...", "cursoId": "<id-curso>", "usuarioId": "<mi-id>", "codigoVerificacion": "RCP-2026-0001",
-  "estado": "PENDIENTE", "fechaEmision": "2026-10-06T15:00:00.000Z", "certificadosRelAtributos": []
+  "id": "cm...", "usuarioId": "<mi-id>", "nombre": "Primeros auxilios", "entidadEmisora": "Cruz Roja Argentina",
+  "fechaEmision": "2026-03-10T12:00:00.000Z", "codigoVerificacion": null, "estado": "PENDIENTE",
+  "archivoTipo": "application/pdf", "archivoNombre": "certificado.pdf",
+  "certificadosRelAtributos": [{ "campoId": "<id-atributo>", "dato": "20", "campos": { "nombre": "Horas", "tipo": "NUMERO" } }]
 }
 ```
 
-Errores `POST`: `401` · `400` faltan `usuarioId` o `codigoVerificacion` (el mensaje también menciona `estadoId`, que ya no es un campo del modelo) · `500` para cualquier otro error, por ejemplo `codigoVerificacion` repetido.
+Errores: la respuesta es `{ "error", "codigo", "campo"? }`. `401` · `400` `CAMPOS_OBLIGATORIOS_FALTANTES` / `FECHA_INVALIDA` / `ARCHIVO_REQUERIDO` / `ARCHIVO_INVALIDO` / `ATRIBUTO_DUPLICADO` / `ATRIBUTO_VALOR_INVALIDO` / `CURSO_SIN_CERTIFICADO` / `CURSO_NO_FINALIZADO` / `CURSO_NO_EDITABLE` / `DATOS_DEL_CURSO` / `SIN_CAMBIOS` · `404` `CERTIFICADO_NO_ENCONTRADO` / `ATRIBUTO_NO_ENCONTRADO` / `CURSO_NO_ENCONTRADO` · `409` `CERTIFICADO_DUPLICADO` · `413` `ARCHIVO_DEMASIADO_GRANDE` · `422` `NO_EDITABLE`.
 
 `PATCH /api/certificados/:id` (coordinador):
 
 | Campo | Tipo | Obligatorio |
 | :--- | :--- | :--- |
 | `estado` | `APROBADO` \| `RECHAZADO` | Sí |
+| `motivo` | texto (hasta 2000 caracteres) | Solo al rechazar |
 
 ```bash
 curl -X PATCH https://mdw.guillermonatali.com/api/certificados/<id> \
@@ -365,24 +376,26 @@ curl -X PATCH https://mdw.guillermonatali.com/api/certificados/<id> \
   -d '{ "estado": "APROBADO" }'
 ```
 
-Errores: `401` · `403` · `400` falta `estado` o valor distinto de `APROBADO`/`RECHAZADO` · `404` · `422` el certificado no está en `PENDIENTE`.
+Errores: `401` · `403` · `400` `ESTADO_INVALIDO` / `MOTIVO_REQUERIDO` · `404` · `409` `ESTADO_NO_PENDIENTE` (ya fue revisado). Al resolver se guardan quién revisó y cuándo, y se avisa a la persona. `PATCH /api/solicitudes-certificados/:id` hace lo mismo; la pantalla de coordinación es `/certificados/revisar`.
 
 ---
 
 ### Atributos de certificado
 
-| Método y ruta | Rol (según el código) | Qué hace |
+Catálogo de datos adicionales (EAV) que se pueden sumar a un certificado.
+
+| Método y ruta | Rol | Qué hace |
 | :--- | :--- | :--- |
-| `GET /api/certificados-atributos` | **Sin autenticación** | Listar atributos vigentes |
-| `POST /api/certificados-atributos` | Autenticado | Crear; body `{ "nombre": string }` (obligatorio) |
+| `GET /api/certificados-atributos` | Autenticado | Listar atributos vigentes |
+| `POST /api/certificados-atributos` | Coordinador | Crear; body `{ "nombre": string, "tipo"?: "TEXTO" \| "NUMERO" \| "FECHA" \| "BOOLEANO" }` |
 
 ```bash
 curl -X POST https://mdw.guillermonatali.com/api/certificados-atributos \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
-  -d '{ "nombre": "Horas lectivas" }'
+  -d '{ "nombre": "Horas lectivas", "tipo": "NUMERO" }'
 ```
 
-Respuesta `201`: `{ "id": "cm...", "nombre": "Horas lectivas", "tipo": "TEXTO", ... }`. Errores: `401` · `500` ante cualquier fallo (incluido `nombre` vacío o repetido).
+Respuesta `201`: `{ "id": "cm...", "nombre": "Horas lectivas", "tipo": "NUMERO", ... }`. Errores: `401` · `403` · `400` `EL_NOMBRE_ES_REQUERIDO` / `TIPO_INVALIDO` · `409` nombre repetido.
 
 ---
 

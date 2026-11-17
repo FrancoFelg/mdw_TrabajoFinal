@@ -11,6 +11,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!esCoordinadorOAdmin(actor)) return ACCESO_NO_AUTORIZADO();
   try {
     const body = await leerBody(req);
-    return jsonPublico(await resolverCertificado((await params).id, body.estado, body.motivo));
+    return jsonPublico(await resolverCertificado((await params).id, body.estado, body.motivo, actor.id));
   } catch (error) { return errorCertificado(error); }
 }

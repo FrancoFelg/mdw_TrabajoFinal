@@ -38,7 +38,7 @@ export default async function Caso({ params }: { params: Promise<{ id: string }>
   if (emergencia.estado === 'SIN_GESTIONAR') {
     if (sesion.rol !== 'VOLUNTARIO') bloqueo = { texto: 'Solo voluntarios pueden tomar emergencias.' };
     else if (activa) bloqueo = { texto: 'Ya tenés un caso en camino. Finalizalo antes de tomar otro.', enlace: { href: `/casos/${activa.id}`, texto: `Ir a tu caso #${codigoCaso(activa.id)}` } };
-    else if (emergencia.prioridad === 'ROJO' && !certificado) bloqueo = { texto: 'Los casos rojos los toma quien tiene un certificado aprobado.', enlace: { href: '/formacion', texto: 'Cargar un certificado' } };
+    else if (emergencia.prioridad === 'ROJO' && !certificado) bloqueo = { texto: 'Los casos rojos los toma quien tiene un certificado aprobado.', enlace: { href: '/certificados/nuevo', texto: 'Cargar un certificado' } };
   }
 
   const conMapa = lat !== null && lng !== null;

@@ -30,7 +30,7 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Entidad | Qué representa | Se relaciona con |
 | :--- | :--- | :--- |
 | **Persona** | Los datos filiatorios y de contacto de un individuo | Usuario (1-1) · Certificado (1-N) · Emergencia (1-N como reportador o asistido) |
-| **Usuario** | La cuenta de acceso con sus credenciales y su rol definido | Persona (1-1) · Rol (N-1) · Emergencia (1-N como voluntario asignado) · SolicitudAscenso (1-N) · Certificado (N-N via UsuarioCertificado) |
+| **Usuario** | La cuenta de acceso con sus credenciales y su rol definido | Persona (1-1) · Rol (N-1) · Emergencia (1-N como voluntario asignado) · SolicitudAscenso (1-N) · Certificado (1-N como dueño) |
 | **Rol** | El perfil de permisos en el sistema (Voluntario, Coordinador, Admin) | Usuario (1-N) |
 | **SolicitudAscenso** | Petición enviada por un voluntario para ser promovido a rol Coordinador | Usuario (N-1) · SolicitudAscensoEstado (N-1) |
 | **SolicitudAscensoEstado** | Estado del trámite de ascenso: PENDIENTE, APROBADO, RECHAZADO | SolicitudAscenso (1-N) |
@@ -42,10 +42,10 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | **Curso** | Formación en asistencia, cuidados o primeros auxilios que valida a un voluntario (opcional en certificados) | CursoAtributo (N-N via CursoRelAtributo) · Certificado (1-N) |
 | **CursoAtributo** | Características del curso (ej. Horas lectivas, Nivel, Entidad emisora) | Curso (N-N via CursoRelAtributo) |
 | **CursoRelAtributo** | Tabla intermedia entre el catálogo de cursos y sus atributos opcionales | Curso (N-1) · CursoAtributo (N-1) |
-| **Certificado** | Documento o comprobante subido para acreditar capacitaciones | Persona (N-1) · Curso (N-1, opcional) · CertificadoEstado (N-1) · Usuario (N-N via UsuarioCertificado) · SolicitudValidacionCertificado (1-N) |
-| **CertificadoEstado**| Estado de la validación del certificado: PENDIENTE, APROBADO, RECHAZADO, VENCIDO | Certificado (1-N) |
-| **UsuarioCertificado** | Tabla de unión que relaciona usuarios con sus certificados asociados | Usuario (N-1) · Certificado (N-1) |
-| **SolicitudValidacionCertificado** | Registro explícito de la solicitud enviada por el usuario para validar un certificado | Usuario (N-1) · Certificado (N-1) · CertificadoEstado (N-1) |
+| **Certificado** | Comprobante subido por un usuario para acreditar una capacitación: nombre, entidad emisora, fecha de emisión, número opcional y archivo (PDF o imagen). Su estado `PENDIENTE` es la solicitud de validación | Usuario (N-1, dueño) · Curso (N-1, opcional) · CertificadoEstado (N-1) · CertificadoAtributo (N-N via CertificadosRelAtributos) |
+| **CertificadoEstado**| Estado de la validación del certificado: PENDIENTE, APROBADO, RECHAZADO (sin vencimiento) | Certificado (1-N) |
+| **CertificadoAtributo** | Catálogo de datos adicionales opcionales de un certificado (ej. Horas, Nivel, Matrícula), con su tipo: TEXTO, NUMERO, FECHA o BOOLEANO | Certificado (N-N via CertificadosRelAtributos) |
+| **CertificadosRelAtributos** | Valor de un dato adicional para un certificado | Certificado (N-1) · CertificadoAtributo (N-1) |
 
 ---
 
@@ -75,20 +75,23 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 ### 4. Gestión de cursos
 *Como coordinador*, quiero dar de alta, modificar y administrar el catálogo de cursos, *para definir los programas de capacitación disponibles.*
 - **Criterios de aceptación:**
-  * Permite crear, editar y listar cursos indicando título, descripción y horas lectivas.
-  * Los cursos sirven como referencia opcional para la posterior validación de certificados.
+  * Permite crear, editar, listar y dar de baja cursos indicando título, descripción, fechas y horas lectivas (opcionales).
+  * Un curso puede indicar el **certificado que otorga** (nombre y entidad emisora, los dos o ninguno).
+  * Los cursos sirven como referencia opcional para la posterior validación de certificados. Editar o dar de baja un curso no cambia los certificados ya cargados.
 
 ### 5. Gestionar certificados
 *Como usuario*, quiero subir y administrar mis certificados de capacitación, *para demostrar mis competencias ante la organización.*
 - **Criterios de aceptación:**
-  * El usuario puede adjuntar archivos de sus certificados (PDF/Imagen).
-  * El campo `Curso` es **opcional** (se puede vincular a un curso del catálogo o dejarlo vacío para certificados externos/generales).
-  * La subida asocia el certificado al usuario mediante la tabla de relación `UsuarioCertificado` y genera automáticamente una solicitud de validación.
+  * El usuario puede cargar, ver, editar y dar de baja sus propios certificados. Cada uno lleva nombre, entidad emisora, fecha de emisión (no futura), número opcional y un archivo PDF o imagen de hasta 5 MB.
+  * Puede sumar datos adicionales elegidos del catálogo (`CertificadoAtributo`); cada valor se valida según su tipo.
+  * El campo `Curso` es **opcional** (se puede vincular a un curso del catálogo o dejarlo vacío para certificados externos/generales). Si el curso otorga certificado y ya terminó, la persona solo sube el archivo: nombre y entidad se copian del curso y la fecha de emisión es su fin. No puede tener dos certificados pendientes o aprobados del mismo curso.
+  * Todo certificado nace `PENDIENTE`: esa es su solicitud de validación. Solo se edita mientras está `PENDIENTE` o `RECHAZADO`; editar uno rechazado lo devuelve a `PENDIENTE`. Uno `APROBADO` no se edita: se da de baja y se carga otro.
+  * **Caso de error:** un usuario no puede ver, editar ni descargar certificados ajenos.
 
 ### 6. Validar certificados
 *Como coordinador*, quiero revisar las solicitudes de validación de certificados, *para verificar la autenticidad de los comprobantes presentados.*
 - **Criterios de aceptación:**
-  * Se dispone de una tabla de solicitudes de validación (`SolicitudValidacionCertificado`) que relaciona a los usuarios con sus certificados subidos (con `Curso` opcional).
+  * Se dispone de una cola con los certificados en estado `PENDIENTE` (con `Curso` opcional).
   * El coordinador puede aprobar el certificado (pasa a estado `APROBADO`) o rechazarlo (pasa a `RECHAZADO` indicando un motivo).
 
 ### 7. Reportar una emergencia
@@ -148,7 +151,9 @@ Los sustantivos que aparecen en las historias de usuario. De acá sale el modelo
 | Directorio de usuarios | `/usuarios` | Coordinador y administrador | Implementada; búsqueda local y cinco estados |
 | Sistema visual | `/sistema` | Con sesión; ejemplos sin datos personales | Implementada |
 | Reportar emergencia | `/reportar` | Público | Implementada; descripción, GPS o dirección manual y foto opcional con reintento |
-| Formación y certificados | `/formacion` | Con sesión; validación solo coordinación | Carga de comprobantes, catálogo opcional e historial; aprobación o rechazo con motivo |
+| Mis certificados | `/certificados`, `/certificados/nuevo`, `/certificados/[id]/editar` | Con sesión (editar: solo el dueño) | Implementada (parte 1: sin curso). `/formacion` redirige según rol. Ver `docs/certificados.md` |
+| Revisión de certificados | `/certificados/revisar` | Coordinador y administrador | Implementada; pendientes e historial, aprobación o rechazo con motivo y aviso a la persona |
+| Cursos | `/cursos`, `/cursos/nuevo`, `/cursos/[id]/editar` | Con sesión (crear, editar y dar de baja: coordinación) | Implementada (parte 2); desde el catálogo se carga el certificado de un curso |
 | Solicitudes de ascenso | `/ascensos` y `/usuarios/:id/solicitudes` | Según rol y operación | Implementada; historial, evaluación y avisos. Ver `docs/ascensos.md` |
 
 El acceso anónimo a `/usuarios` redirige a `/login?next=/usuarios`. Al iniciar sesión se recupera ese destino.
@@ -176,9 +181,9 @@ Los detalles `/usuarios/[id]` y `/usuarios/[id]/solicitudes` requieren coordinac
 Listado y detalle se resuelven en Server Components mediante servicios/repositorios conectados a `src/lib/db.ts`, sin `fetch` a la API propia. `config/database.ts` reexporta esa única instancia para mantener compatibles los módulos existentes. Los componentes cliente se reservan para filtros, mapas, geolocalización y acciones interactivas.
 
 1. Un reporte de emergencia no requiere cuenta de usuario, pero la asignación para acudir a resolverla exige un **Usuario** autenticado.
-2. Para tomar una emergencia de prioridad `ROJO`, el voluntario debe poseer al menos un **Certificado** en estado `APROBADO` vinculado a su cuenta vía `UsuarioCertificado`.
+2. Para tomar una emergencia de prioridad `ROJO`, el voluntario debe poseer al menos un **Certificado** propio en estado `APROBADO` y no dado de baja.
 3. El campo `Curso` dentro de un `Certificado` es opcional; si no se selecciona un curso del catálogo, se registra como certificado general.
-4. Toda subida de certificado por parte de un usuario genera automáticamente un registro en la tabla de solicitudes de validación (`SolicitudValidacionCertificado`) para revisión de los coordinadores.
+4. Toda subida de certificado por parte de un usuario nace en estado `PENDIENTE`, que funciona como solicitud de validación para los coordinadores.
 5. Una emergencia en estado `SIN GESTIONAR` solo puede ser tomada por un voluntario a la vez.
 6. Un voluntario solo puede tener una emergencia activa en estado `EN CAMINO` en un momento dado.
 7. Las solicitudes de ascensión a coordinador solo pueden ser aprobadas por usuarios con rol `Coordinador` o `Admin`.

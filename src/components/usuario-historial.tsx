@@ -12,7 +12,7 @@ export async function UsuarioHistorial({ usuarioId }: { usuarioId: string }) {
     }),
     db.certificado.findMany({
       where: { usuarioId, fechaEliminacion: null }, orderBy: { fechaEmision: 'desc' },
-      select: { id: true, codigoVerificacion: true, estado: true, motivoRechazo: true, archivo: true, fechaEmision: true, curso: { select: { titulo: true, descripcion: true, fechaDesde: true, fechaHasta: true } } },
+      select: { id: true, nombre: true, entidadEmisora: true, codigoVerificacion: true, estado: true, motivoRechazo: true, fechaEmision: true, curso: { select: { titulo: true, descripcion: true, fechaDesde: true, fechaHasta: true } } },
     }),
   ]);
   return <>
@@ -25,11 +25,12 @@ export async function UsuarioHistorial({ usuarioId }: { usuarioId: string }) {
     </Card>
     <Card><h2>Cursos y certificados</h2>
       {certificados.length ? <ul>{certificados.map(c => <li key={c.id}>
-        <strong>{c.curso?.titulo ?? 'Certificado sin curso asociado'}</strong>
+        <strong>{c.nombre}</strong> <span className="muted">· {c.entidadEmisora}</span>
+        <p>{c.curso?.titulo ?? 'Certificado sin curso asociado'}</p>
         {c.curso && <><p>{c.curso.descripcion}</p><p>Curso: {fecha(c.curso.fechaDesde)} al {fecha(c.curso.fechaHasta)}</p></>}
-        <p>Certificado: {c.codigoVerificacion} · {estado(c.estado)} · Emitido: {fecha(c.fechaEmision)}</p>
+        <p>{c.codigoVerificacion && <>Número: {c.codigoVerificacion} · </>}{estado(c.estado)} · Emitido: {fecha(c.fechaEmision)}</p>
         {c.motivoRechazo && <p>Motivo: {c.motivoRechazo}</p>}
-        {c.archivo && <a href={c.archivo}>Descargar comprobante</a>}
+        <a href={`/api/certificados/${c.id}/archivo`}>Descargar comprobante</a>
       </li>)}</ul> : <p>Sin cursos ni certificados registrados.</p>}
     </Card>
   </>;
