@@ -11,7 +11,7 @@ function cargar(archivo) {
   return modulo.exports;
 }
 
-const { distanciaMetros, filtrarPorRadio, RADIOS_CERCANIA, ALCANCE_MAXIMO, dentroDelAlcance } = cargar('src/lib/casos.ts');
+const { distanciaMetros, filtrarPorRadio, RADIOS_CERCANIA, ALCANCE_MAXIMO, dentroDelAlcance, horaCorta, fechaCorta } = cargar('src/lib/casos.ts');
 
 // Punto de partida: Monumento a la Bandera, Rosario.
 const yo = { lat: -32.9477, lng: -60.6304 };
@@ -79,3 +79,24 @@ test('dentroDelAlcance: sin ubicación propia no filtra y no modifica la lista o
   dentroDelAlcance(casos, yo);
   assert.deepEqual(casos, copia);
 });
+
+// El servidor de producción corre en UTC: las fechas se muestran igual en hora de Argentina (UTC-3).
+function enServidorUTC(prueba) {
+  const anterior = process.env.TZ;
+  process.env.TZ = 'UTC';
+  try { prueba(); } finally { if (anterior === undefined) delete process.env.TZ; else process.env.TZ = anterior; }
+}
+
+test('horaCorta: muestra la hora de Argentina aunque el servidor esté en UTC', () => enServidorUTC(() => {
+  const texto = horaCorta('2026-11-24T19:57:13.856Z');
+  assert.match(texto, /24 nov/);
+  assert.match(texto, /04:57|16:57/);
+  assert.doesNotMatch(texto, /07:57|19:57/);
+}));
+
+test('horaCorta y fechaCorta: de noche en Argentina sigue siendo el mismo día', () => enServidorUTC(() => {
+  const texto = horaCorta('2026-11-25T01:30:00Z'); // 24/11 22:30 en Argentina
+  assert.match(texto, /24 nov/);
+  assert.match(texto, /10:30|22:30/);
+  assert.match(fechaCorta('2026-11-25T01:30:00Z'), /24 de nov/);
+}));
