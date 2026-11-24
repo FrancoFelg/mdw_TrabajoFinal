@@ -263,3 +263,19 @@ test('foto persistente acepta PNG y rechaza SVG, exceso de tamaño y rutas ajena
     fs.rmSync(carpeta, { recursive: true });
   }
 });
+
+test('la prioridad del reporte se deriva de las dos preguntas de estado', () => {
+  const { derivarPrioridad } = cargar('src/lib/reporte.ts');
+  // Cualquier No es grave: no responde o no respira con normalidad.
+  for (const [responde, respira] of [['NO', 'SI'], ['SI', 'NO'], ['NO', 'NO'], ['NO', 'NO_SE'], ['NO_SE', 'NO'], ['NO', null], [null, 'NO']]) {
+    assert.equal(derivarPrioridad({ responde, respira }), 'ROJO', `${responde}/${respira}`);
+  }
+  // Sin ningún No, una duda alcanza para Amarillo.
+  for (const [responde, respira] of [['NO_SE', 'SI'], ['SI', 'NO_SE'], ['NO_SE', 'NO_SE'], ['NO_SE', null], [null, 'NO_SE']]) {
+    assert.equal(derivarPrioridad({ responde, respira }), 'AMARILLO', `${responde}/${respira}`);
+  }
+  // Dos Sí, o sin responder, queda Verde (la spec: prioridad por defecto VERDE).
+  for (const [responde, respira] of [['SI', 'SI'], ['SI', null], [null, 'SI'], [null, null]]) {
+    assert.equal(derivarPrioridad({ responde, respira }), 'VERDE', `${responde}/${respira}`);
+  }
+});

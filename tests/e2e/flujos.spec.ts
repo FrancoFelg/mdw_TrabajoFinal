@@ -46,6 +46,41 @@ test('H1/H2/H3/H8: coordinador inicia sesión, ve casos, aprueba y deniega perso
   await expect(page.getByRole('heading', { name: 'Perfil de Nombre actualizado Apellido actualizado' })).toBeVisible();
   await logoutInBrowser(page, coordinator.nombreUsuario);
 });
+test('H7: la prioridad del reporte sale de las preguntas de estado', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  const reportar = async (responde: string | null, respira: string | null) => {
+    await page.goto('/reportar');
+    // No hay un selector de prioridad con un valor elegido de antemano.
+    await expect(page.getByLabel('Prioridad de la emergencia')).toHaveCount(0);
+    await expect(page.getByRole('status').filter({ hasText: 'Prioridad' })).toContainText('Verde');
+    if (responde) await page.getByRole('group', { name: '¿Responde si le hablás?' }).getByLabel(responde, { exact: true }).check();
+    if (respira) await page.getByRole('group', { name: '¿Respira con normalidad?' }).getByLabel(respira, { exact: true }).check();
+    await page.getByLabel('¿Qué está pasando?').fill(`Prioridad derivada ${randomUUID()}`);
+    await page.getByLabel('Dirección del incidente').fill('Mariano Moreno 1810, Rosario, Santa Fe');
+    return page;
+  };
+  const enviar = async () => {
+    await page.getByRole('button', { name: 'Reportar emergencia', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Emergencia reportada' })).toBeVisible();
+    const id = (await page.locator('.reporte-codigo').innerText()).replace('Código: ', '').trim();
+    return (await db.emergencia.findUniqueOrThrow({ where: { id } })).prioridad;
+  };
+
+  await reportar('No', 'Sí');
+  await expect(page.getByRole('status').filter({ hasText: 'Prioridad' })).toContainText('Rojo');
+  // Con Rojo se repite cómo llamar a emergencias junto a la prioridad.
+  await expect(page.getByRole('link', { name: 'Llamar al 107' })).toHaveCount(2);
+  expect(await enviar()).toBe('ROJO');
+
+  await reportar('Sí', 'No sé');
+  await expect(page.getByRole('status').filter({ hasText: 'Prioridad' })).toContainText('Amarillo');
+  await expect(page.getByRole('link', { name: 'Llamar al 107' })).toHaveCount(1);
+  expect(await enviar()).toBe('AMARILLO');
+
+  await reportar('Sí', 'Sí');
+  expect(await enviar()).toBe('VERDE');
+});
+
 test('H1/H2/H3/H5/H7-H11: persona sin cuenta reporta; voluntario se registra, atiende, carga certificado, solicita ascenso y sale', async ({ page }) => {
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 375, height: 812 });
@@ -128,6 +163,63 @@ test('H3: solicitud, duplicado, rechazo, historial y aprobación con avisos', as
     const history = await db.solicitudAscenso.findMany({ where: { usuarioId: user.id } });
     expect(history.map(row => row.estado).sort()).toEqual(['APROBADO', 'RECHAZADO']);
     expect(await request.post('/api/solicitudes-ascenso').then(r => r.status())).toBe(403);
+  } finally { await coordinator.dispose(); }
+});
+
+test('H3: no se asciende a quien tiene un caso en camino', async ({ request, playwright }) => {
+  const user = await account(request);
+  const coordinator = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:3100' });
+  try {
+    await account(coordinator, 'COORDINADOR');
+    const caso = await report(request);
+    expect(await request.post(`/api/emergencias/${caso.id}/tomar`).then(r => r.status())).toBe(200);
+    const solicitud = await (await request.post('/api/solicitudes-ascenso')).json();
+
+    // Si se lo ascendiera, el caso quedaría en camino sin nadie que pueda finalizarlo.
+    const aprobar = await coordinator.post(`/api/solicitudes-ascenso/${solicitud.id}/aprobar`);
+    expect(aprobar.status()).toBe(409);
+    expect((await aprobar.json()).error).toBe('Tiene un caso en camino: tiene que finalizarlo antes del ascenso.');
+    const editar = await coordinator.patch(`/api/usuarios/${user.id}`, { data: { rol: 'COORDINADOR' } });
+    expect(editar.status()).toBe(409);
+    expect((await editar.json()).error).toBe('Tiene un caso en camino: tiene que finalizarlo antes del ascenso.');
+    expect((await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol).toBe('VOLUNTARIO');
+    expect((await db.solicitudAscenso.findUniqueOrThrow({ where: { id: solicitud.id } })).estado).toBe('PENDIENTE');
+    // El resto del perfil se puede seguir editando.
+    expect(await coordinator.patch(`/api/usuarios/${user.id}`, { data: { persona: { nombre: 'Editada' } } }).then(r => r.status())).toBe(200);
+
+    expect(await request.post(`/api/emergencias/${caso.id}/finalizar`, {
+      data: { observaciones: 'Asistencia finalizada antes del ascenso.' },
+    }).then(r => r.status())).toBe(200);
+    expect(await coordinator.post(`/api/solicitudes-ascenso/${solicitud.id}/aprobar`).then(r => r.status())).toBe(200);
+    expect((await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol).toBe('COORDINADOR');
+
+    // Quien ya coordina no está ascendiendo: su perfil se edita aunque arrastre un caso trabado
+    // de antes de esta regla (el formulario siempre envía el rol).
+    const previo = await report(request);
+    await db.emergencia.update({ where: { id: previo.id }, data: { estado: 'EN_CAMINO', usuarios: { create: { usuarioId: user.id } } } });
+    expect(await coordinator.patch(`/api/usuarios/${user.id}`, { data: { rol: 'COORDINADOR', persona: { nombre: 'Coordina' } } }).then(r => r.status())).toBe(200);
+  } finally { await coordinator.dispose(); }
+});
+
+test('H3: tomar un caso y ascender a la vez nunca deja a un coordinador con un caso en camino', async ({ playwright }) => {
+  const coordinator = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:3100' });
+  try {
+    await account(coordinator, 'COORDINADOR');
+    for (let i = 0; i < 10; i++) {
+      const voluntario = await playwright.request.newContext({ baseURL: 'http://127.0.0.1:3100' });
+      try {
+        const user = await account(voluntario);
+        const caso = await report(voluntario);
+        const solicitud = await (await voluntario.post('/api/solicitudes-ascenso')).json();
+        await Promise.all([
+          voluntario.post(`/api/emergencias/${caso.id}/tomar`),
+          coordinator.post(`/api/solicitudes-ascenso/${solicitud.id}/aprobar`),
+        ]);
+        const rol = (await db.usuario.findUniqueOrThrow({ where: { id: user.id } })).rol;
+        const enCamino = await db.emergencia.count({ where: { estado: 'EN_CAMINO', usuarios: { some: { usuarioId: user.id } } } });
+        expect(rol === 'COORDINADOR' && enCamino > 0, `iteración ${i}: rol ${rol}, casos en camino ${enCamino}`).toBe(false);
+      } finally { await voluntario.dispose(); }
+    }
   } finally { await coordinator.dispose(); }
 });
 

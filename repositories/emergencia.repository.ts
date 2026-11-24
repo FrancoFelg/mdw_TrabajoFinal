@@ -1,6 +1,19 @@
 import { db } from '../config/database';
 import { Emergencia, EmergenciaEstado, Prioridad, CertificadoEstado, Provincia, Prisma } from '@prisma/client';
 
+// Un caso EN_CAMINO solo lo puede finalizar un voluntario, así que nadie con un caso en camino
+// puede dejar de serlo. Bloquea la fila del usuario, igual que tomarEmergencia: tomar un caso y
+// cambiar el rol quedan serializados y ninguno decide con datos viejos.
+export async function asegurarSinCasoEnCamino(tx: Prisma.TransactionClient, usuarioId: string) {
+  await tx.$queryRaw`SELECT id FROM Usuario WHERE id = ${usuarioId} FOR UPDATE`;
+  // Lectura con bloqueo: con REPEATABLE READ, un SELECT común puede reusar la foto tomada en la
+  // primera lectura de la transacción, anterior al bloqueo, y no ver un caso recién tomado.
+  const activas = await tx.$queryRaw<{ id: string }[]>`
+    SELECT e.id FROM Emergencia e JOIN UsuarioEmergencia ue ON ue.emergenciaId = e.id
+    WHERE ue.usuarioId = ${usuarioId} AND e.estado = 'EN_CAMINO' LIMIT 1 FOR SHARE`;
+  if (activas.length) throw new Error('CASO_EN_CAMINO');
+}
+
 export class EmergenciaRepository {
   // Emergencia con sus coordenadas (para calcular rutas hacia ella)
   async findByIdConUbicacion(id: string) {
@@ -127,7 +140,10 @@ export class EmergenciaRepository {
     return await db.$transaction(async (tx) => {
       // Serializa asignaciones del mismo usuario incluso cuando compite por casos distintos.
       // La lectura de la activa sucede después de adquirir el bloqueo de fila en MySQL.
-      await tx.$queryRaw`SELECT id FROM Usuario WHERE id = ${usuarioId} FOR UPDATE`;
+      // El rol se vuelve a leer con la misma lectura que bloquea la fila: un ascenso confirmado
+      // después de la verificación del servicio dejaría a un coordinador con un caso que no puede finalizar.
+      const [usuario] = await tx.$queryRaw<{ rol: string }[]>`SELECT rol FROM Usuario WHERE id = ${usuarioId} FOR UPDATE`;
+      if (usuario?.rol !== 'VOLUNTARIO') throw new Error('ROL_VOLUNTARIO_REQUERIDO');
       const activa = await tx.emergencia.findFirst({
         where: { estado: EmergenciaEstado.EN_CAMINO, usuarios: { some: { usuarioId } } },
       });

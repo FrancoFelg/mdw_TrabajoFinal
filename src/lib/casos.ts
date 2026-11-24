@@ -152,6 +152,19 @@ export function filtrarPorRadio<T extends { lat: number | null; lng: number | nu
   return casos.filter(c => c.lat !== null && c.lng !== null && distanciaMetros(yo, { lat: c.lat, lng: c.lng }) <= radio);
 }
 
+// Alcance de las sugerencias: con ubicación activa, la lista y el mapa nunca muestran casos a más de 30 km.
+export const ALCANCE_MAXIMO = 30000;
+
+// A diferencia de los radios que elige la persona, el alcance conserva los casos sin coordenadas:
+// es un límite que la persona no eligió, y ocultar un caso que podría estar a la vuelta sería peor que mostrarlo.
+export function dentroDelAlcance<T extends { lat: number | null; lng: number | null }>(
+  casos: T[],
+  yo: { lat: number; lng: number } | null,
+): T[] {
+  if (!yo) return casos;
+  return casos.filter(c => c.lat === null || c.lng === null || distanciaMetros(yo, { lat: c.lat, lng: c.lng }) <= ALCANCE_MAXIMO);
+}
+
 // Habilitación para casos rojos según los certificados de la persona (regla 2).
 export type EstadoHabilitacion = 'aprobado' | 'revision' | 'rechazado' | 'sin';
 export function estadoHabilitacion(certificados: { estado: string }[]): EstadoHabilitacion {

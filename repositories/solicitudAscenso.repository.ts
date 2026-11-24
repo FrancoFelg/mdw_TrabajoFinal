@@ -1,6 +1,7 @@
 import { db } from '../config/database';
 import { Prisma, SolicitudAscensoEstado } from '@prisma/client';
 import { usuarioPublicoSelect } from '../src/lib/usuario-publico';
+import { asegurarSinCasoEnCamino } from './emergencia.repository';
 
 // Nunca devolver contraseñas dentro del historial de solicitudes.
 const usuarioPublico = { select: { ...usuarioPublicoSelect, persona: { select: { nombre: true, apellido: true } } } };
@@ -45,6 +46,7 @@ export class SolicitudAscensoRepository {
       const cambio = await tx.solicitudAscenso.updateMany({ where: { id, estado: 'PENDIENTE' }, data: { estado } });
       if (!cambio.count) throw new Error('SOLICITUD_NO_PENDIENTE');
       if (estado === 'APROBADO') {
+        await asegurarSinCasoEnCamino(tx, solicitud.usuarioId);
         const cambioRol = await tx.usuario.updateMany({ where: { id: solicitud.usuarioId, rol: 'VOLUNTARIO' }, data: { rol: 'COORDINADOR' } });
         if (!cambioRol.count) throw new Error('USUARIO_YA_ES_COORDINADOR');
       }

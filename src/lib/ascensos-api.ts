@@ -12,6 +12,7 @@ const errores: Record<string, [number, string]> = {
   SOLICITUD_NO_ENCONTRADA: [404, 'Solicitud no encontrada.'],
   SOLICITUD_NO_PENDIENTE: [409, 'La solicitud ya fue resuelta.'],
   SOLICITUD_PROPIA: [403, 'No podés resolver tu propia solicitud.'],
+  CASO_EN_CAMINO: [409, 'Tiene un caso en camino: tiene que finalizarlo antes del ascenso.'],
 };
 
 export async function operarAscenso(req: NextRequest, operacion: 'crear' | 'aprobar' | 'rechazar', id?: string) {
