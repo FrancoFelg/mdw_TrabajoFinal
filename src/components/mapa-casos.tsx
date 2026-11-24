@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type * as Leaflet from 'leaflet';
-import { LocateFixed } from 'lucide-react';
+import { LocateFixed, LocateOff } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import { codigoCaso, distanciaMetros, PRIORIDADES } from '@/lib/casos';
-import type { MiUbicacion } from '@/lib/mi-ubicacion';
+import { reintentarUbicacion, type MiUbicacion } from '@/lib/mi-ubicacion';
 import type { CasoFila } from './casos-vista';
 
 // Formas de las marcas, iguales a los íconos de la lista: octógono, triángulo, reloj de arena.
@@ -161,15 +161,25 @@ export default function MapaCasos({ casos, solo = false, etiqueta, yo }: Props) 
     }
   }, [listo, yoActiva?.lat, yoActiva?.lng, yoActiva?.precision]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Siempre a mano: con ubicación centra; sin permiso vuelve a pedirla; mientras busca avisa que espera
+  // (el primer dato encuadra el mapa solo).
   function centrarEnMi() {
-    tocado.current = true;
-    if (yoActiva && mapa.current) mapa.current.setView([yoActiva.lat, yoActiva.lng], Math.max(mapa.current.getZoom(), 16));
+    if (yoActiva && mapa.current) {
+      tocado.current = true;
+      mapa.current.setView([yoActiva.lat, yoActiva.lng], Math.max(mapa.current.getZoom(), 16));
+    } else if (yo?.estado === 'denegada') {
+      reintentarUbicacion();
+    }
   }
+  const buscando = yo?.estado === 'buscando' || yo?.estado === 'inactiva';
+  const textoCentrar = yoActiva ? 'Centrar el mapa en tu ubicación' : buscando ? 'Buscando tu ubicación' : 'Volver a pedir tu ubicación';
 
   const sinUbicar = casos.filter(c => c.lat === null || c.lng === null).length;
   return <div className={solo ? 'mapa mapa-chico' : 'mapa'}>
     <div ref={nodo} className="mapa-lienzo" role="region" aria-label={solo ? 'Ubicación del caso' : `Mapa con ${casos.length} casos`} />
-    {yoActiva && <button type="button" className="centrar" onClick={centrarEnMi} aria-label="Centrar el mapa en tu ubicación"><LocateFixed aria-hidden="true" size={22} /></button>}
+    {yo && yo.estado !== 'no-disponible' && <button type="button" className={`centrar${yoActiva ? '' : buscando ? ' centrar-buscando' : ' centrar-sin-permiso'}`} onClick={centrarEnMi} aria-label={textoCentrar} title={textoCentrar} aria-disabled={buscando || undefined}>
+      {yoActiva || buscando ? <LocateFixed aria-hidden="true" size={22} /> : <LocateOff aria-hidden="true" size={22} />}
+    </button>}
     {!solo && !casos.length && <p className="mapa-aviso" role="status">No hay casos para mostrar en el mapa con este filtro.</p>}
     {sinUbicar > 0 && <p className="mapa-aviso">{sinUbicar} caso{sinUbicar > 1 ? 's' : ''} con ubicación pendiente. Se reintentará al actualizar; consultá la dirección en la lista.</p>}
   </div>;

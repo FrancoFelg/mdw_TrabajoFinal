@@ -23,6 +23,18 @@ function iniciar() {
   if (seguimiento !== null || typeof navigator === 'undefined') return;
   if (!('geolocation' in navigator)) return emitir({ estado: 'no-disponible' });
   if (actual.estado !== 'activa') emitir({ estado: 'buscando' });
+  // En el celular el GPS de alta precisión puede tardar en dar el primer dato. Mientras tanto se usa una posición
+  // aproximada (Wi-Fi, antenas o la última conocida) para ubicar el mapa ya; el seguimiento la reemplaza al afinar.
+  // Solo se usa si todavía no llegó un dato del seguimiento, y sus errores se ignoran: los informa el seguimiento.
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      if (seguimiento !== null && actual.estado !== 'activa') {
+        emitir({ estado: 'activa', lat: pos.coords.latitude, lng: pos.coords.longitude, precision: Math.round(pos.coords.accuracy) });
+      }
+    },
+    () => {},
+    { enableHighAccuracy: false, maximumAge: 300000, timeout: 5000 },
+  );
   seguimiento = navigator.geolocation.watchPosition(
     pos => emitir({ estado: 'activa', lat: pos.coords.latitude, lng: pos.coords.longitude, precision: Math.round(pos.coords.accuracy) }),
     err => {

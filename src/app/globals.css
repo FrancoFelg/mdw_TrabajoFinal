@@ -410,6 +410,10 @@ fieldset.pregunta { border: 0; margin: 0; padding: 0; min-width: 0; }
 .yo-precision { fill: var(--blue); fill-opacity: .1; stroke: var(--blue); stroke-opacity: .35; stroke-width: 1; }
 .centrar { position: absolute; right: 12px; bottom: 28px; z-index: 600; display: grid; place-items: center; width: 48px; height: 48px; border: 0; border-radius: 50%; background: var(--bg); color: var(--blue); box-shadow: var(--shadow-2); cursor: pointer; transition: transform .12s var(--ease); }
 .centrar:active { transform: scale(.94); }
+.centrar-buscando { color: var(--text-2); cursor: progress; }
+.centrar-buscando svg { animation: pulso-icono 1.4s var(--ease) infinite alternate; }
+.centrar-sin-permiso { color: var(--text-2); }
+@keyframes pulso-icono { from { opacity: 1; } to { opacity: .35; } }
 .hoja .casos-mapa .centrar, .casos-mapa .centrar { bottom: 40px; }
 
 /* ── Detalle del caso ──────────────────────────────── */

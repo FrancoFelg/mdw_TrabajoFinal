@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import type { EmergenciaEstado, Prioridad } from '@prisma/client';
 import { Camera, ChevronRight, Mic, Navigation } from 'lucide-react';
 import { Asignado, CodigoCaso, IconoPrioridad, MarcaPrioridad } from './marcas';
-import { PRIORIDADES, RADIOS_CERCANIA, distanciaMetros, filtrarPorRadio, formatoDistancia } from '@/lib/casos';
+import { ALCANCE_MAXIMO, PRIORIDADES, RADIOS_CERCANIA, dentroDelAlcance, distanciaMetros, filtrarPorRadio, formatoDistancia } from '@/lib/casos';
 import { reintentarUbicacion, useMiUbicacion } from '@/lib/mi-ubicacion';
 
 const MapaCasos = dynamic(() => import('./mapa-casos'), { ssr: false, loading: () => <div className="mapa mapa-cargando" role="status">Cargando mapa…</div> });
@@ -27,22 +27,24 @@ export function CasosVista({ casos, mio }: { casos: CasoFila[]; mio: CasoFila | 
   const yo = useMiUbicacion();
   const yoActiva = yo.estado === 'activa' ? yo : null;
 
-  const deEstado = useMemo(() => casos.filter(c => c.estado === (filtro === 'libres' ? 'SIN_GESTIONAR' : 'EN_CAMINO')), [casos, filtro]);
-  // Filtro por proximidad (historia 8): solo con ubicación activa y un radio elegido.
-  // Sin radio no depende del GPS, así que la posición en vivo no recalcula la lista ni el mapa.
-  const centro = radio !== null ? yoActiva : null;
-  const cercanos = useMemo(() => filtrarPorRadio(deEstado, centro, radio), [deEstado, centro, radio]);
+  // Alcance de 30 km y filtro por proximidad (historia 8): dependen del GPS en vivo, que cambia cada pocos segundos.
+  // Se memorizan por la lista de ids que quedan, así el mapa solo redibuja (y cierra el globo abierto) si entra o sale un caso.
+  const idsAlcance = dentroDelAlcance(casos, yoActiva).map(c => c.id).join(',');
+  const alcance = useMemo(() => soloIds(casos, idsAlcance), [casos, idsAlcance]);
+  const deEstado = useMemo(() => alcance.filter(c => c.estado === (filtro === 'libres' ? 'SIN_GESTIONAR' : 'EN_CAMINO')), [alcance, filtro]);
+  const idsCercanos = filtrarPorRadio(deEstado, radio !== null ? yoActiva : null, radio).map(c => c.id).join(',');
+  const cercanos = useMemo(() => soloIds(deEstado, idsCercanos), [deEstado, idsCercanos]);
   // Memorizada: el GPS en vivo re-renderiza seguido y el mapa no tiene que redibujar las marcas por eso.
   const visibles = useMemo(() => prioridad ? cercanos.filter(c => c.prioridad === prioridad) : cercanos, [cercanos, prioridad]);
   const distancia = (c: CasoFila) => yoActiva && c.lat !== null && c.lng !== null ? distanciaMetros(yoActiva, { lat: c.lat, lng: c.lng }) : null;
   const ordenados = cercania && yoActiva
     ? [...visibles].sort((a, b) => (distancia(a) ?? Infinity) - (distancia(b) ?? Infinity))
     : visibles;
-  const libres = casos.filter(c => c.estado === 'SIN_GESTIONAR').length;
-  const enCamino = casos.length - libres;
+  const libres = alcance.filter(c => c.estado === 'SIN_GESTIONAR').length;
+  const enCamino = alcance.length - libres;
   const sufijo = prioridad ? ` ${PRIORIDADES[prioridad].nombre.toLowerCase()}s` : '';
   const radioActivo = radio !== null && yoActiva ? radio : null;
-  const enRadio = radioActivo !== null ? ` a menos de ${formatoDistancia(radioActivo)}` : '';
+  const enRadio = yoActiva ? ` a menos de ${formatoDistancia(radioActivo ?? ALCANCE_MAXIMO)}` : '';
 
   return <div className="casos-vista">
     <div className="casos-mapa"><MapaCasos casos={visibles} yo={yo} /></div>
@@ -81,7 +83,7 @@ export function CasosVista({ casos, mio }: { casos: CasoFila[]; mio: CasoFila | 
       </div>}
       
       {yoActiva && <div className="orden filtro-distancia" role="group" aria-label="Filtrar por distancia">
-        <button className="chip" aria-pressed={radio === null} onClick={() => setRadio(null)}>Cualquier distancia</button>
+        <button className="chip" aria-pressed={radio === null} onClick={() => setRadio(null)}>Hasta {formatoDistancia(ALCANCE_MAXIMO)}</button>
         {RADIOS_CERCANIA.map(r => <button key={r} className="chip" aria-pressed={radio === r} onClick={() => setRadio(r)}>Hasta {formatoDistancia(r)}</button>)}
       </div>}
 
@@ -102,10 +104,16 @@ export function CasosVista({ casos, mio }: { casos: CasoFila[]; mio: CasoFila | 
           <h2>{filtro === 'libres' ? `No hay casos${sufijo} libres${enRadio}` : `Nadie va en camino a un caso${sufijo}${enRadio}`}</h2>
           <p>{filtro === 'libres' ? 'Cuando alguien reporte una emergencia, aparece acá.' : 'Los casos que tomen los voluntarios aparecen acá con su nombre.'}</p>
           {prioridad && <button className="button button-secondary" onClick={() => setPrioridad(null)}>Ver todas las prioridades</button>}
-          {radioActivo !== null && <button className="button button-secondary" onClick={() => setRadio(null)}>Ver a cualquier distancia</button>}
+          {radioActivo !== null && <button className="button button-secondary" onClick={() => setRadio(null)}>Ver hasta {formatoDistancia(ALCANCE_MAXIMO)}</button>}
         </div>}
     </div>
   </div>;
+}
+
+// Devuelve los casos de `lista` cuyos ids están en `ids` (separados por coma), en el mismo orden.
+function soloIds(lista: CasoFila[], ids: string) {
+  const quedan = new Set(ids.split(','));
+  return lista.filter(c => quedan.has(c.id));
 }
 
 function EstadoUbicacion({ yo }: { yo: ReturnType<typeof useMiUbicacion> }) {
