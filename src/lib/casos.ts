@@ -109,8 +109,12 @@ export function haceCuanto(fecha: Date | string, ahora = Date.now()) {
   return relativo.format(Math.round(horas / 24), 'day');
 }
 
+// La base guarda en UTC y el servidor corre en UTC: sin zona explícita, una página armada en el servidor
+// mostraría la hora UTC (19:57 en vez de 16:57). Los momentos se muestran siempre en hora de Argentina.
+const ZONA_AR = 'America/Argentina/Buenos_Aires';
+
 export function fechaCorta(fecha: Date | string) {
-  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(fecha));
+  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', year: 'numeric', timeZone: ZONA_AR }).format(new Date(fecha));
 }
 
 // Fechas sin hora (cursos): se guardan a medianoche UTC, se muestran en UTC para no correrse un día.
@@ -119,7 +123,7 @@ export function fechaDia(fecha: Date | string) {
 }
 
 export function horaCorta(fecha: Date | string) {
-  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(fecha));
+  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: ZONA_AR }).format(new Date(fecha));
 }
 
 export const esCoordinador = (rol?: string) => rol === 'COORDINADOR' || rol === 'ADMIN';
