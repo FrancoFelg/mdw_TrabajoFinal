@@ -26,3 +26,12 @@ export function derivarPrioridad({ responde, respira }: RespuestasEstado): 'ROJO
   if (respuestas.includes('NO_SE')) return 'AMARILLO';
   return 'VERDE';
 }
+
+// Precisión del GPS al reportar. En un celular con GPS el margen es de pocos metros; en una computadora
+// el navegador estima por Wi-Fi o IP y puede errarle por kilómetros. Más de 100 m no alcanza para
+// mandar a alguien al lugar sin que quien reporta lo confirme o escriba la dirección.
+export const PRECISION_GPS_MAXIMA = 100;
+
+export function ubicacionAproximada(margenMetros: number) {
+  return !Number.isFinite(margenMetros) || margenMetros < 0 || margenMetros > PRECISION_GPS_MAXIMA;
+}

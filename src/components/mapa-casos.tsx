@@ -53,11 +53,12 @@ function tarjetaCaso(c: CasoFila) {
 
 const CENTRO_ARGENTINA: [number, number] = [-34.6, -58.45];
 
-type Props = { casos: CasoFila[]; solo?: boolean; etiqueta?: string; yo?: MiUbicacion };
+// verMargen: el primer encuadre muestra el círculo de precisión completo (al reportar, para ver cuánto puede errar).
+type Props = { casos: CasoFila[]; solo?: boolean; etiqueta?: string; yo?: MiUbicacion; verMargen?: boolean };
 
 // El mapa se crea una sola vez. Los casos y la ubicación propia se actualizan como capas,
 // así el refresco de 30 s y el GPS en vivo no le cambian el encuadre a quien lo está mirando.
-export default function MapaCasos({ casos, solo = false, etiqueta, yo }: Props) {
+export default function MapaCasos({ casos, solo = false, etiqueta, yo, verMargen = false }: Props) {
   const nodo = useRef<HTMLDivElement>(null);
   const L = useRef<typeof Leaflet | null>(null);
   const mapa = useRef<Leaflet.Map | null>(null);
@@ -155,6 +156,7 @@ export default function MapaCasos({ casos, solo = false, etiqueta, yo }: Props) 
       marco.current = () => {
         m.invalidateSize();
         if (cerca.length) m.fitBounds(mod.latLngBounds([...cerca, punto]), { padding: [56, 56], maxZoom: 16, animate: false });
+        else if (verMargen && circuloYo.current) m.fitBounds(circuloYo.current.getBounds(), { padding: [24, 24], maxZoom: 17, animate: false });
         else m.setView(punto, 15, { animate: false });
       };
       marco.current();

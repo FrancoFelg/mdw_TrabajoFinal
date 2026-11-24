@@ -279,3 +279,14 @@ test('la prioridad del reporte se deriva de las dos preguntas de estado', () => 
     assert.equal(derivarPrioridad({ responde, respira }), 'VERDE', `${responde}/${respira}`);
   }
 });
+
+test('una ubicación GPS con más de 100 m de margen es aproximada', () => {
+  const { ubicacionAproximada, PRECISION_GPS_MAXIMA } = cargar('src/lib/reporte.ts');
+  assert.equal(PRECISION_GPS_MAXIMA, 100);
+  // Celular con GPS: pocos metros. El límite es inclusivo.
+  for (const metros of [5, 20, 100]) assert.equal(ubicacionAproximada(metros), false, `${metros} m`);
+  // Computadora sin GPS (Wi-Fi o IP): de cientos de metros a varios kilómetros.
+  for (const metros of [101, 1200, 10000]) assert.equal(ubicacionAproximada(metros), true, `${metros} m`);
+  // Sin un margen informado no se puede afirmar que sea precisa.
+  for (const metros of [NaN, Infinity, -1]) assert.equal(ubicacionAproximada(metros), true, `${metros}`);
+});
