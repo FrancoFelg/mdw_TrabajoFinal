@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { reportarAction, fotoReporteAction } from '@/app/actions/formularios';
 import { Formulario } from './formulario';
-import { LocateFixed, CheckCircle } from 'lucide-react';
-import { MAX_FOTO, TIPOS_FOTO, OPCIONES_RESPUESTA, PREGUNTAS_ESTADO, derivarPrioridad, type RespuestasEstado } from '@/lib/reporte';
+import { LocateFixed, CheckCircle, TriangleAlert } from 'lucide-react';
+import { MAX_FOTO, TIPOS_FOTO, OPCIONES_RESPUESTA, PREGUNTAS_ESTADO, derivarPrioridad, ubicacionAproximada, type RespuestasEstado } from '@/lib/reporte';
 import { MarcaPrioridad } from './marcas';
 import { LlamarEmergencias } from './llamar-emergencias';
-import { estimarProvincia, NOMBRES_PROVINCIA, PRIORIDADES } from '@/lib/casos';
+import { estimarProvincia, formatoDistancia, NOMBRES_PROVINCIA, PRIORIDADES } from '@/lib/casos';
 import type { Prioridad, Provincia } from '@prisma/client';
 
 type GPS = { coordenada_x: number; coordenada_y: number };
+
+const MapaCasos = dynamic(() => import('./mapa-casos'), { ssr: false, loading: () => <div className="mapa mapa-chico mapa-cargando" role="status">Cargando mapa…</div> });
 type Reportado = { id: string; permisoFoto: string | null; prioridad: Prioridad };
 
 export function ReporteForm({ provincias }: { provincias: string[] }) {
@@ -20,6 +23,8 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
   const [direccion, setDireccion] = useState('');
   const [provincia, setProvincia] = useState('');
   const [gps, setGps] = useState<GPS | null>(null);
+  // Margen de error del GPS en metros. No se envía: solo decide si hace falta confirmar el punto.
+  const [margenGps, setMargenGps] = useState<number | null>(null);
   const [localizando, setLocalizando] = useState(false);
   const [mensajeGps, setMensajeGps] = useState('');
   const [foto, setFoto] = useState<File | null>(null);
@@ -70,16 +75,29 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
     setLocalizando(true);
     setMensajeGps('Buscando tu ubicación…');
     navigator.geolocation.getCurrentPosition(posicion => {
+      const margen = Math.round(posicion.coords.accuracy);
       setGps({ coordenada_x: posicion.coords.longitude, coordenada_y: posicion.coords.latitude });
+      setMargenGps(margen);
       setProvincia(estimarProvincia(posicion.coords.latitude, posicion.coords.longitude));
       setLocalizando(false);
-      setMensajeGps('Ubicación obtenida. Revisá la provincia estimada y confirmá que el incidente está en este lugar.');
+      setMensajeGps(ubicacionAproximada(margen)
+        ? `Ubicación obtenida, pero aproximada: margen de ${formatoDistancia(margen)}.`
+        : `Ubicación obtenida con un margen de ${formatoDistancia(margen)}. Revisá en el mapa que el incidente esté en este lugar.`);
     }, fallo => {
       setGps(null);
+      setMargenGps(null);
       setLocalizando(false);
       setMensajeGps(fallo.code === 1 ? 'No diste permiso de ubicación. Escribí la dirección o reintentá el GPS.' : 'No pudimos obtener tu ubicación. Escribí la dirección o reintentá el GPS.');
       entradaDireccion.current?.focus();
     }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+  }
+
+  function usarDireccionManual() {
+    setGps(null);
+    setMargenGps(null);
+    setMensajeGps('Escribí la dirección del incidente.');
+    // El campo aparece al quitar el GPS: se enfoca en el siguiente cuadro.
+    requestAnimationFrame(() => entradaDireccion.current?.focus());
   }
 
   async function subirFoto(reporte: Reportado) {
@@ -171,13 +189,20 @@ export function ReporteForm({ provincias }: { provincias: string[] }) {
           <LocateFixed size={20} aria-hidden="true" />{localizando ? 'Buscando ubicación…' : 'Usar mi ubicación GPS'}</button>
         <p className="muted" role="status">{mensajeGps || 'Usá GPS si estás junto al incidente, o escribí la dirección.'}</p>
         {gps ? <div className="stack">
-          <p>Latitud {gps.coordenada_y.toFixed(5)}, longitud {gps.coordenada_x.toFixed(5)}.</p>
+          <MapaCasos key={`${gps.coordenada_y},${gps.coordenada_x}`} solo verMargen casos={[]}
+            yo={{ estado: 'activa', lat: gps.coordenada_y, lng: gps.coordenada_x, precision: margenGps ?? 0 }} />
+          {margenGps !== null && ubicacionAproximada(margenGps) && <div className="stack">
+            <div className="aviso" role="alert"><TriangleAlert size={18} aria-hidden="true" />
+              <span>Tu ubicación es aproximada: el incidente puede estar hasta a {formatoDistancia(margenGps)} de este punto. Pasa en computadoras o sin señal de GPS. Escribí la dirección para que lleguen al lugar correcto.</span></div>
+            <button type="button" className="button" onClick={usarDireccionManual}>Escribir la dirección</button>
+            <label className="casilla"><input type="checkbox" name="confirmarUbicacion" required />El punto del mapa es el lugar del incidente</label>
+          </div>}
           <div className="field"><label htmlFor="provincia">Provincia del incidente</label>
             <select className="input" id="provincia" name="provincia" required value={provincia} onChange={e => setProvincia(e.target.value)}>
               <option value="">Seleccioná una provincia</option>
               {provincias.map(p => <option key={p} value={p}>{NOMBRES_PROVINCIA[p as Provincia]}</option>)}
             </select></div>
-          <button type="button" className="button button-secondary" onClick={() => { setGps(null); setMensajeGps('Escribí la dirección del incidente.'); }}>Usar dirección manual</button>
+          {!(margenGps !== null && ubicacionAproximada(margenGps)) && <button type="button" className="button button-secondary" onClick={usarDireccionManual}>Usar dirección manual</button>}
         </div> : <div className="field"><label htmlFor="direccion">Dirección del incidente</label>
           <input ref={entradaDireccion} className="input" id="direccion" name="direccion" value={direccion} required minLength={3} maxLength={250}
             placeholder="Calle, altura, localidad y provincia" autoComplete="off" aria-describedby="direccion-ayuda"
